@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+.next/
+out/
+
+# Env (never commit secrets)
+.env
+.env.local
+.env.*.local
+.env.production
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# TLS keys (nginx/ssl — только локально / на сервере)
+nginx/ssl/*.pem
+nginx/ssl/*.crt
+nginx/ssl/*.key
+
+# Logs
+*.log
+npm-debug.log*
