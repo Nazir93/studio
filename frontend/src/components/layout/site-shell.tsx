@@ -5,7 +5,6 @@ import { Header } from "./header";
 import { ConditionalNavBar } from "./conditional-navbar";
 import { Footer } from "./footer";
 import { MobileBottomNav } from "./mobile-bottom-nav";
-import { CallFab } from "./call-fab";
 import { CustomCursor } from "../ui/custom-cursor";
 import { ContactModal } from "../ui/contact-modal";
 
@@ -36,7 +35,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <Footer />
-      <CallFab />
       <MobileBottomNav />
       {/* Отступ под фиксированный таббар + home indicator */}
       <div

@@ -123,15 +123,14 @@ export function MaskedVideoText({
     void v.play().catch(() => {});
   }, [ready, reduceMotion, text, videoSrc]);
 
+  const strokeStyle = {
+    color: "transparent" as const,
+    WebkitTextStroke: "1.5px color-mix(in srgb, var(--text) 25%, transparent)",
+  };
+
   if (reduceMotion || disableVideo) {
     return (
-      <span
-        className={`block ${measureClassName} ${className}`}
-        style={{
-          color: "transparent",
-          WebkitTextStroke: "1.5px color-mix(in srgb, var(--text) 25%, transparent)",
-        }}
-      >
+      <span className={`block ${measureClassName} ${className}`} style={strokeStyle}>
         {text}
       </span>
     );
@@ -151,9 +150,19 @@ export function MaskedVideoText({
         {text}
       </div>
 
+      {!ready && (
+        <span
+          className={`absolute left-0 top-0 block w-full ${measureClassName}`}
+          style={strokeStyle}
+          aria-hidden
+        >
+          {text}
+        </span>
+      )}
+
       {ready && (
         <div className="absolute inset-0">
-          <svg width="0" height="0" className="absolute" aria-hidden>
+          <svg width="1" height="1" className="pointer-events-none absolute overflow-hidden opacity-0" aria-hidden>
             <defs>
               <mask
                 id={maskId}

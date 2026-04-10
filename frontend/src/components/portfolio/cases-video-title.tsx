@@ -134,6 +134,11 @@ export function CasesVideoTitle() {
     void v.play().catch(() => {});
   }, [ready, reduceMotion]);
 
+  const strokeTitleStyle = {
+    color: "transparent" as const,
+    WebkitTextStroke: "1.5px color-mix(in srgb, var(--text) 28%, transparent)",
+  };
+
   if (reduceMotion || !allowVideo) {
     return (
       <h1 className={`${HEADING_CLASS} ${HEADING_MARGIN}`} style={{ color: "var(--text)" }}>
@@ -156,9 +161,15 @@ export function CasesVideoTitle() {
         {CASES_TITLE}
       </div>
 
+      {!ready && (
+        <div className={`absolute left-0 top-0 w-full ${HEADING_CLASS}`} style={strokeTitleStyle} aria-hidden>
+          {CASES_TITLE}
+        </div>
+      )}
+
       {ready && (
         <div className="absolute inset-0">
-          <svg width="0" height="0" className="absolute" aria-hidden>
+          <svg width="1" height="1" className="pointer-events-none absolute overflow-hidden opacity-0" aria-hidden>
             <defs>
               <mask
                 id={maskId}

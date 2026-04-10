@@ -12,6 +12,15 @@ export type NavSection = {
   items: NavItem[];
 };
 
+/** Верхняя строка шапки (десктоп): без выпадающих списков — как в макете */
+export const HEADER_TOP_LINKS: NavItem[] = [
+  { href: "/portfolio", label: "Кейсы" },
+  { href: "/services", label: "Услуги" },
+  { href: "/services/ai-automation", label: "ИИ и автоматизация" },
+  { href: "/blog", label: "Новости" },
+  { href: "/brief?source=header", label: "Проект" },
+];
+
 export const NAV_SECTIONS: NavSection[] = [
   {
     label: "Кейсы",

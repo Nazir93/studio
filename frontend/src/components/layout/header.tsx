@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { X, Sun, Moon, Send } from "lucide-react";
 import { PHONE, PHONE_RAW, EMAIL, SITE_NAME, SOCIAL_LINKS } from "@/lib/constants";
 import { WhatsAppGlyph, MaxMessengerIcon } from "@/components/ui/contact-channels-bar";
-import { NAV_SECTIONS } from "@/lib/nav-config";
+import { HEADER_TOP_LINKS, NAV_SECTIONS } from "@/lib/nav-config";
 import {
   FONT_UI_MONO_NAV,
   FONT_UI_MONO_SECTION,
@@ -382,17 +382,8 @@ export function Header() {
 }
 
 export function NavBar() {
-  const [openSection, setOpenSection] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { isDark, toggleTheme } = useTheme();
-  const handleEnter = (label: string) => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setOpenSection(label);
-  };
-
-  const handleLeave = () => {
-    timeoutRef.current = setTimeout(() => setOpenSection(null), 200);
-  };
+  const pathname = usePathname();
 
   return (
     <div
@@ -414,63 +405,43 @@ export function NavBar() {
               sizes="(max-width: 640px) 80px, 96px"
             />
           </Link>
-          <div className={`hidden md:flex items-center gap-3 ${FONT_UI_MONO_CONTACT}`} style={{ color: "var(--text-muted)" }}>
-            <a href={`tel:${PHONE_RAW}`} className="hover:opacity-100 transition-opacity">{PHONE}</a>
-            <span style={{ color: "var(--text-subtle)" }}>/</span>
-            <a href={`mailto:${EMAIL}`} className="hover:opacity-100 transition-opacity max-w-[200px] truncate xl:max-w-none xl:overflow-visible xl:whitespace-normal">{EMAIL}</a>
+          <div className={`hidden sm:flex items-center gap-2 sm:gap-3 ${FONT_UI_MONO_CONTACT}`} style={{ color: "var(--text-muted)" }}>
+            <a href={`tel:${PHONE_RAW}`} className="shrink-0 whitespace-nowrap hover:opacity-100 transition-opacity">
+              {PHONE}
+            </a>
+            <span className="shrink-0" style={{ color: "var(--text-subtle)" }}>
+              /
+            </span>
+            <a
+              href={`mailto:${EMAIL}`}
+              className="min-w-0 hover:opacity-100 transition-opacity max-w-[min(42vw,200px)] truncate sm:max-w-[220px] md:max-w-[260px] xl:max-w-none xl:whitespace-normal"
+            >
+              {EMAIL}
+            </a>
           </div>
         </div>
 
-        {/* Right: Navigation with dropdowns + switch */}
-        <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
-          {NAV_SECTIONS.map((section) => (
-            <div
-              key={section.label}
-              className="relative"
-              onMouseEnter={() => handleEnter(section.label)}
-              onMouseLeave={handleLeave}
-            >
-              <button
-                type="button"
-                className={`${FONT_UI_MONO_NAV} transition-colors py-2`}
-                style={{ color: openSection === section.label ? "var(--text)" : "var(--text-muted)" }}
-              >
-                {section.label}
-              </button>
-
-              {openSection === section.label && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3">
-                  <div
-                    className={`py-2 backdrop-blur-xl ${section.label === "Кейсы" ? "min-w-[min(100vw-2rem,320px)]" : "min-w-[240px]"}`}
-                    style={{
-                      backgroundColor: isDark ? "rgba(20,20,20,0.95)" : "rgba(255,255,255,0.95)",
-                      border: "1px solid var(--border)",
-                      borderRadius: "12px",
-                    }}
-                  >
-                    {section.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`${FONT_UI_MONO_MENU_BODY} block px-5 py-2.5 transition-colors duration-200`}
-                        style={{ color: "var(--text-muted)" }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.color = "var(--text)";
-                          e.currentTarget.style.backgroundColor = "var(--bg-secondary)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.color = "var(--text-muted)";
-                          e.currentTarget.style.backgroundColor = "transparent";
-                        }}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+        {/* Плоские ссылки + тема (как в макете: Кейсы · Услуги · …) */}
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-6 2xl:gap-7 min-w-0 flex-1 justify-end">
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-1 xl:gap-x-5">
+            {HEADER_TOP_LINKS.map((item) => {
+              const pathOnly = item.href.split("?")[0];
+              const isActive =
+                pathOnly === "/"
+                  ? pathname === "/"
+                  : pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${FONT_UI_MONO_NAV} shrink-0 whitespace-nowrap py-2 transition-colors`}
+                  style={{ color: isActive ? "var(--text)" : "var(--text-muted)" }}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
 
           {/* Theme toggle */}
           <button

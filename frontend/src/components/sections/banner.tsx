@@ -7,6 +7,8 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { MaskedVideoText } from "@/components/effects/masked-video-text";
 import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
+import { useTheme } from "@/lib/theme-context";
+import { cn } from "@/lib/utils";
 const BANNER_GHOST_VIDEO = "/videos/banner-title-ghost.mp4";
 const BANNER_GHOST_MEASURE_CLASS =
   "font-akony text-[clamp(1.05rem,4.6vw,2.55rem)] font-normal leading-[0.95] tracking-[0.02em] uppercase " +
@@ -84,19 +86,44 @@ const OFFER_LOGO = "/logo.png";
 /** Фон «киноплёнки» — только мобильный баннер (на десктопе не показываем) */
 const BANNER_FILM_VIDEO = "/videos/film-old-movies-effects.mp4";
 
-/** Круг «Обсудить проект» → бриф; на мобильных компактнее, на lg — крупный */
+/** Круг с лого «Обсудить проект» — моб.: текст внутри круга под лого; десктоп: чёрный круг по центру */
 function BannerOfferCircle() {
   return (
     <Link
       href="/brief?source=banner-offer"
-      className="group absolute bottom-12 right-4 z-[21] flex h-[min(7.75rem,28vw)] w-[min(7.75rem,28vw)] min-h-[7rem] min-w-[7rem] overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 min-[480px]:bottom-[7.5rem] min-[480px]:right-5 min-[480px]:h-[min(8.5rem,30vw)] min-[480px]:w-[min(8.5rem,30vw)] min-[480px]:min-h-[7.75rem] min-[480px]:min-w-[7.75rem] lg:bottom-[4.5rem] lg:right-[11.5rem] lg:min-h-[11rem] lg:min-w-[11rem] lg:h-[min(14rem,32vw)] lg:w-[min(14rem,32vw)]"
+      className="group relative z-[1] flex h-[7rem] w-[7rem] shrink-0 overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 min-[480px]:h-[7.75rem] min-[480px]:w-[7.75rem] lg:h-[min(11.5rem,22vw)] lg:w-[min(11.5rem,22vw)] lg:min-h-[10.5rem] lg:min-w-[10.5rem]"
       style={{
         borderColor: "var(--border)",
         boxShadow: "0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 16px 40px rgba(0,0,0,0.35)",
       }}
       aria-label="Обсудить проект — бриф"
     >
-        <span className="pointer-events-none absolute inset-0 bg-[var(--bg)]" aria-hidden />
+      <span className="pointer-events-none absolute inset-0 bg-[var(--bg)]" aria-hidden />
+
+      {/* Мобильные / планшеты: лого сверху, подпись внизу внутри круга */}
+      <div className="absolute inset-0 flex flex-col lg:hidden">
+        <div className="relative min-h-0 flex-1 w-full">
+          <Image
+            src={OFFER_LOGO}
+            alt=""
+            fill
+            className="object-contain object-center p-2 pb-0 transition-transform duration-300 group-hover:scale-[1.03]"
+            sizes="112px"
+          />
+        </div>
+        <div
+          className="shrink-0 bg-gradient-to-t from-black/75 via-black/45 to-transparent px-2 pb-2 pt-3"
+          aria-hidden
+        >
+          <div className="font-akony text-[8px] font-normal uppercase leading-[1.1] tracking-[0.08em] text-white min-[400px]:text-[9px]">
+            <span className="block drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">Обсудить</span>
+            <span className="mt-0.5 block drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">проект</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Десктоп: лого + чёрный круг с текстом по центру */}
+      <div className="absolute inset-0 hidden lg:block">
         <Image
           src={OFFER_LOGO}
           alt=""
@@ -113,7 +140,8 @@ function BannerOfferCircle() {
             <span className="block">проект</span>
           </span>
         </span>
-      </Link>
+      </div>
+    </Link>
   );
 }
 
@@ -322,6 +350,7 @@ export function BannerSection() {
   const time = useCurrentTime();
   const active = SLIDES[activeIdx];
   const allowHeavyMedia = useIsDesktopLg();
+  const { isDark } = useTheme();
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 200);
@@ -393,7 +422,10 @@ export function BannerSection() {
         aria-hidden
       >
         <video
-          className="absolute inset-0 h-full w-full scale-105 object-cover opacity-[0.42]"
+          className={cn(
+            "absolute inset-0 h-full w-full scale-105 object-cover",
+            isDark ? "opacity-[0.42]" : "opacity-[0.34]"
+          )}
           autoPlay
           muted
           loop
@@ -405,10 +437,21 @@ export function BannerSection() {
         <div
           className="absolute inset-0"
           style={{
-            background:
-              "linear-gradient(to bottom, var(--bg) 0%, transparent 28%, transparent 72%, var(--bg) 100%), linear-gradient(to right, var(--bg) 0%, transparent 18%, transparent 82%, var(--bg) 100%)",
+            background: isDark
+              ? "linear-gradient(to bottom, var(--bg) 0%, transparent 28%, transparent 72%, var(--bg) 100%), linear-gradient(to right, var(--bg) 0%, transparent 18%, transparent 82%, var(--bg) 100%)"
+              : "linear-gradient(to bottom, color-mix(in srgb, var(--bg) 96%, transparent) 0%, color-mix(in srgb, var(--bg) 55%, transparent) 18%, rgba(255,255,255,0.5) 42%, color-mix(in srgb, var(--bg) 55%, transparent) 78%, color-mix(in srgb, var(--bg) 96%, transparent) 100%), linear-gradient(to right, color-mix(in srgb, var(--bg) 92%, transparent) 0%, transparent 22%, transparent 78%, color-mix(in srgb, var(--bg) 92%, transparent) 100%)",
           }}
         />
+        {/* Светлая тема: лёгкая «дымка» под текстом баннера */}
+        {!isDark && (
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 115% 65% at 50% 42%, rgba(250,250,250,0.82) 0%, rgba(250,250,250,0.28) 52%, transparent 72%)",
+            }}
+          />
+        )}
         <div className="absolute left-3 top-[max(0.75rem,env(safe-area-inset-top))] flex items-center gap-2 sm:left-4">
           <span className="h-2 w-2 shrink-0 rounded-full animate-pulse" style={{ backgroundColor: "#ff3333" }} />
           <span className="font-matrix text-[8px] uppercase tracking-[0.2em] sm:text-[9px]" style={{ color: "#ff3333" }}>
@@ -419,13 +462,13 @@ export function BannerSection() {
 
       {/* ===== CONTENT ===== */}
       <div className="relative z-[10] flex h-full min-h-0 flex-col justify-between">
-        {/* ── TOP BAR ── */}
-        {/* На экранах &lt; lg шапка уже в NavBar (site shell) — иначе два логотипа и две «шапки» */}
+        {/* ── TOP BAR ── Отключено: контакты и ссылки — в глобальной NavBar (иначе дубль с логотипом) */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={visible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="hidden lg:flex items-start justify-between pad-x-hero pt-4 sm:pt-5 md:pt-6"
+          className="hidden"
+          aria-hidden
         >
           <div className="flex items-center gap-2.5 sm:gap-3">
             <Link href="/" className="group block relative w-20 h-9 sm:w-24 sm:h-10 md:w-28 md:h-11 shrink-0">
@@ -491,7 +534,11 @@ export function BannerSection() {
           initial={{ opacity: 0 }}
           animate={visible ? { opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex min-h-0 flex-1 flex-col justify-center pad-x-hero"
+          className={cn(
+            "flex min-h-0 flex-1 flex-col justify-center pad-x-hero",
+            !isDark &&
+              "max-lg:[--banner-text-shadow:0_1px_0_rgba(255,255,255,0.95),0_0_18px_rgba(250,250,250,0.9),0_0_1px_rgba(0,0,0,0.12)] max-lg:[&_h1]:[text-shadow:var(--banner-text-shadow)] max-lg:[&_p]:[text-shadow:var(--banner-text-shadow)] max-lg:[&_.font-matrix]:[text-shadow:var(--banner-text-shadow)] max-lg:[&_.font-akony]:[text-shadow:var(--banner-text-shadow)]"
+          )}
         >
           <div className="relative z-[1] mb-4 flex min-w-0 items-start gap-2.5 sm:mb-6 sm:gap-4 lg:items-end">
             <div className="flex shrink-0 flex-col items-center gap-2 pb-0 pt-0.5 sm:pb-2 sm:pt-0 lg:pb-1">
@@ -598,10 +645,13 @@ export function BannerSection() {
               ))}
             </motion.div>
           </AnimatePresence>
-        </motion.div>
 
-        {/* Круг оффера — тот же контейнер, что и «Далее», вплотную слева от стрелки */}
-        <BannerOfferCircle />
+          {/* Круг с лого — сразу под последней строкой списка (выровнено с текстом пунктов) */}
+          <div className="relative z-[1] mt-5 flex w-full max-w-xl items-center gap-3 sm:mt-6">
+            <span className="pointer-events-none w-4 shrink-0" aria-hidden />
+            <BannerOfferCircle />
+          </div>
+        </motion.div>
 
         {/* ── RIGHT: copyright + arrow ── */}
         <div className="banner-corner-tr absolute bottom-16 z-20 flex flex-col items-end gap-3 sm:bottom-20 sm:gap-5 md:bottom-24">
