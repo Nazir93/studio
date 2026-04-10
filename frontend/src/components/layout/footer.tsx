@@ -146,12 +146,6 @@ export function Footer() {
             >
               {PHONE}
             </a>
-            <Link
-              href="/fonts"
-              className="transition-colors duration-200 hover:text-[var(--text)]"
-            >
-              Шрифты
-            </Link>
           </div>
         </div>
       </div>

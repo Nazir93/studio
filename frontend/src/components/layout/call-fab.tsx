@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Phone } from "lucide-react";
-import { PHONE_RAW } from "@/lib/constants";
 
 /**
- * Круглая кнопка звонка на всех страницах кроме главной и /brief.
+ * Круг «Обсудить проект» на всех страницах кроме главной и /brief.
  * Не пересекается с нижним таббаром (отступ снизу).
  */
 export function CallFab() {
@@ -15,17 +13,22 @@ export function CallFab() {
 
   return (
     <Link
-      href={`tel:${PHONE_RAW}`}
-      className="fixed z-[60] flex h-12 w-12 items-center justify-center rounded-full border shadow-lg transition-[transform,box-shadow] hover:scale-[1.04] active:scale-[0.98] sm:h-14 sm:w-14 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))] max-lg:right-[max(1rem,env(safe-area-inset-right,0px))] lg:bottom-8 lg:right-8"
+      href="/brief?source=fab"
+      className="fixed z-[60] flex h-14 w-14 flex-col items-center justify-center rounded-full border px-1.5 text-center shadow-lg transition-[transform,box-shadow] hover:scale-[1.04] active:scale-[0.98] sm:h-16 sm:w-16 max-lg:bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px))] max-lg:right-[max(1rem,env(safe-area-inset-right,0px))] lg:bottom-8 lg:right-8"
       style={{
         borderColor: "var(--border)",
         backgroundColor: "var(--bg-secondary)",
         color: "var(--text)",
         boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
       }}
-      aria-label={`Позвонить ${PHONE_RAW}`}
+      aria-label="Обсудить проект — заявка"
     >
-      <Phone className="h-6 w-6" strokeWidth={1.5} aria-hidden />
+      <span className="font-akony text-[7px] font-normal uppercase leading-[1.05] tracking-[0.06em] sm:text-[8px]">
+        Обсудить
+      </span>
+      <span className="font-akony mt-0.5 text-[7px] font-normal uppercase leading-[1.05] tracking-[0.06em] sm:text-[8px]">
+        проект
+      </span>
     </Link>
   );
 }

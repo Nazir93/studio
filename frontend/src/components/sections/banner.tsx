@@ -4,9 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PHONE_RAW } from "@/lib/constants";
 import { MaskedVideoText } from "@/components/effects/masked-video-text";
 import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 const BANNER_GHOST_VIDEO = "/videos/banner-title-ghost.mp4";
@@ -83,33 +81,21 @@ const SLIDES = [
 
 const SWITCH_SOUND = "/sounds/banner-switch.mp3";
 const OFFER_LOGO = "/logo.png";
+/** Фон «киноплёнки» — только мобильный баннер (на десктопе не показываем) */
+const BANNER_FILM_VIDEO = "/videos/film-old-movies-effects.mp4";
 
-/** Мобильные / планшеты: круглый звонок. Десктоп: большой круг → бриф */
+/** Круг «Обсудить проект» → бриф; на мобильных компактнее, на lg — крупный */
 function BannerOfferCircle() {
   return (
-    <>
-      <a
-        href={`tel:${PHONE_RAW}`}
-        className="absolute bottom-[7.25rem] right-4 z-[21] flex h-[3.75rem] w-[3.75rem] items-center justify-center rounded-full border text-center shadow-lg transition-[transform,box-shadow] active:scale-[0.97] min-[480px]:bottom-[7.5rem] min-[480px]:right-5 min-[480px]:h-16 min-[480px]:w-16 lg:hidden"
-        style={{
-          borderColor: "var(--border)",
-          backgroundColor: "var(--bg-secondary)",
-          color: "var(--text)",
-          boxShadow: "0 10px 28px rgba(0,0,0,0.4)",
-        }}
-        aria-label="Позвонить — обсудить проект"
-      >
-        <Phone className="h-[1.35rem] w-[1.35rem] min-[480px]:h-7 min-[480px]:w-7" strokeWidth={1.5} aria-hidden />
-      </a>
-      <Link
-        href="/brief?source=banner-offer"
-        className="group absolute bottom-12 right-[7.5rem] z-[21] hidden h-[min(11.5rem,38vw)] w-[min(11.5rem,38vw)] min-h-[9.5rem] min-w-[9.5rem] overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:bottom-14 sm:right-[8.5rem] lg:flex lg:bottom-[4.5rem] lg:right-[11.5rem] lg:min-h-[11rem] lg:min-w-[11rem] lg:h-[min(14rem,32vw)] lg:w-[min(14rem,32vw)]"
-        style={{
-          borderColor: "var(--border)",
-          boxShadow: "0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 16px 40px rgba(0,0,0,0.35)",
-        }}
-        aria-label="Обсудить проект — бриф"
-      >
+    <Link
+      href="/brief?source=banner-offer"
+      className="group absolute bottom-12 right-4 z-[21] flex h-[min(7.75rem,28vw)] w-[min(7.75rem,28vw)] min-h-[7rem] min-w-[7rem] overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 min-[480px]:bottom-[7.5rem] min-[480px]:right-5 min-[480px]:h-[min(8.5rem,30vw)] min-[480px]:w-[min(8.5rem,30vw)] min-[480px]:min-h-[7.75rem] min-[480px]:min-w-[7.75rem] lg:bottom-[4.5rem] lg:right-[11.5rem] lg:min-h-[11rem] lg:min-w-[11rem] lg:h-[min(14rem,32vw)] lg:w-[min(14rem,32vw)]"
+      style={{
+        borderColor: "var(--border)",
+        boxShadow: "0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 16px 40px rgba(0,0,0,0.35)",
+      }}
+      aria-label="Обсудить проект — бриф"
+    >
         <span className="pointer-events-none absolute inset-0 bg-[var(--bg)]" aria-hidden />
         <Image
           src={OFFER_LOGO}
@@ -122,13 +108,12 @@ function BannerOfferCircle() {
           className="pointer-events-none absolute left-1/2 top-1/2 z-[2] flex aspect-square w-[54%] max-w-[7.25rem] min-w-[4.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black px-2 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] sm:min-w-[5rem] md:max-w-[8rem]"
           aria-hidden
         >
-          <span className="flex flex-col items-center gap-[0.45em] font-akony text-center font-normal uppercase leading-none tracking-[0.02em] text-[clamp(0.34rem,1.65vw,0.5rem)] text-white sm:gap-[0.52em] sm:text-[clamp(0.38rem,1.4vw,0.56rem)] md:gap-[0.58em] md:text-[clamp(0.42rem,1.25vw,0.6rem)]">
+          <span className="flex flex-col items-center gap-[0.45em] font-akony text-center font-normal uppercase leading-none tracking-[0.02em] text-[clamp(0.32rem,2.8vw,0.5rem)] text-white sm:gap-[0.52em] sm:text-[clamp(0.36rem,1.4vw,0.56rem)] md:gap-[0.58em] md:text-[clamp(0.42rem,1.25vw,0.6rem)]">
             <span className="block">Обсудить</span>
             <span className="block">проект</span>
           </span>
         </span>
       </Link>
-    </>
   );
 }
 
@@ -401,6 +386,36 @@ export function BannerSection() {
 
       {/* Интерактивная сетка точек */}
       <DotGrid />
+
+      {/* Видео «киноплёнка» — только мобильная вёрстка баннера */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] overflow-hidden lg:hidden"
+        aria-hidden
+      >
+        <video
+          className="absolute inset-0 h-full w-full scale-105 object-cover opacity-[0.42]"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+        >
+          <source src={BANNER_FILM_VIDEO} type="video/mp4" />
+        </video>
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, var(--bg) 0%, transparent 28%, transparent 72%, var(--bg) 100%), linear-gradient(to right, var(--bg) 0%, transparent 18%, transparent 82%, var(--bg) 100%)",
+          }}
+        />
+        <div className="absolute left-3 top-[max(0.75rem,env(safe-area-inset-top))] flex items-center gap-2 sm:left-4">
+          <span className="h-2 w-2 shrink-0 rounded-full animate-pulse" style={{ backgroundColor: "#ff3333" }} />
+          <span className="font-matrix text-[8px] uppercase tracking-[0.2em] sm:text-[9px]" style={{ color: "#ff3333" }}>
+            rec
+          </span>
+        </div>
+      </div>
 
       {/* ===== CONTENT ===== */}
       <div className="relative z-[10] flex h-full min-h-0 flex-col justify-between">
