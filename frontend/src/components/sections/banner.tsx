@@ -2,12 +2,17 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PHONE_RAW } from "@/lib/constants";
 import { MaskedVideoText } from "@/components/effects/masked-video-text";
+import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 const BANNER_GHOST_VIDEO = "/videos/banner-title-ghost.mp4";
 const BANNER_GHOST_MEASURE_CLASS =
-  "font-akony text-[clamp(1.65rem,5.5vw,4.25rem)] font-normal leading-[0.95] tracking-[0.02em] uppercase";
+  "font-akony text-[clamp(1.05rem,4.6vw,2.55rem)] font-normal leading-[0.95] tracking-[0.02em] uppercase " +
+  "sm:text-[clamp(1.15rem,4vw,2.85rem)] md:text-[clamp(1.25rem,3.4vw,3.2rem)] lg:text-[clamp(1.45rem,3.8vw,3.85rem)]";
 
 const SLIDES = [
   {
@@ -79,36 +84,51 @@ const SLIDES = [
 const SWITCH_SOUND = "/sounds/banner-switch.mp3";
 const OFFER_LOGO = "/logo.png";
 
-/** Круг на баннере: крупный логотип по кругу, в центре — чёрный диск с «Обсудить проект» */
+/** Мобильные / планшеты: круглый звонок. Десктоп: большой круг → бриф */
 function BannerOfferCircle() {
   return (
-    <Link
-      href="/brief?source=banner-offer"
-      className="group absolute bottom-12 right-[7.5rem] z-[21] hidden h-[min(11.5rem,38vw)] w-[min(11.5rem,38vw)] min-h-[9.5rem] min-w-[9.5rem] overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:bottom-14 sm:right-[8.5rem] lg:flex lg:bottom-[4.5rem] lg:right-[11.5rem] lg:min-h-[11rem] lg:min-w-[11rem] lg:h-[min(14rem,32vw)] lg:w-[min(14rem,32vw)]"
-      style={{
-        borderColor: "var(--border)",
-        boxShadow: "0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 16px 40px rgba(0,0,0,0.35)",
-      }}
-      aria-label="Обсудить проект"
-    >
-      <span className="pointer-events-none absolute inset-0 bg-[var(--bg)]" aria-hidden />
-      <Image
-        src={OFFER_LOGO}
-        alt=""
-        fill
-        className="object-contain object-center p-0 opacity-[0.99] transition-transform duration-300 group-hover:scale-[1.02]"
-        sizes="(max-width: 768px) 200px, 260px"
-      />
-      <span
-        className="pointer-events-none absolute left-1/2 top-1/2 z-[2] flex aspect-square w-[54%] max-w-[7.25rem] min-w-[4.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black px-2 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] sm:min-w-[5rem] md:max-w-[8rem]"
-        aria-hidden
+    <>
+      <a
+        href={`tel:${PHONE_RAW}`}
+        className="absolute bottom-[7.25rem] right-4 z-[21] flex h-[3.75rem] w-[3.75rem] items-center justify-center rounded-full border text-center shadow-lg transition-[transform,box-shadow] active:scale-[0.97] min-[480px]:bottom-[7.5rem] min-[480px]:right-5 min-[480px]:h-16 min-[480px]:w-16 lg:hidden"
+        style={{
+          borderColor: "var(--border)",
+          backgroundColor: "var(--bg-secondary)",
+          color: "var(--text)",
+          boxShadow: "0 10px 28px rgba(0,0,0,0.4)",
+        }}
+        aria-label="Позвонить — обсудить проект"
       >
-        <span className="flex flex-col items-center gap-[0.45em] font-akony text-center font-normal uppercase leading-none tracking-[0.02em] text-[clamp(0.34rem,1.65vw,0.5rem)] text-white sm:gap-[0.52em] sm:text-[clamp(0.38rem,1.4vw,0.56rem)] md:gap-[0.58em] md:text-[clamp(0.42rem,1.25vw,0.6rem)]">
-          <span className="block">Обсудить</span>
-          <span className="block">проект</span>
+        <Phone className="h-[1.35rem] w-[1.35rem] min-[480px]:h-7 min-[480px]:w-7" strokeWidth={1.5} aria-hidden />
+      </a>
+      <Link
+        href="/brief?source=banner-offer"
+        className="group absolute bottom-12 right-[7.5rem] z-[21] hidden h-[min(11.5rem,38vw)] w-[min(11.5rem,38vw)] min-h-[9.5rem] min-w-[9.5rem] overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:bottom-14 sm:right-[8.5rem] lg:flex lg:bottom-[4.5rem] lg:right-[11.5rem] lg:min-h-[11rem] lg:min-w-[11rem] lg:h-[min(14rem,32vw)] lg:w-[min(14rem,32vw)]"
+        style={{
+          borderColor: "var(--border)",
+          boxShadow: "0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 16px 40px rgba(0,0,0,0.35)",
+        }}
+        aria-label="Обсудить проект — бриф"
+      >
+        <span className="pointer-events-none absolute inset-0 bg-[var(--bg)]" aria-hidden />
+        <Image
+          src={OFFER_LOGO}
+          alt=""
+          fill
+          className="object-contain object-center p-0 opacity-[0.99] transition-transform duration-300 group-hover:scale-[1.02]"
+          sizes="(max-width: 768px) 200px, 260px"
+        />
+        <span
+          className="pointer-events-none absolute left-1/2 top-1/2 z-[2] flex aspect-square w-[54%] max-w-[7.25rem] min-w-[4.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black px-2 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] sm:min-w-[5rem] md:max-w-[8rem]"
+          aria-hidden
+        >
+          <span className="flex flex-col items-center gap-[0.45em] font-akony text-center font-normal uppercase leading-none tracking-[0.02em] text-[clamp(0.34rem,1.65vw,0.5rem)] text-white sm:gap-[0.52em] sm:text-[clamp(0.38rem,1.4vw,0.56rem)] md:gap-[0.58em] md:text-[clamp(0.42rem,1.25vw,0.6rem)]">
+            <span className="block">Обсудить</span>
+            <span className="block">проект</span>
+          </span>
         </span>
-      </span>
-    </Link>
+      </Link>
+    </>
   );
 }
 
@@ -309,30 +329,46 @@ function DotGrid() {
 }
 
 export function BannerSection() {
+  const router = useRouter();
   const switchSoundRef = useRef<HTMLAudioElement | null>(null);
   const isFirstMountRef = useRef(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [visible, setVisible] = useState(false);
   const time = useCurrentTime();
   const active = SLIDES[activeIdx];
+  const allowHeavyMedia = useIsDesktopLg();
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 200);
     return () => clearTimeout(t);
   }, []);
 
+  /** Предзагрузка маршрутов разделов — быстрее тап по вкладкам на мобильных */
+  useEffect(() => {
+    SLIDES.forEach((slide) => {
+      router.prefetch(slide.href);
+    });
+  }, [router]);
+
   useEffect(() => {
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false;
       return;
     }
+    if (!allowHeavyMedia) return;
     if (!switchSoundRef.current) {
       switchSoundRef.current = new Audio(SWITCH_SOUND);
+      try {
+        switchSoundRef.current.preload = "auto";
+      } catch {
+        /* ignore */
+      }
     }
-    switchSoundRef.current.currentTime = 0;
-    switchSoundRef.current.volume = 0.5;
-    switchSoundRef.current.play().catch(() => {});
-  }, [activeIdx]);
+    const a = switchSoundRef.current;
+    a.currentTime = 0;
+    a.volume = 0.35;
+    void a.play().catch(() => {});
+  }, [activeIdx, allowHeavyMedia]);
 
   const goNext = () => setActiveIdx((p) => (p + 1) % SLIDES.length);
 
@@ -442,8 +478,8 @@ export function BannerSection() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="flex min-h-0 flex-1 flex-col justify-center pad-x-hero"
         >
-          <div className="relative z-[1] flex min-w-0 items-end gap-2.5 sm:gap-4 mb-4 sm:mb-6">
-            <div className="flex shrink-0 flex-col items-center gap-2 pb-1 sm:pb-2">
+          <div className="relative z-[1] mb-4 flex min-w-0 items-start gap-2.5 sm:mb-6 sm:gap-4 lg:items-end">
+            <div className="flex shrink-0 flex-col items-center gap-2 pb-0 pt-0.5 sm:pb-2 sm:pt-0 lg:pb-1">
               <button
                 type="button"
                 onClick={goNext}
@@ -478,7 +514,7 @@ export function BannerSection() {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="font-akony text-[clamp(1.65rem,5.5vw,4.25rem)] font-normal leading-[0.95] tracking-[0.02em] uppercase"
+                  className={BANNER_GHOST_MEASURE_CLASS}
                   style={{ color: "var(--text)" }}
                 >
                   {active.title}
@@ -497,6 +533,7 @@ export function BannerSection() {
                     text={active.titleGhost}
                     videoSrc={BANNER_GHOST_VIDEO}
                     measureClassName={BANNER_GHOST_MEASURE_CLASS}
+                    disableVideo={!allowHeavyMedia}
                   />
                 </motion.div>
               </AnimatePresence>
@@ -598,6 +635,7 @@ export function BannerSection() {
               key={slide.num}
               href={slide.href}
               prefetch
+              scroll
               onClick={() => setActiveIdx(i)}
               className="relative font-matrix text-[9px] sm:text-[10px] md:text-[11px] tracking-[0.08em] sm:tracking-[0.12em] uppercase px-2.5 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 transition-all duration-400"
               style={{

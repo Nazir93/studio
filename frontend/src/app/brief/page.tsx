@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 export default function BriefPage() {
   return (
     <div
-      className="flex min-h-0 flex-1 flex-col overflow-hidden"
-      style={{ backgroundColor: "var(--bg)", height: "100%", maxHeight: "100%" }}
+      className="flex min-h-[100dvh] w-full flex-1 flex-col md:min-h-0 md:overflow-hidden"
+      style={{ backgroundColor: "var(--bg)" }}
     >
       <BriefRequestSection />
     </div>

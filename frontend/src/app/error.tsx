@@ -20,7 +20,7 @@ export default function Error({
       style={{ backgroundColor: "var(--bg)" }}
     >
       <div className="max-w-md text-center">
-        <h1 className="font-heading text-2xl font-semibold md:text-3xl" style={{ color: "var(--text)" }}>
+        <h1 className="font-heading text-xl font-semibold sm:text-2xl md:text-3xl" style={{ color: "var(--text)" }}>
           Что-то пошло не так
         </h1>
         <p className="mt-3 text-sm md:text-base" style={{ color: "var(--text-muted)" }}>

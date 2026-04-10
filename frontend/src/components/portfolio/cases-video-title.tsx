@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { useTheme } from "@/lib/theme-context";
+import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 
 const VIDEO_SRC = "/videos/cases-title.mp4";
 
@@ -66,6 +67,7 @@ export function CasesVideoTitle() {
   const measureRef = useRef<HTMLDivElement>(null);
   const [fontPx, setFontPx] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const allowVideo = useIsDesktopLg();
   const { isDark } = useTheme();
   const maskIdRaw = useId();
   const maskId = `cases-v-${maskIdRaw.replace(/:/g, "")}`;
@@ -132,7 +134,7 @@ export function CasesVideoTitle() {
     void v.play().catch(() => {});
   }, [ready, reduceMotion]);
 
-  if (reduceMotion) {
+  if (reduceMotion || !allowVideo) {
     return (
       <h1 className={`${HEADING_CLASS} ${HEADING_MARGIN}`} style={{ color: "var(--text)" }}>
         {CASES_TITLE}

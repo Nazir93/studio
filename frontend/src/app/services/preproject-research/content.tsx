@@ -60,7 +60,7 @@ export function PreprojectResearchContent() {
           <div className="mt-14 grid grid-cols-2 gap-6 border-t pt-10 md:gap-10" style={{ borderColor: "var(--border)" }}>
             {HERO_STATS.map((s) => (
               <div key={s.label}>
-                <p className="font-body text-2xl font-semibold tabular-nums tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>
+                <p className="font-body text-xl font-semibold tabular-nums tracking-tight sm:text-2xl md:text-3xl" style={{ color: "var(--text)" }}>
                   {s.value}
                 </p>
                 <p className="font-body mt-1 text-[10px] leading-relaxed md:text-[11px]" style={{ color: "var(--text-muted)" }}>
@@ -168,7 +168,7 @@ export function PreprojectResearchContent() {
           <div className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-6 sm:grid-cols-3">
             {SPRINT_STATS.map((s) => (
               <div key={s.label} className="border px-4 py-5" style={{ borderColor: "var(--border)" }}>
-                <p className="font-body text-2xl font-semibold tabular-nums tracking-tight md:text-3xl">{s.value}</p>
+                <p className="font-body text-xl font-semibold tabular-nums tracking-tight sm:text-2xl md:text-3xl">{s.value}</p>
                 <p className="font-body mt-2 text-[9px] leading-relaxed md:text-[10px]" style={{ color: "var(--text-muted)" }}>
                   {s.label}
                 </p>

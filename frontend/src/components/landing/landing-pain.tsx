@@ -69,7 +69,7 @@ export function LandingPain({ title, points, conclusion }: LandingPainProps) {
                 }}
               >
                 <span
-                  className="font-matrix text-2xl font-semibold tabular-nums md:text-3xl leading-none mt-0.5 shrink-0"
+                  className="font-matrix text-xl font-semibold tabular-nums sm:text-2xl md:text-3xl leading-none mt-0.5 shrink-0"
                   style={{ color: "var(--accent)" }}
                 >
                   {String(i + 1).padStart(2, "0")}

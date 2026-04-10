@@ -39,13 +39,21 @@ type Props = {
   /** Классы как у видимого заголовка (для измерения и совпадения с AKONY) */
   measureClassName: string;
   className?: string;
+  /** Без `<video>` — только обводка (мобильные / планшеты) */
+  disableVideo?: boolean;
 };
 
 /**
  * Текст с видео внутри букв (SVG-маска), как на портфолио «КЕЙСЫ».
  * При prefers-reduced-motion — обычная строка с обводкой.
  */
-export function MaskedVideoText({ text, videoSrc, measureClassName, className = "" }: Props) {
+export function MaskedVideoText({
+  text,
+  videoSrc,
+  measureClassName,
+  className = "",
+  disableVideo = false,
+}: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const [fontPx, setFontPx] = useState(0);
@@ -115,7 +123,7 @@ export function MaskedVideoText({ text, videoSrc, measureClassName, className = 
     void v.play().catch(() => {});
   }, [ready, reduceMotion, text, videoSrc]);
 
-  if (reduceMotion) {
+  if (reduceMotion || disableVideo) {
     return (
       <span
         className={`block ${measureClassName} ${className}`}

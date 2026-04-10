@@ -136,7 +136,7 @@ function ServiceRow({
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: "radial-gradient(ellipse at 30% 50%, rgba(250,204,21,0.06) 0%, transparent 70%)",
+              background: "radial-gradient(ellipse at 30% 50%, color-mix(in srgb, var(--text) 6%, transparent) 0%, transparent 70%)",
             }}
           />
 
@@ -201,11 +201,11 @@ function PriceBanner() {
           transform: visible ? "translateY(0)" : "translateY(30px)",
         }}
       >
-        {/* Pulsing yellow border glow */}
         <div
           className="absolute inset-0 rounded-2xl price-pulse-border"
           style={{
-            background: "linear-gradient(135deg, rgba(250,204,21,0.3), rgba(250,204,21,0.05), rgba(250,204,21,0.2), rgba(250,204,21,0.05))",
+            background:
+              "linear-gradient(135deg, color-mix(in srgb, var(--text) 22%, transparent), color-mix(in srgb, var(--text) 5%, transparent), color-mix(in srgb, var(--text) 14%, transparent), color-mix(in srgb, var(--text) 5%, transparent))",
             backgroundSize: "300% 300%",
             padding: "1px",
           }}
@@ -220,7 +220,7 @@ function PriceBanner() {
           <div
             className="absolute inset-0 rounded-2xl pointer-events-none price-pulse-glow"
             style={{
-              background: "radial-gradient(ellipse at 20% 50%, rgba(250,204,21,0.04) 0%, transparent 60%)",
+              background: "radial-gradient(ellipse at 20% 50%, color-mix(in srgb, var(--text) 5%, transparent) 0%, transparent 60%)",
             }}
           />
 
@@ -288,7 +288,7 @@ export function ServicesSection() {
     >
       <div className="container mx-auto">
         <h2
-          className="font-body text-3xl font-semibold sm:text-4xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight mb-3 sm:mb-4 uppercase"
+          className="font-body text-2xl font-semibold sm:text-3xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight mb-3 sm:mb-4 uppercase"
           style={{ color: "var(--text)" }}
         >
           УСЛУГИ

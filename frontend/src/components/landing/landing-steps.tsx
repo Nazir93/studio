@@ -43,7 +43,7 @@ function StepRow({ step, index, total }: { step: Step; index: number; total: num
     >
       {/* Number */}
       <div className="col-span-2 md:col-span-1">
-        <span className="font-matrix text-3xl font-semibold tabular-nums md:text-4xl leading-none" style={{ color: "var(--accent)" }}>
+        <span className="font-matrix text-2xl font-semibold tabular-nums sm:text-3xl md:text-4xl leading-none" style={{ color: "var(--accent)" }}>
           {String(index + 1).padStart(2, "0")}
         </span>
       </div>

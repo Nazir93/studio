@@ -4,6 +4,8 @@ export const SITE_BRAND_MARK = "CODE1618";
 export const SITE_TAGLINE = "Студия разработки";
 export const CITY = process.env.NEXT_PUBLIC_CITY || "";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+/** Домен для подписей в футере / политике (без протокола) */
+export const SITE_DOMAIN = "code1618.ru";
 
 export const PHONE = "+7 917 704-18-93";
 export const PHONE_RAW = "+79177041893";

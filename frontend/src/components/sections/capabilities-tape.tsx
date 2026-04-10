@@ -4,6 +4,7 @@ import { useRef, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "@/lib/theme-context";
 import { useStickyHeaderPinned } from "@/lib/use-sticky-header-pinned";
+import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 import { PinnedCodeTypist } from "@/components/ui/pinned-code-typist";
 
 interface TapeItem {
@@ -92,6 +93,76 @@ const COLUMNS: Column[] = [
 
 const SECTION_HEIGHT_VH = 250;
 const GAP = 4;
+
+function flattenTapeItemsUnique(columns: Column[]): TapeItem[] {
+  const seen = new Set<string>();
+  const out: TapeItem[] = [];
+  for (const col of columns) {
+    for (const { item } of col.items) {
+      const key = `${item.title}|${item.hoverLine}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(item);
+    }
+  }
+  return out;
+}
+
+function TapeStackCard(item: TapeItem) {
+  const titleLines = item.title.split("\n");
+  return (
+    <Link
+      href={item.href}
+      data-cursor-word="смотреть"
+      className="block border-b px-4 py-5 transition-opacity active:opacity-90 last:border-b-0"
+      style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
+    >
+      <p
+        className="font-matrix text-[10px] uppercase tracking-[0.22em]"
+        style={{ color: "var(--text-muted)" }}
+      >
+        {item.subtitle}
+      </p>
+      <h3
+        className="font-akony mt-2 text-[0.95rem] uppercase leading-snug tracking-[0.06em] sm:text-[1.05rem] sm:leading-tight sm:tracking-[0.07em] md:text-lg"
+        style={{ color: "var(--text)" }}
+      >
+        {titleLines.map((line, i) => (
+          <span key={i} className="block">
+            {line}
+          </span>
+        ))}
+      </h3>
+      <p
+        className="mt-3 font-body text-xs leading-relaxed sm:text-[13px]"
+        style={{ color: "var(--text-muted)" }}
+      >
+        {item.desc}
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {item.tags.map((tag) => (
+          <span
+            key={tag}
+            className="rounded border px-2.5 py-1 font-matrix text-[9px] uppercase tracking-[0.14em]"
+            style={{
+              borderColor: "var(--border)",
+              color: "var(--text)",
+              backgroundColor: "color-mix(in srgb, var(--text) 6%, transparent)",
+            }}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+      <p
+        className="mt-3 font-matrix text-[10px] leading-snug tracking-[0.06em]"
+        style={{ color: "var(--text-subtle)" }}
+      >
+        {item.hoverLine}
+      </p>
+    </Link>
+  );
+}
 
 function clamp(v: number, lo: number, hi: number) {
   return Math.min(Math.max(v, lo), hi);
@@ -244,23 +315,34 @@ function darkTitleFilter(hovered: boolean): string {
     : "none";
 }
 
-function TapeCell({ title, subtitle, href, image, video, effect, tags, hoverLine }: TapeItem) {
+function TapeCell({
+  title,
+  subtitle,
+  href,
+  image,
+  video,
+  effect,
+  tags,
+  hoverLine,
+  videosEnabled,
+}: TapeItem & { videosEnabled: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
   const { isDark } = useTheme();
-  const hasMedia = !!(video || effect);
+  const effectiveVideo = videosEnabled ? video : null;
+  const hasMedia = !!(effectiveVideo || effect);
   const titleLines = title.split("\n");
 
   useEffect(() => {
     const v = videoRef.current;
-    if (!v) return;
+    if (!v || !effectiveVideo) return;
     if (hovered) {
       v.currentTime = 0;
       v.play().catch(() => {});
     } else {
       v.pause();
     }
-  }, [hovered]);
+  }, [hovered, effectiveVideo]);
 
   const ease = "cubic-bezier(0.22, 1, 0.36, 1)";
 
@@ -293,15 +375,15 @@ function TapeCell({ title, subtitle, href, image, video, effect, tags, hoverLine
         )}
       </div>
 
-      {/* Видео при наведении */}
-      {video && (
+      {/* Видео при наведении (только lg+) */}
+      {effectiveVideo && (
         <div
           className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-500"
           style={{ opacity: hovered ? 1 : 0 }}
         >
           <video
             ref={videoRef}
-            src={video}
+            src={effectiveVideo}
             muted
             loop
             playsInline
@@ -454,7 +536,17 @@ function TapeCell({ title, subtitle, href, image, video, effect, tags, hoverLine
   );
 }
 
-function TapeColumn({ col, ci, progress }: { col: Column; ci: number; progress: number }) {
+function TapeColumn({
+  col,
+  ci,
+  progress,
+  videosEnabled,
+}: {
+  col: Column;
+  ci: number;
+  progress: number;
+  videosEnabled: boolean;
+}) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [maxTravel, setMaxTravel] = useState(0);
@@ -505,7 +597,7 @@ function TapeColumn({ col, ci, progress }: { col: Column; ci: number; progress: 
             key={si}
             style={{ borderBottom: si < col.items.length - 1 ? `${GAP}px solid var(--border)` : undefined }}
           >
-            <TapeCell {...cell.item} />
+            <TapeCell {...cell.item} videosEnabled={videosEnabled} />
           </div>
         ))}
       </div>
@@ -513,12 +605,15 @@ function TapeColumn({ col, ci, progress }: { col: Column; ci: number; progress: 
   );
 }
 
+const MOBILE_TAPE_ITEMS = flattenTapeItemsUnique(COLUMNS);
+
 export function CapabilitiesTapeSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const stickyHeaderRef = useRef<HTMLDivElement>(null);
   const headerPinned = useStickyHeaderPinned(stickyHeaderRef);
   const [progress, setProgress] = useState(0);
   const rafRef = useRef(0);
+  const videosEnabled = useIsDesktopLg();
 
   const handleScroll = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -546,7 +641,7 @@ export function CapabilitiesTapeSection() {
       ref={sectionRef}
       id="capabilities"
       data-cursor-word="смотреть"
-      className="relative"
+      className="relative max-md:!h-auto max-md:min-h-0"
       style={{ height: `${SECTION_HEIGHT_VH}vh`, backgroundColor: "var(--bg)", color: "var(--text)" }}
       aria-label="Направления студии"
     >
@@ -556,18 +651,18 @@ export function CapabilitiesTapeSection() {
         className="sticky top-0 z-[40] flex items-center justify-between px-4 py-3 md:px-6 md:py-3.5"
         style={{ backgroundColor: "var(--bg)", borderBottom: "1px solid var(--border)" }}
       >
-        <div className="flex min-w-0 flex-wrap items-baseline gap-3 md:gap-4">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-2 md:gap-4">
           <h2
-            className="font-akony text-xl uppercase tracking-[0.12em] md:text-3xl lg:text-4xl"
+            className="font-akony text-[0.95rem] uppercase leading-snug tracking-[0.14em] sm:text-lg md:text-2xl lg:text-4xl"
             style={{ color: "var(--text)" }}
           >
             Что умеем
           </h2>
-          {headerPinned ? (
+          {videosEnabled && headerPinned ? (
             <PinnedCodeTypist text="// услуги: 15 направлений · full stack" charDelayMs={12} />
           ) : (
             <span
-              className="font-matrix text-[10px] uppercase tracking-[0.28em] md:text-[11px]"
+              className="max-w-[16rem] font-matrix text-[8px] uppercase leading-snug tracking-[0.22em] sm:max-w-none sm:text-[10px] sm:tracking-[0.28em] md:text-[11px]"
               style={{ color: "var(--text-muted)" }}
             >
               15 направлений
@@ -579,7 +674,13 @@ export function CapabilitiesTapeSection() {
         </p>
       </div>
 
-      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
+      <div className="border-t md:hidden" style={{ borderColor: "var(--border)" }}>
+        {MOBILE_TAPE_ITEMS.map((item) => (
+          <TapeStackCard key={`${item.title}|${item.hoverLine}`} {...item} />
+        ))}
+      </div>
+
+      <div className="sticky top-0 hidden h-[100dvh] w-full overflow-hidden md:block">
         {/* Шероховатость / зерно */}
         <div className="pointer-events-none absolute inset-0 z-30 mix-blend-overlay" style={{ opacity: 0.15 }}>
           <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">
@@ -607,7 +708,7 @@ export function CapabilitiesTapeSection() {
           style={{ backgroundColor: "var(--bg)" }}
         >
           {COLUMNS.map((col, ci) => (
-            <TapeColumn key={ci} col={col} ci={ci} progress={progress} />
+            <TapeColumn key={ci} col={col} ci={ci} progress={progress} videosEnabled={videosEnabled} />
           ))}
         </div>
       </div>

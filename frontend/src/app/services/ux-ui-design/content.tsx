@@ -388,10 +388,10 @@ export function UxUiDesignContent() {
             Что мы умеем и любим
           </p>
           <div className="mt-8 flex flex-col gap-2 md:mt-10 md:gap-3">
-            <h2 className="font-akony text-[clamp(1.35rem,5vw,3rem)] font-normal leading-[0.95] uppercase tracking-[0.02em]" style={{ color: "var(--text)" }}>
+            <h2 className="font-akony text-[clamp(1.05rem,4vw,3rem)] font-normal leading-[0.95] uppercase tracking-[0.02em] sm:text-[clamp(1.2rem,3.5vw,3rem)]" style={{ color: "var(--text)" }}>
               дизайн
             </h2>
-            <h2 className="font-akony text-[clamp(1.35rem,5vw,3rem)] font-normal leading-[0.95] uppercase tracking-[0.02em]"
+            <h2 className="font-akony text-[clamp(1.05rem,4vw,3rem)] font-normal leading-[0.95] uppercase tracking-[0.02em] sm:text-[clamp(1.2rem,3.5vw,3rem)]"
               style={{ color: "transparent", WebkitTextStroke: "1.5px color-mix(in srgb, var(--text) 30%, transparent)" }}>
               продукт
             </h2>

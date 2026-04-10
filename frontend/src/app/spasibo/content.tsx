@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Phone, ArrowRight, Send, MessageCircle } from "lucide-react";
@@ -13,11 +13,25 @@ import {
 import { isWorkingHours } from "@/lib/utils";
 import Link from "next/link";
 
+const panelClass =
+  "rounded-2xl border p-6 mb-8";
+const panelStyle: CSSProperties = {
+  borderColor: "var(--border)",
+  backgroundColor: "color-mix(in srgb, var(--text) 5%, var(--bg))",
+};
+
+const socialBtnClass =
+  "flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl border text-sm font-medium transition-colors";
+const socialBtnStyle: CSSProperties = {
+  borderColor: "var(--border)",
+  backgroundColor: "color-mix(in srgb, var(--text) 6%, transparent)",
+  color: "var(--text-muted)",
+};
+
 export function ThankYouContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  const source = searchParams.get("from");
 
   const [countdown, setCountdown] = useState(15);
   const [valid, setValid] = useState<boolean | null>(null);
@@ -57,17 +71,23 @@ export function ThankYouContent() {
   const workingHours = isWorkingHours();
 
   return (
-    <section className="min-h-screen bg-brand flex items-center justify-center px-4 pt-20">
-      <div className="max-w-lg w-full text-center">
-        <div className="w-20 h-20 rounded-full bg-brand-accent/20 flex items-center justify-center mx-auto mb-6">
-          <CheckCircle size={40} className="text-brand-accent" />
+    <section
+      className="theme-bg flex min-h-screen items-center justify-center px-4 pb-12 pt-24 transition-colors duration-500 md:pt-20"
+      style={{ color: "var(--text)" }}
+    >
+      <div className="w-full max-w-lg text-center">
+        <div
+          className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full"
+          style={{ backgroundColor: "color-mix(in srgb, var(--accent) 14%, transparent)" }}
+        >
+          <CheckCircle size={40} style={{ color: "var(--accent)" }} aria-hidden />
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mb-4">
+        <h1 className="mb-4 font-heading text-2xl font-bold md:text-3xl" style={{ color: "var(--text)" }}>
           Спасибо за заявку!
         </h1>
 
-        <p className="text-gray-300 text-lg mb-8 leading-relaxed">
+        <p className="mb-8 text-lg leading-relaxed" style={{ color: "var(--text-muted)" }}>
           Мы получили ваш запрос. Инженер {SITE_NAME} свяжется с вами{" "}
           {workingHours
             ? "в течение 30 минут"
@@ -75,56 +95,81 @@ export function ThankYouContent() {
           .
         </p>
 
-        <div className="glass rounded-2xl p-6 mb-8">
-          <p className="text-gray-400 text-sm mb-3">
+        <div className={panelClass} style={panelStyle}>
+          <p className="mb-3 text-sm" style={{ color: "var(--text-subtle)" }}>
             Если вопрос срочный — позвоните:
           </p>
           <a
             href={`tel:${PHONE_RAW}`}
-            className="flex items-center justify-center gap-3 text-brand-accent text-xl font-bold hover:text-white transition-colors"
+            className="flex items-center justify-center gap-3 text-xl font-bold transition-opacity hover:opacity-85"
+            style={{ color: "var(--accent)" }}
           >
-            <Phone size={22} />
+            <Phone size={22} aria-hidden />
             {PHONE}
           </a>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 mb-8">
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row">
           <a
             href={SOCIAL_LINKS.whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-gray-300 hover:bg-green-600 hover:text-white transition-all text-sm font-medium"
+            className={socialBtnClass}
+            style={socialBtnStyle}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#16a34a";
+              e.currentTarget.style.borderColor = "#16a34a";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = socialBtnStyle.backgroundColor as string;
+              e.currentTarget.style.borderColor = socialBtnStyle.borderColor as string;
+              e.currentTarget.style.color = socialBtnStyle.color as string;
+            }}
           >
-            <MessageCircle size={18} />
+            <MessageCircle size={18} aria-hidden />
             Написать в WhatsApp
           </a>
           <a
             href={SOCIAL_LINKS.telegram}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-gray-300 hover:bg-blue-500 hover:text-white transition-all text-sm font-medium"
+            className={socialBtnClass}
+            style={socialBtnStyle}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#2563eb";
+              e.currentTarget.style.borderColor = "#2563eb";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = socialBtnStyle.backgroundColor as string;
+              e.currentTarget.style.borderColor = socialBtnStyle.borderColor as string;
+              e.currentTarget.style.color = socialBtnStyle.color as string;
+            }}
           >
-            <Send size={18} />
+            <Send size={18} aria-hidden />
             Написать в Telegram
           </a>
         </div>
 
         <div className="mb-8">
-          <p className="text-gray-400 text-sm mb-3">
+          <p className="mb-3 text-sm" style={{ color: "var(--text-subtle)" }}>
             Пока ждёте — посмотрите наши проекты:
           </p>
           <Link href="/#portfolio">
             <Button variant="outline" size="sm">
               Перейти в портфолио
-              <ArrowRight size={16} className="ml-2" />
+              <ArrowRight size={16} className="ml-2" aria-hidden />
             </Button>
           </Link>
         </div>
 
-        <div className="glass rounded-xl p-4">
-          <p className="text-gray-500 text-sm">
+        <div className="rounded-xl border p-4" style={panelStyle}>
+          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
             Вы вернётесь на главную через{" "}
-            <span className="text-brand-accent font-bold">{countdown}</span>{" "}
+            <span className="font-bold" style={{ color: "var(--accent)" }}>
+              {countdown}
+            </span>{" "}
             {countdown === 1
               ? "секунду"
               : countdown < 5
@@ -132,8 +177,10 @@ export function ThankYouContent() {
                 : "секунд"}
           </p>
           <button
+            type="button"
             onClick={() => router.push("/")}
-            className="text-brand-accent text-sm hover:underline mt-1"
+            className="mt-1 text-sm underline-offset-2 hover:underline"
+            style={{ color: "var(--accent)" }}
           >
             Вернуться сейчас
           </button>

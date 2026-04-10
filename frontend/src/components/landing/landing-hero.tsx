@@ -40,7 +40,7 @@ export function LandingHero({ title, subtitle, tag, features, goals }: LandingHe
 
         {/* Title */}
         <h1
-          className="font-heading text-[clamp(20px,4.5vw,36px)] leading-[1.1] tracking-tight mb-6 sm:mb-8 md:mb-10 max-w-4xl transition-all duration-1000 ease-out"
+          className="font-heading text-[clamp(17px,4vw,32px)] sm:text-[clamp(18px,3.5vw,34px)] leading-[1.1] tracking-tight mb-6 sm:mb-8 md:mb-10 max-w-4xl transition-all duration-1000 ease-out"
           style={{
             color: "var(--text)",
             opacity: visible ? 1 : 0,

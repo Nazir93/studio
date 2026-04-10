@@ -9,13 +9,13 @@ type Props = {
 };
 
 const tabBase =
-  "shrink-0 rounded-lg px-3 py-2 font-montserrat text-[11px] font-medium transition-[color,background-color,box-shadow] md:px-3.5 md:text-xs";
+  "rounded-lg px-3 py-2 font-montserrat text-[11px] font-medium transition-[color,background-color,box-shadow] md:px-3.5 md:text-xs";
 
 export function PortfolioSectorTabs({ activeSector }: Props) {
   return (
     <div className="mb-8 md:mb-10">
       <div
-        className="relative flex gap-1 overflow-x-auto pb-0.5 [scrollbar-width:thin] md:flex-wrap md:overflow-visible md:pb-0"
+        className="relative flex flex-wrap gap-1.5 gap-y-2 md:gap-2"
         role="tablist"
         aria-label="Разделы портфолио"
       >

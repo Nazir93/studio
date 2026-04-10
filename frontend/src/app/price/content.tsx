@@ -77,7 +77,7 @@ function SectionAccordion({
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 shrink-0"
           style={{
-            backgroundColor: isOpen ? "rgba(250,204,21,0.15)" : "var(--bg-secondary)",
+            backgroundColor: isOpen ? "color-mix(in srgb, var(--text) 12%, transparent)" : "var(--bg-secondary)",
             border: "1px solid var(--border)",
           }}
         >
@@ -163,7 +163,7 @@ export function PricePageContent() {
           >
             {SITE_NAME} / Прайс
           </p>
-          <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight mb-4 sm:mb-6">
+          <h1 className="font-heading text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight mb-4 sm:mb-6">
             СТАВКИ И ФОРМАТЫ
           </h1>
           <p
@@ -180,7 +180,7 @@ export function PricePageContent() {
               { label: "Позиций", value: totalItemsCount },
             ].map((stat) => (
               <div key={stat.label} className="flex items-baseline gap-2">
-                <span className="font-body text-2xl font-semibold tabular-nums sm:text-3xl" style={{ color: "var(--accent)" }}>
+                <span className="font-body text-lg font-semibold tabular-nums sm:text-2xl md:text-3xl" style={{ color: "var(--accent)" }}>
                   {stat.value}
                 </span>
                 <span className="text-xs uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
@@ -224,8 +224,8 @@ export function PricePageContent() {
                 onClick={() => setWithVat(!withVat)}
                 className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300"
                 style={{
-                  backgroundColor: withVat ? "rgba(250,204,21,0.15)" : "var(--bg-secondary)",
-                  border: `1px solid ${withVat ? "rgba(250,204,21,0.5)" : "var(--border)"}`,
+                  backgroundColor: withVat ? "color-mix(in srgb, var(--text) 12%, transparent)" : "var(--bg-secondary)",
+                  border: `1px solid ${withVat ? "color-mix(in srgb, var(--text) 35%, transparent)" : "var(--border)"}`,
                   color: withVat ? "var(--accent)" : "var(--text-muted)",
                 }}
               >

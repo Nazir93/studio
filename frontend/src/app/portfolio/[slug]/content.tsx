@@ -244,19 +244,19 @@ function HeroCaseImage({ src, title, compact }: { src: string; title: string; co
     >
       <div
         className="relative w-full overflow-hidden rounded-2xl md:rounded-3xl"
-        style={{ backgroundColor: "var(--bg)" }}
+        style={{ backgroundColor: "var(--bg)", paddingBottom: "1px" }}
       >
         <PortfolioRasterImg
           src={src}
           alt={`${title} — интерфейс`}
-          className="mx-auto block h-auto max-h-[min(85vh,1100px)] w-auto object-contain object-top"
+          className="mx-auto block h-auto max-h-[min(85vh,1100px)] w-auto object-contain object-center"
           decoding="async"
           fetchPriority="high"
         />
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-24 md:h-32"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-14 md:h-20"
           style={{
-            background: "linear-gradient(to top, rgba(0,0,0,0.35), transparent)",
+            background: "linear-gradient(to top, rgba(0,0,0,0.22), transparent)",
           }}
         />
       </div>
@@ -308,8 +308,8 @@ function HeroCaseVideo({
         <video
           src={src}
           poster={poster}
-          className="absolute inset-0 z-[1] h-full w-full object-cover object-top"
-          style={{ backgroundColor: "transparent" }}
+          className="absolute inset-0 z-[1] h-full w-full object-contain object-center"
+          style={{ backgroundColor: "var(--bg)" }}
           muted
           loop
           playsInline
@@ -320,9 +320,9 @@ function HeroCaseVideo({
           aria-label={`${title} — демонстрация интерфейса`}
         />
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-24 md:h-32"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-14 md:h-20"
           style={{
-            background: "linear-gradient(to top, rgba(0,0,0,0.35), transparent)",
+            background: "linear-gradient(to top, rgba(0,0,0,0.22), transparent)",
           }}
         />
       </div>
@@ -367,11 +367,14 @@ function ShowcasePhoto({
             borderColor: dark ? "rgba(255,255,255,0.12)" : "var(--border)",
           }}
         >
-          <div className="overflow-hidden rounded-2xl md:rounded-3xl" style={{ backgroundColor: dark ? "#0a0a0a" : "var(--bg)" }}>
+          <div
+            className="overflow-hidden rounded-2xl md:rounded-3xl"
+            style={{ backgroundColor: dark ? "#0a0a0a" : "var(--bg)", paddingBottom: "1px" }}
+          >
             <PortfolioRasterImg
               src={src}
               alt={label.trim() ? label : "Скриншот интерфейса"}
-              className="mx-auto block h-auto max-h-[min(88vh,1200px)] w-auto object-contain object-top"
+              className="mx-auto block h-auto max-h-[min(88vh,1200px)] w-auto object-contain object-center"
               loading="lazy"
               decoding="async"
             />
@@ -442,7 +445,7 @@ function NavLink({ href, label, direction }: { href: string; label: string; dire
       href={href}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="flex-1 flex items-center gap-4 px-6 py-6 md:py-8 rounded-2xl relative overflow-hidden transition-all duration-500"
+      className="flex w-full min-w-0 flex-1 items-center gap-3 px-4 py-5 sm:gap-4 sm:px-6 sm:py-6 md:py-8 rounded-2xl relative overflow-hidden transition-all duration-500"
       style={{ border: "1px solid var(--border)" }}
     >
       <div
@@ -459,7 +462,7 @@ function NavLink({ href, label, direction }: { href: string; label: string; dire
           style={{ color: hovered ? "var(--bg)" : "var(--text)" }}
         />
       )}
-      <div className="relative z-10 flex-1">
+      <div className="relative z-10 min-w-0 flex-1">
         <span
           className="text-[10px] uppercase tracking-[0.15em] block mb-1 transition-colors duration-700"
           style={{ color: hovered ? "var(--bg)" : "var(--text-muted)" }}
@@ -467,7 +470,7 @@ function NavLink({ href, label, direction }: { href: string; label: string; dire
           {direction === "prev" ? "Предыдущий проект" : "Следующий проект"}
         </span>
         <span
-          className="font-heading normal-case text-base font-bold md:text-lg transition-colors duration-700"
+          className="font-heading normal-case text-base font-bold md:text-lg transition-colors duration-700 break-words text-pretty"
           style={{ color: hovered ? "var(--bg)" : "var(--text)" }}
         >
           {label}
@@ -727,17 +730,23 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
                 >
                   Результаты
                 </p>
-                <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 md:gap-8">
+                <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-3 lg:grid-cols-4 md:gap-8">
                   {project.resultMetrics.map((m, i) => (
                     <div
                       key={`${m.label}-${i}`}
-                      className="rounded-2xl border px-4 py-5 text-center md:px-5 md:py-6"
+                      className="rounded-xl border px-2.5 py-3 text-center sm:rounded-2xl sm:px-4 sm:py-5 md:px-5 md:py-6"
                       style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
                     >
-                      <p className="font-heading text-2xl font-bold tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>
+                      <p
+                        className="font-heading text-base font-bold leading-[1.15] tracking-tight sm:text-lg md:text-2xl lg:text-3xl"
+                        style={{ color: "var(--text)" }}
+                      >
                         {m.value}
                       </p>
-                      <p className="mt-2 text-xs leading-snug md:text-sm" style={{ color: "var(--text-muted)" }}>
+                      <p
+                        className="mt-1.5 text-[10px] leading-snug sm:mt-2 sm:text-xs md:text-sm"
+                        style={{ color: "var(--text-muted)" }}
+                      >
                         {m.label}
                       </p>
                     </div>
@@ -784,7 +793,7 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
       {/* Navigation between cases */}
       <section className="py-16 md:py-20" style={{ backgroundColor: "var(--bg)", borderTop: "1px solid var(--border)" }}>
         <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex w-full min-w-0 flex-col gap-3 md:flex-row md:gap-4">
             {prevCase && (
               <NavLink href={`/portfolio/${prevCase.slug}`} label={prevCase.title} direction="prev" />
             )}

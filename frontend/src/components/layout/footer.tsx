@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
-import { SITE_NAME, SITE_BRAND_MARK, PHONE, PHONE_RAW, EMAIL, SOCIAL_LINKS } from "@/lib/constants";
+import { SITE_NAME, SITE_BRAND_MARK, SITE_DOMAIN, PHONE, PHONE_RAW, EMAIL, SOCIAL_LINKS } from "@/lib/constants";
 import { FONT_UI_AKONY_CTA_LARGE } from "@/lib/ui-typography";
 import { cn } from "@/lib/utils";
 
@@ -68,7 +68,7 @@ export function Footer() {
       {/* Название бренда — читаемо CODE1618 */}
       <div className="container mx-auto px-4 pb-4 sm:px-6 sm:pb-5 md:px-8 md:pb-6">
         <h2
-          className="m-0 w-full font-akony font-normal uppercase leading-[0.92] tracking-[0.08em] sm:tracking-[0.1em] select-none text-[clamp(1.65rem,7vw,4rem)]"
+          className="m-0 w-full font-akony font-normal uppercase leading-[0.92] tracking-[0.08em] sm:tracking-[0.1em] select-none text-[clamp(1.05rem,4.8vw,3rem)] sm:text-[clamp(1.2rem,4.2vw,3.25rem)] md:text-[clamp(1.35rem,3.5vw,3.5rem)]"
           style={{ color: "var(--text)" }}
         >
           {SITE_BRAND_MARK}
@@ -118,6 +118,22 @@ export function Footer() {
                 WhatsApp
               </a>
             )}
+            {SOCIAL_LINKS.max && (
+              <a
+                href={SOCIAL_LINKS.max}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors duration-200 hover:text-[var(--text)]"
+              >
+                MAX
+              </a>
+            )}
+            <Link
+              href="/privacy"
+              className="transition-colors duration-200 hover:text-[var(--text)]"
+            >
+              Политика конфиденциальности · {SITE_DOMAIN}
+            </Link>
             <a
               href={`mailto:${EMAIL}`}
               className="transition-colors duration-200 hover:text-[var(--text)]"

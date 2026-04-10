@@ -39,7 +39,7 @@ export function PriceBannerSection() {
           className="absolute inset-0 pointer-events-none"
           style={{
             backgroundImage: isDark
-              ? "linear-gradient(rgba(250,204,21,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(250,204,21,0.03) 1px, transparent 1px)"
+              ? "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)"
               : "linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)",
             backgroundSize: "80px 80px",
           }}
@@ -53,8 +53,8 @@ export function PriceBannerSection() {
             bottom: 0,
             width: "1px",
             background: isDark
-              ? "linear-gradient(180deg, transparent 10%, rgba(250,204,21,0.15) 50%, transparent 90%)"
-              : "linear-gradient(180deg, transparent 10%, rgba(250,204,21,0.2) 50%, transparent 90%)",
+              ? "linear-gradient(180deg, transparent 10%, rgba(255,255,255,0.12) 50%, transparent 90%)"
+              : "linear-gradient(180deg, transparent 10%, rgba(0,0,0,0.12) 50%, transparent 90%)",
             transform: "rotate(15deg) scaleY(1.4)",
             transformOrigin: "top center",
           }}
@@ -70,10 +70,10 @@ export function PriceBannerSection() {
               }}
             >
               <div className="flex items-center gap-2 mb-4 md:mb-6">
-                <div className="w-8 h-[1px]" style={{ backgroundColor: "rgba(250,204,21,0.6)" }} />
+                <div className="w-8 h-[1px]" style={{ backgroundColor: "color-mix(in srgb, var(--text) 35%, transparent)" }} />
                 <span
                   className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-medium"
-                  style={{ color: "rgba(250,204,21,0.8)" }}
+                  style={{ color: "var(--text-muted)" }}
                 >
                   Прозрачное ценообразование
                 </span>
@@ -84,7 +84,7 @@ export function PriceBannerSection() {
                 style={{ color: "var(--text)" }}
               >
                 Стоимость без{" "}
-                <span style={{ color: "rgba(250,204,21,1)" }}>скрытых</span> доплат
+                <span style={{ color: "var(--text)", fontWeight: 600 }}>скрытых</span> доплат
               </h2>
 
               <p
@@ -102,18 +102,18 @@ export function PriceBannerSection() {
                   onMouseLeave={() => setBriefHovered(false)}
                   className="group relative flex items-center justify-center gap-2.5 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full overflow-hidden transition-all duration-500"
                   style={{
-                    backgroundColor: briefHovered ? "rgba(250,204,21,1)" : "transparent",
-                    border: "1px solid rgba(250,204,21,0.6)",
+                    backgroundColor: briefHovered ? "var(--text)" : "transparent",
+                    border: "1px solid var(--border)",
                   }}
                 >
                   <MessageSquare
                     size={16}
                     className="transition-colors duration-500"
-                    style={{ color: briefHovered ? "#0A0A0A" : "rgba(250,204,21,1)" }}
+                    style={{ color: briefHovered ? "var(--bg)" : "var(--text-muted)" }}
                   />
                   <span
                     className="font-matrix text-xs sm:text-sm uppercase tracking-[0.1em] transition-colors duration-500"
-                    style={{ color: briefHovered ? "#0A0A0A" : "var(--text)" }}
+                    style={{ color: briefHovered ? "var(--bg)" : "var(--text)" }}
                   >
                     Запросить оценку
                   </span>
@@ -132,7 +132,7 @@ export function PriceBannerSection() {
                   <ListChecks
                     size={16}
                     className="transition-colors duration-500"
-                    style={{ color: priceHovered ? "rgba(250,204,21,1)" : "var(--text-muted)" }}
+                    style={{ color: priceHovered ? "var(--text)" : "var(--text-muted)" }}
                   />
                   <span
                     className="font-matrix text-xs sm:text-sm uppercase tracking-[0.1em] transition-colors duration-500"
@@ -167,11 +167,11 @@ export function PriceBannerSection() {
                       <div
                         className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center mb-3 sm:mb-4 transition-all duration-500 group-hover:scale-110"
                         style={{
-                          backgroundColor: "rgba(250,204,21,0.1)",
-                          border: "1px solid rgba(250,204,21,0.2)",
+                          backgroundColor: "color-mix(in srgb, var(--text) 8%, transparent)",
+                          border: "1px solid var(--border)",
                         }}
                       >
-                        <Icon size={16} style={{ color: "rgba(250,204,21,0.8)" }} />
+                        <Icon size={16} style={{ color: "var(--text-muted)" }} />
                       </div>
                       <h4
                         className="font-matrix text-xs sm:text-sm uppercase tracking-wide mb-1"

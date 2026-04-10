@@ -148,7 +148,7 @@ export function ContactsTerminalSection() {
         <p className="font-matrix text-[10px] uppercase tracking-[0.3em]" style={{ color: "var(--text-muted)" }}>
           Контакты
         </p>
-        <h1 className="mt-3 font-heading text-2xl leading-tight tracking-tight md:text-3xl lg:text-4xl" style={{ color: "var(--text)" }}>
+        <h1 className="mt-3 font-heading text-xl leading-tight tracking-tight sm:text-2xl md:text-3xl lg:text-4xl" style={{ color: "var(--text)" }}>
           Свяжитесь с нами
         </h1>
 

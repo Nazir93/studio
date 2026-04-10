@@ -175,8 +175,8 @@ export function TechnologySection() {
                     className="inline-block text-[9px] sm:text-[10px] uppercase tracking-[0.2em] px-3 py-1 rounded-full mb-5 sm:mb-6 border"
                     style={{
                       color: "var(--accent)",
-                      borderColor: "rgba(250,204,21,0.2)",
-                      backgroundColor: "rgba(250,204,21,0.05)",
+                      borderColor: "var(--border)",
+                      backgroundColor: "color-mix(in srgb, var(--text) 6%, transparent)",
                     }}
                   >
                     {step.tag}
@@ -184,7 +184,7 @@ export function TechnologySection() {
 
                   {/* Number */}
                   <div
-                    className="font-matrix text-6xl sm:text-7xl md:text-8xl font-bold leading-none mb-3 sm:mb-4 tabular-nums"
+                    className="font-matrix text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-none mb-3 sm:mb-4 tabular-nums"
                     style={{ color: "var(--text)", opacity: 0.08 }}
                   >
                     {step.number}
@@ -270,7 +270,7 @@ export function TechnologySection() {
                               ? "var(--accent)"
                               : "var(--border)",
                             boxShadow: isCurrent
-                              ? "0 0 12px rgba(250,204,21,0.4)"
+                              ? "0 0 12px color-mix(in srgb, var(--text) 25%, transparent)"
                               : "none",
                             transform: isCurrent ? "scale(1.4)" : "scale(1)",
                           }}

@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /** Древовидное подключение тяжёлых пакетов — меньше JS при навигации */
+  experimental: {
+    optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
   /** Сборка Docker: `frontend/Dockerfile` копирует `.next/standalone` */
   output: "standalone",
   /** Ускоряет `next build` на слабом VPS (lint отдельно: `npm run lint`) */

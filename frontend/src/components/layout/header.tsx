@@ -4,8 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { X, Sun, Moon } from "lucide-react";
-import { PHONE, PHONE_RAW, EMAIL, SITE_NAME } from "@/lib/constants";
+import { X, Sun, Moon, Send } from "lucide-react";
+import { PHONE, PHONE_RAW, EMAIL, SITE_NAME, SOCIAL_LINKS } from "@/lib/constants";
+import { WhatsAppGlyph, MaxMessengerIcon } from "@/components/ui/contact-channels-bar";
 import { NAV_SECTIONS } from "@/lib/nav-config";
 import {
   FONT_UI_MONO_NAV,
@@ -109,7 +110,7 @@ function CircuitGrid() {
             <path
               d={d}
               fill="none"
-              stroke="rgba(250,204,21,0.15)"
+              stroke="rgba(255,255,255,0.12)"
               strokeWidth="3"
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -126,7 +127,7 @@ function CircuitGrid() {
             <path
               d={d}
               fill="none"
-              stroke="rgba(232,212,139,0.25)"
+              stroke="rgba(255,255,255,0.2)"
               strokeWidth="0.8"
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -151,7 +152,7 @@ function CircuitGrid() {
             cx={cx * CELL}
             cy={cy * CELL}
             r="1.5"
-            fill="rgba(250,204,21,0.08)"
+            fill="rgba(255,255,255,0.06)"
           />
         ))}
       </svg>
@@ -309,7 +310,7 @@ export function Header() {
               <Link
                 href="/brief?source=header-menu"
                 onClick={() => setIsOpen(false)}
-                className={`w-full mt-2 sm:mt-4 py-4 sm:py-5 ${FONT_UI_AKONY_CTA} text-center rounded-full mb-4 sm:mb-6 min-h-[52px] border transition-colors duration-300 hover:opacity-95`}
+                className={`block w-full mt-2 sm:mt-4 py-3 sm:py-5 ${FONT_UI_AKONY_CTA} text-center rounded-full mb-4 sm:mb-5 min-h-[48px] border transition-colors duration-300 hover:opacity-95 sm:min-h-[52px]`}
                 style={{
                   backgroundColor: "var(--text)",
                   color: "var(--bg)",
@@ -318,11 +319,57 @@ export function Header() {
               >
                 Обсудить проект
               </Link>
-              <div className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 ${FONT_UI_MONO_CONTACT}`}>
-                <a href={`tel:${PHONE_RAW}`} className="min-h-[36px] flex items-center" style={{ color: "var(--text-muted)" }}>
+
+              <p
+                className={`mb-2 text-center ${FONT_UI_MONO_MENU_BODY}`}
+                style={{ color: "var(--text-subtle)" }}
+              >
+                Мессенджеры
+              </p>
+              <div className="mb-5 flex flex-wrap items-center justify-center gap-3 sm:mb-6">
+                <a
+                  href={SOCIAL_LINKS.telegram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-opacity active:opacity-90"
+                  style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                  aria-label="Telegram"
+                  title="Telegram"
+                >
+                  <Send size={18} strokeWidth={1.75} aria-hidden />
+                </a>
+                <a
+                  href={SOCIAL_LINKS.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-opacity active:opacity-90"
+                  style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                  aria-label="WhatsApp"
+                  title="WhatsApp"
+                >
+                  <WhatsAppGlyph size={19} />
+                </a>
+                <a
+                  href={SOCIAL_LINKS.max}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-opacity active:opacity-90"
+                  style={{ borderColor: "var(--border)", color: "var(--text)" }}
+                  aria-label="MAX"
+                  title="MAX"
+                >
+                  <MaxMessengerIcon size={20} />
+                </a>
+              </div>
+
+              <div className={`flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2 ${FONT_UI_MONO_CONTACT}`}>
+                <a href={`tel:${PHONE_RAW}`} className="min-h-[40px] flex items-center justify-center sm:justify-start" style={{ color: "var(--text-muted)" }}>
                   {PHONE}
                 </a>
-                <a href={`mailto:${EMAIL}`} className="min-h-[36px] flex items-center break-all" style={{ color: "var(--text-muted)" }}>
+                <a href={`mailto:${EMAIL}`} className="min-h-[40px] flex items-center justify-center break-all sm:justify-start" style={{ color: "var(--text-muted)" }}>
                   {EMAIL}
                 </a>
               </div>

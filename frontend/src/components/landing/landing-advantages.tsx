@@ -74,7 +74,7 @@ function AdvantageCard({ item, index }: { item: AdvantageItem; index: number }) 
           style={{ color: hovered ? "var(--bg)" : "var(--accent)" }}
         />
         <span
-          className="font-matrix text-4xl font-bold tabular-nums leading-none transition-colors duration-500"
+          className="font-matrix text-2xl sm:text-3xl md:text-4xl font-bold tabular-nums leading-none transition-colors duration-500"
           style={{ color: hovered ? "rgba(var(--bg-rgb), 0.15)" : "var(--border)" }}
         >
           {String(index + 1).padStart(2, "0")}

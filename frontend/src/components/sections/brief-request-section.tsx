@@ -27,10 +27,10 @@ export function BriefRequestSection() {
 
   return (
     <div
-      className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-1 flex-col gap-1 overflow-hidden px-3 sm:gap-1.5 sm:px-5 md:max-w-[52rem] md:px-6"
+      className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden px-3 py-2 sm:gap-1.5 sm:px-5 md:h-full md:overflow-hidden md:py-0 md:max-w-[52rem] md:px-6"
       style={{
-        paddingTop: "max(0.35rem, env(safe-area-inset-top))",
-        paddingBottom: "max(0.25rem, env(safe-area-inset-bottom))",
+        paddingTop: "max(0.5rem, env(safe-area-inset-top))",
+        paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
       }}
     >
       <header className="flex shrink-0 items-center justify-between gap-2">
@@ -59,8 +59,8 @@ export function BriefRequestSection() {
       <TerminalWindow
         titleBar={titleBar}
         scrollableContent={false}
-        className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden text-[10px] sm:text-[11px]"
-        innerClassName="!flex !min-h-0 !min-w-0 !flex-1 !flex-col !overflow-hidden !p-2 sm:!p-3 md:!p-4"
+        className="flex min-h-[min(70vh,32rem)] min-w-0 flex-1 flex-col overflow-hidden text-[10px] sm:min-h-0 sm:text-[11px] md:flex-1"
+        innerClassName="!flex !min-h-0 !min-w-0 !flex-1 !flex-col !overflow-y-auto !overflow-x-hidden md:!overflow-hidden !p-2 sm:!p-3 md:!p-4"
       >
         <p className="mb-1.5 shrink-0 font-mono text-[9px] leading-tight sm:text-[10px]" style={{ color: "var(--text-subtle)" }}>
           # Тема и комментарий обязательны.

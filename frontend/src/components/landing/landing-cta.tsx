@@ -11,7 +11,7 @@ export function LandingCTA() {
   return (
     <section className="py-16 sm:py-20 md:py-28" style={{ backgroundColor: "var(--bg)" }}>
       <div className="container mx-auto text-center">
-        <h2 className="font-body text-2xl font-semibold sm:text-3xl md:text-4xl mb-4 sm:mb-6 leading-snug">
+        <h2 className="font-body text-xl font-semibold sm:text-2xl md:text-3xl lg:text-4xl mb-4 sm:mb-6 leading-snug">
           Обсудим ваш проект?
         </h2>
         <p

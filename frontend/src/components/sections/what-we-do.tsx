@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Clapperboard, Palette, Pyramid } from "lucide-react";
 import { useStickyHeaderPinned } from "@/lib/use-sticky-header-pinned";
+import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 import { PinnedCodeTypist } from "@/components/ui/pinned-code-typist";
 
 /** Демо и интерактивы — пополняется. */
@@ -97,7 +98,7 @@ function SlantedLinesParallax({ progress }: { progress: number }) {
   );
 }
 
-function ShowcaseCell({ item }: { item: ShowcaseItem }) {
+function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; previewVideosEnabled: boolean }) {
   return (
     <Link
       href={item.href}
@@ -105,7 +106,7 @@ function ShowcaseCell({ item }: { item: ShowcaseItem }) {
       className="group relative flex shrink-0 flex-col justify-between overflow-hidden p-3 transition-colors md:p-5"
       style={{ aspectRatio: "9 / 13", backgroundColor: "var(--bg-secondary)" }}
     >
-      {"previewVideo" in item && item.previewVideo && (
+      {"previewVideo" in item && item.previewVideo && previewVideosEnabled && (
         <>
           <video
             className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-105 object-cover opacity-0 transition-[opacity,transform] duration-700 ease-out group-hover:scale-100 group-hover:opacity-100"
@@ -199,14 +200,62 @@ function ShowcaseCell({ item }: { item: ShowcaseItem }) {
   );
 }
 
+function ShowcaseStackCard({ item }: { item: ShowcaseItem }) {
+  return (
+    <Link
+      href={item.href}
+      data-cursor-word="смотреть"
+      className="flex items-start gap-4 border-b px-4 py-5 transition-opacity active:opacity-90 last:border-b-0"
+      style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
+    >
+      <span
+        className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border"
+        style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+        aria-hidden
+      >
+        {item.icon === "ancient" ? (
+          <Pyramid size={20} strokeWidth={1.25} />
+        ) : item.icon === "palette" ? (
+          <Palette size={20} strokeWidth={1.25} />
+        ) : (
+          <Clapperboard size={20} strokeWidth={1.25} />
+        )}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="font-matrix text-[10px] uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>
+          {item.subtitle}
+        </p>
+        <h3
+          className="font-akony mt-1.5 text-[0.95rem] uppercase leading-snug tracking-[0.07em] sm:text-[1.05rem] sm:leading-tight sm:tracking-[0.08em] md:text-lg"
+          style={{ color: "var(--text)" }}
+        >
+          {item.title}
+        </h3>
+        <p className="mt-3 font-body text-xs leading-relaxed sm:text-[13px]" style={{ color: "var(--text-muted)" }}>
+          {item.description}
+        </p>
+        <div
+          className="mt-3 flex items-center gap-2 font-matrix text-[9px] uppercase tracking-[0.18em]"
+          style={{ color: "var(--accent)" }}
+        >
+          {item.id === "film" ? "Открыть демо" : "Открыть раздел"}
+          <ArrowRight size={12} />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 function ShowcaseColumn({
   col,
   ci,
   progress,
+  previewVideosEnabled,
 }: {
   col: ColumnConfig;
   ci: number;
   progress: number;
+  previewVideosEnabled: boolean;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -247,7 +296,7 @@ function ShowcaseColumn({
     >
       <div ref={contentRef} className="flex flex-col will-change-transform" style={{ transform: `translateY(${y}px)` }}>
         <div style={{ borderBottom: `${GAP}px solid var(--border)` }}>
-          <ShowcaseCell item={SHOWCASE_ITEMS[col.itemIndex]} />
+          <ShowcaseCell item={SHOWCASE_ITEMS[col.itemIndex]} previewVideosEnabled={previewVideosEnabled} />
         </div>
         {/* Нижний «ход» ленты — как у портфолио, чтобы параллакс был заметен */}
         <div className="h-[min(52vh,420px)] shrink-0" aria-hidden />
@@ -262,6 +311,8 @@ export function WhatWeDoSection() {
   const headerPinned = useStickyHeaderPinned(stickyHeaderRef);
   const [progress, setProgress] = useState(0);
   const rafRef = useRef(0);
+  const previewVideosEnabled = useIsDesktopLg();
+  const codeTypistEnabled = useIsDesktopLg();
 
   const handleScroll = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -288,7 +339,7 @@ export function WhatWeDoSection() {
     <section
       ref={sectionRef}
       data-navbar
-      className="relative"
+      className="relative max-md:!h-auto max-md:min-h-0"
       style={{ height: `${SECTION_HEIGHT_VH}vh`, backgroundColor: "var(--bg)", color: "var(--text)" }}
       aria-label="Выбери себе дизайн"
     >
@@ -299,13 +350,13 @@ export function WhatWeDoSection() {
       >
         <div className="min-w-0 flex-1">
           <h2
-            className="font-akony text-lg uppercase leading-tight tracking-[0.12em] md:text-2xl lg:text-3xl"
+            className="font-akony text-[0.95rem] uppercase leading-snug tracking-[0.14em] sm:text-lg md:text-2xl lg:text-3xl"
             style={{ color: "var(--text)" }}
           >
             Выбери себе дизайн
           </h2>
-          <div className="mt-1 min-h-[1.9rem] max-w-2xl sm:min-h-[2rem]">
-            {headerPinned ? (
+          <div className="mt-1 min-h-[1.6rem] max-w-2xl sm:min-h-[2rem]">
+            {codeTypistEnabled && headerPinned ? (
               <PinnedCodeTypist
                 text={
                   '// дизайн: showcase[] — интерактивы, UX/UI\n// блок пополняем · gallery → демо'
@@ -314,7 +365,7 @@ export function WhatWeDoSection() {
               />
             ) : (
               <p
-                className="font-matrix text-[10px] uppercase tracking-[0.2em] md:text-[11px]"
+                className="max-w-[18rem] font-matrix text-[8px] uppercase leading-snug tracking-[0.2em] sm:max-w-none sm:text-[10px] md:text-[11px]"
                 style={{ color: "var(--text-muted)" }}
               >
                 Разные интерактивы и визуальные форматы — блок будем наполнять
@@ -331,7 +382,13 @@ export function WhatWeDoSection() {
         </Link>
       </div>
 
-      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
+      <div className="border-t md:hidden" style={{ borderColor: "var(--border)" }}>
+        {SHOWCASE_ITEMS.map((item) => (
+          <ShowcaseStackCard key={item.id} item={item} />
+        ))}
+      </div>
+
+      <div className="sticky top-0 hidden h-[100dvh] w-full overflow-hidden md:block">
         <div className="pointer-events-none absolute inset-0 z-[30] mix-blend-overlay" style={{ opacity: 0.12 }}>
           <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden>
             <filter id="whatwedo-grain">
@@ -355,7 +412,13 @@ export function WhatWeDoSection() {
 
         <div className="relative z-10 flex h-full w-full min-h-0 bg-transparent">
           {COLUMNS.map((col, ci) => (
-            <ShowcaseColumn key={ci} col={col} ci={ci} progress={progress} />
+            <ShowcaseColumn
+              key={ci}
+              col={col}
+              ci={ci}
+              progress={progress}
+              previewVideosEnabled={previewVideosEnabled}
+            />
           ))}
         </div>
       </div>

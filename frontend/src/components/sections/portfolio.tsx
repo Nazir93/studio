@@ -4,8 +4,8 @@ import { useRef, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { PORTFOLIO_CASES } from "@/lib/portfolio-data";
 import { useStickyHeaderPinned } from "@/lib/use-sticky-header-pinned";
+import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 import { PinnedCodeTypist } from "@/components/ui/pinned-code-typist";
-import { PortfolioSmokeBackground } from "@/components/effects/portfolio-smoke-background";
 
 interface PortfolioTapeItem {
   title: string;
@@ -195,6 +195,40 @@ function PortfolioCell({ title, subtitle, tag, year, area, href, image, video }:
   );
 }
 
+function PortfolioStackCard(cell: PortfolioTapeItem) {
+  return (
+    <Link
+      href={cell.href}
+      data-cursor-word="смотреть"
+      className="block border-b px-4 py-5 transition-opacity active:opacity-90 last:border-b-0"
+      style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="font-matrix text-[10px] uppercase tracking-[0.2em]" style={{ color: "var(--text-subtle)" }}>
+          {cell.tag}
+        </span>
+        <span className="font-matrix text-[10px] uppercase tracking-[0.15em]" style={{ color: "var(--text-subtle)" }}>
+          {cell.year}
+        </span>
+      </div>
+      <h3
+        className="mt-2 font-akony text-[0.95rem] uppercase leading-snug tracking-[0.07em] sm:text-[1.05rem] sm:leading-tight sm:tracking-[0.08em] md:text-lg"
+        style={{ color: "var(--text)" }}
+      >
+        {cell.title}
+      </h3>
+      <p className="mt-2 font-matrix text-xs uppercase tracking-[0.12em]" style={{ color: "var(--text-muted)" }}>
+        {cell.subtitle}
+      </p>
+      {cell.area ? (
+        <p className="mt-2 font-matrix text-[10px] uppercase tracking-[0.14em]" style={{ color: "var(--text-subtle)" }}>
+          {cell.area}
+        </p>
+      ) : null}
+    </Link>
+  );
+}
+
 function PortfolioColumn({ col, ci, progress }: { col: Column; ci: number; progress: number }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -258,6 +292,7 @@ export function PortfolioSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const stickyHeaderRef = useRef<HTMLDivElement>(null);
   const headerPinned = useStickyHeaderPinned(stickyHeaderRef);
+  const codeTypistEnabled = useIsDesktopLg();
   const [progress, setProgress] = useState(0);
   const rafRef = useRef(0);
 
@@ -287,7 +322,7 @@ export function PortfolioSection() {
       ref={sectionRef}
       id="portfolio"
       data-cursor-word="смотреть"
-      className="relative"
+      className="relative max-md:!h-auto max-md:min-h-0"
       style={{ height: `${SECTION_HEIGHT_VH}vh`, backgroundColor: "var(--bg)", color: "var(--text)" }}
       aria-label="Портфолио"
     >
@@ -297,18 +332,18 @@ export function PortfolioSection() {
         className="sticky top-0 z-[40] flex items-center justify-between px-4 py-3 md:px-6 md:py-3.5"
         style={{ backgroundColor: "var(--bg)", borderBottom: "1px solid var(--border)" }}
       >
-        <div className="flex min-w-0 flex-wrap items-baseline gap-3 md:gap-4">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-2 md:gap-4">
           <h2
-            className="font-akony text-xl uppercase tracking-[0.12em] md:text-3xl lg:text-4xl"
+            className="font-akony text-[0.95rem] uppercase leading-snug tracking-[0.14em] sm:text-lg md:text-2xl lg:text-4xl"
             style={{ color: "var(--text)" }}
           >
             Портфолио
           </h2>
-          {headerPinned ? (
+          {codeTypistEnabled && headerPinned ? (
             <PinnedCodeTypist text='// портфолио: cases.filter(Boolean).length === 7' charDelayMs={11} />
           ) : (
             <span
-              className="font-matrix text-[10px] uppercase tracking-[0.28em] md:text-[11px]"
+              className="max-w-[14rem] font-matrix text-[8px] uppercase leading-snug tracking-[0.22em] sm:max-w-none sm:text-[10px] sm:tracking-[0.28em] md:text-[11px]"
               style={{ color: "var(--text-muted)" }}
             >
               7 проектов
@@ -324,7 +359,13 @@ export function PortfolioSection() {
         </Link>
       </div>
 
-      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
+      <div className="border-t md:hidden" style={{ borderColor: "var(--border)" }}>
+        {P.map((cell) => (
+          <PortfolioStackCard key={cell.href} {...cell} />
+        ))}
+      </div>
+
+      <div className="sticky top-0 hidden h-[100dvh] w-full overflow-hidden md:block">
         {/* Шероховатость / зерно */}
         <div className="pointer-events-none absolute inset-0 z-30 mix-blend-overlay" style={{ opacity: 0.15 }}>
           <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">

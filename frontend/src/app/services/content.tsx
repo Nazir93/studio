@@ -34,21 +34,25 @@ function ServiceCard({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  /** Видео подключаем вместе с появлением карточки — один observer, без одновременной загрузки всех mp4 */
+  const [loadVideo, setLoadVideo] = useState(false);
   const Icon = SERVICE_ICONS[service.icon];
 
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
+        if (!entry.isIntersecting) return;
+        setVisible(true);
+        if (service.videoUrl) setLoadVideo(true);
+        observer.disconnect();
       },
-      { threshold: 0.12 }
+      { threshold: 0.08, rootMargin: "140px 0px" }
     );
-    if (ref.current) observer.observe(ref.current);
+    observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [service.videoUrl]);
 
   return (
     <div
@@ -63,13 +67,13 @@ function ServiceCard({
       <Link
         href={service.slug}
         data-cursor-word="смотреть"
-        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--bg-secondary)_88%,var(--bg)_12%)] transition-all duration-500 hover:-translate-y-0.5 hover:border-[rgba(250,204,21,0.35)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.07)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--bg-secondary)_88%,var(--bg)_12%)] transition-all duration-500 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--text)_22%,transparent)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.07)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
       >
         <div
           className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px opacity-70 transition-opacity group-hover:opacity-100"
           style={{
             background:
-              "linear-gradient(90deg, transparent 0%, rgba(250,204,21,0.45) 40%, rgba(250,204,21,0.45) 60%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--text) 35%, transparent) 40%, color-mix(in srgb, var(--text) 35%, transparent) 60%, transparent 100%)",
           }}
           aria-hidden
         />
@@ -77,17 +81,31 @@ function ServiceCard({
         {/* Превью */}
         <div className="relative aspect-[16/10] overflow-hidden border-b" style={{ borderColor: "var(--border)" }}>
           {service.videoUrl ? (
-            <video
-              className="h-full w-full object-cover opacity-90 transition-[opacity,transform] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-hidden
-            >
-              <source src={service.videoUrl} type="video/mp4" />
-            </video>
+            loadVideo ? (
+              <video
+                className="h-full w-full object-cover opacity-90 transition-[opacity,transform] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                aria-hidden
+              >
+                <source src={service.videoUrl} type="video/mp4" />
+              </video>
+            ) : (
+              <div
+                className="flex h-full w-full items-center justify-center bg-[color-mix(in_srgb,var(--bg-secondary)_92%,var(--bg)_8%)]"
+                aria-hidden
+              >
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl border opacity-70"
+                  style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+                >
+                  <Icon size={24} strokeWidth={1.35} />
+                </span>
+              </div>
+            )
           ) : (
             <div
               className="flex h-full w-full items-center justify-center transition-colors duration-500 group-hover:bg-[color-mix(in_srgb,var(--bg-secondary)_88%,var(--bg)_12%)]"
@@ -97,7 +115,7 @@ function ServiceCard({
               }}
             >
               <span
-                className="flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 group-hover:border-[rgba(250,204,21,0.45)] group-hover:text-[rgba(250,204,21,0.95)]"
+                className="flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 group-hover:border-[color-mix(in_srgb,var(--text)_35%,transparent)] group-hover:text-[var(--text)]"
                 style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                 aria-hidden
               >
@@ -120,7 +138,7 @@ function ServiceCard({
               {String(index + 1).padStart(2, "0")}
             </span>
             <span
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-all duration-300 group-hover:border-[rgba(250,204,21,0.5)] group-hover:text-[rgba(250,204,21,1)]"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-all duration-300 group-hover:border-[color-mix(in_srgb,var(--text)_40%,transparent)] group-hover:text-[var(--text)]"
               style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
               aria-hidden
             >
@@ -129,7 +147,7 @@ function ServiceCard({
           </div>
 
           <h2
-            className="font-akony text-lg uppercase leading-tight tracking-[0.08em] transition-colors duration-300 group-hover:text-[color-mix(in_srgb,var(--text)_90%,rgba(250,204,21,1)_10%)] md:text-xl"
+            className="font-akony text-lg uppercase leading-tight tracking-[0.08em] transition-colors duration-300 group-hover:opacity-95 md:text-xl"
             style={{ color: "var(--text)" }}
           >
             {service.title}
@@ -157,16 +175,16 @@ export function ServicesPageContent() {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="mb-10 md:mb-14 max-w-3xl">
           <div className="mb-5 flex items-center gap-2">
-            <div className="h-px w-8 shrink-0" style={{ backgroundColor: "rgba(250, 204, 21, 0.65)" }} />
+            <div className="h-px w-8 shrink-0" style={{ backgroundColor: "color-mix(in srgb, var(--text) 40%, transparent)" }} />
             <span
               className="text-[10px] font-medium uppercase tracking-[0.2em] sm:text-[11px]"
-              style={{ color: "rgba(250, 204, 21, 0.85)" }}
+              style={{ color: "var(--text-muted)" }}
             >
               Направления студии
             </span>
           </div>
           <h1
-            className="font-heading text-[clamp(1.5rem,4.5vw,2.75rem)] leading-[1.05] tracking-tight"
+            className="font-heading text-[clamp(1.2rem,3.8vw,2.75rem)] leading-[1.05] tracking-tight"
             style={{ color: "var(--text)" }}
           >
             УСЛУГИ
