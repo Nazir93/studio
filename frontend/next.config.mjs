@@ -2,6 +2,10 @@
 const nextConfig = {
   /** Сборка Docker: `frontend/Dockerfile` копирует `.next/standalone` */
   output: "standalone",
+  /** Ускоряет `next build` на слабом VPS (lint отдельно: `npm run lint`) */
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   /**
    * Только для `next dev` без --turbo. Turbopack эти опции не применяет — для стабильности на Windows
    * используйте обычный `npm run dev` (см. .env.development WATCHPACK_POLLING).

@@ -1,6 +1,5 @@
-version: "3.8"
-
 # Переменные приложения: frontend/.env.production (без DATABASE_URL)
+# Образ nginx из AWS Public ECR — без лимита анонимных pull с Docker Hub
 services:
   nextjs:
     build:
@@ -11,7 +10,7 @@ services:
     restart: unless-stopped
 
   nginx:
-    image: nginx:alpine
+    image: public.ecr.aws/docker/library/nginx:alpine
     ports:
       - "80:80"
       - "443:443"
