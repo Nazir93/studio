@@ -50,9 +50,46 @@ nano frontend/.env.production
 
 Файл `frontend/.env.production` на сервере не коммитится (см. `.gitignore`).
 
+После **любого** изменения `frontend/.env.production` пересоздайте контейнер приложения, иначе старые переменные останутся в памяти:
+
+```bash
+docker compose up -d --force-recreate nextjs
+```
+
+### Заявки в Telegram не приходят
+
+- Убедитесь, что в контейнере есть переменные: `docker compose exec nextjs sh -c 'printenv | grep TELEGRAM'`
+- **Личный чат:** вы один раз написали боту `/start` (без этого Bot API не шлёт вам сообщения).
+- **Группа:** `TELEGRAM_CHAT_ID` вида `-100…`, бот добавлен в группу.
+- Ошибки API смотрите в логах: `docker compose logs -f nextjs` (строки `[TELEGRAM]`).
+- С сервера должен быть доступ в интернет: `docker compose exec nextjs wget -qO- https://api.telegram.org`
+
 ## 5. SSL для Nginx (иначе контейнер nginx не поднимет `:443`)
 
-Без файлов в `nginx/ssl/` блок HTTPS не стартует. Для первого запуска — самоподписанный сертификат (потом замените на Let’s Encrypt):
+Без файлов в `nginx/ssl/` блок HTTPS не стартует.
+
+### Заход по IP (Chrome «Неподдерживаемый сертификат» / NET::ERR_CERT_COMMON_NAME_INVALID)
+
+Если сертификат выпущен на **hostname** или **домен**, а в браузере открываете **https://IP** — имя не совпадает, браузер **блокирует** HTTPS. Варианты:
+
+- открывать **`http://IP`** (без S), или
+- выпустить самоподписанный сертификат с **SAN = IP** (подставьте свой IP):
+
+```bash
+mkdir -p nginx/ssl
+IP="ВАШ_IP_СЮДА"
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout nginx/ssl/privkey.pem \
+  -out nginx/ssl/fullchain.pem \
+  -subj "/CN=$IP" \
+  -addext "subjectAltName=IP:$IP"
+chmod 600 nginx/ssl/privkey.pem
+docker compose restart nginx
+```
+
+После этого `https://IP` всё равно будет «не доверенный» (самоподписанный), но **дойти до сайта** можно через «Дополнительные → перейти».
+
+### Домен (без IP в браузере)
 
 ```bash
 mkdir -p nginx/ssl
@@ -76,7 +113,7 @@ docker compose logs -f --tail=50
 
 Проверка nginx: `docker compose exec nginx nginx -t`
 
-Сайт: `http://IP` и `https://IP` (браузер предупредит о самоподписанном сертификате).
+Сайт: сначала проверьте **`http://IP`**. HTTPS по IP — только если в сертификате есть SAN с этим IP (см. раздел 5).
 
 Если при `docker compose up` ошибка **Docker Hub pull rate limit** для образа nginx: в репозитории уже указан `public.ecr.aws/docker/library/nginx:alpine` (не Docker Hub). Выполните `git pull` и снова `docker compose pull && docker compose up -d`. Альтернатива: `docker login` на Docker Hub.
 

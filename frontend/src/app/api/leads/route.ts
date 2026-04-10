@@ -3,6 +3,8 @@ import { leadFormSchema } from "@/lib/schemas";
 import { v4 as uuidv4 } from "uuid";
 import { sendTelegramNotification, formatLeadMessage } from "@/lib/telegram";
 
+export const dynamic = "force-dynamic";
+
 const RATE_LIMIT_MAP = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_MAX = 3;
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000;
@@ -66,7 +68,14 @@ export async function POST(request: NextRequest) {
     );
 
     if (!telegramOk) {
-      console.warn("[LEAD] Telegram delivery failed; check TELEGRAM_* env");
+      console.error("[LEAD] Telegram delivery failed; check TELEGRAM_* env and bot/chat (user must /start bot in private chat)");
+      return NextResponse.json(
+        {
+          error:
+            "Не удалось отправить заявку в мессенджер. Позвоните нам или напишите в Telegram — мы на связи.",
+        },
+        { status: 503 }
+      );
     }
 
     console.log("[LEAD]", {

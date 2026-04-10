@@ -1,7 +1,7 @@
 /** Успешная доставка в Telegram (false — нет env, сеть или ответ ok: false) */
 export async function sendTelegramNotification(message: string): Promise<boolean> {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
 
   if (!botToken || !chatId) {
     console.warn("[TELEGRAM] Задайте TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID в окружении");
@@ -19,9 +19,17 @@ export async function sendTelegramNotification(message: string): Promise<boolean
         disable_web_page_preview: true,
       }),
     });
-    const data = (await res.json().catch(() => null)) as { ok?: boolean; description?: string } | null;
+    const data = (await res.json().catch(() => null)) as {
+      ok?: boolean;
+      description?: string;
+      error_code?: number;
+    } | null;
     if (!res.ok || data?.ok === false) {
-      console.error("[TELEGRAM] sendMessage:", data?.description ?? res.status);
+      console.error(
+        "[TELEGRAM] sendMessage failed:",
+        data?.description ?? res.status,
+        data?.error_code != null ? `(code ${data.error_code})` : ""
+      );
       return false;
     }
     return true;
