@@ -105,6 +105,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
   },
+  /** Тот же файл, что логотип в шапке (`/public/logo.png`) */
+  icons: {
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    shortcut: "/logo.png",
+    apple: [{ url: "/logo.png", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({

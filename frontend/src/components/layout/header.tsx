@@ -17,6 +17,7 @@ import {
   FONT_UI_MONO_CONTACT,
 } from "@/lib/ui-typography";
 import { useTheme } from "@/lib/theme-context";
+import { cn } from "@/lib/utils";
 
 function buildGridPath(
   cols: number, rows: number, cellW: number, cellH: number,
@@ -384,13 +385,24 @@ export function Header() {
 export function NavBar() {
   const { isDark, toggleTheme } = useTheme();
   const pathname = usePathname();
+  const isHome = pathname === "/";
+  /** Главная: шапка в потоке страницы, сплошной фон — без sticky и без «стекла» поверх баннера */
+  const stickyBar = !isHome;
 
   return (
     <div
-      className="safe-sticky-top sticky top-0 z-40 border-b backdrop-blur-md"
+      className={cn(
+        "z-40 border-b border-[var(--border)]",
+        isHome
+          ? "relative safe-top"
+          : "safe-sticky-top sticky top-0 backdrop-blur-md transition-[background-color,backdrop-filter,border-color] duration-300"
+      )}
       style={{
-        backgroundColor: isDark ? "rgba(10,10,10,0.9)" : "rgba(255,255,255,0.9)",
-        borderColor: "var(--border)",
+        backgroundColor: stickyBar
+          ? isDark
+            ? "rgba(10,10,10,0.9)"
+            : "rgba(255,255,255,0.9)"
+          : "var(--bg)",
       }}
     >
       <div className="container mx-auto flex items-center justify-between py-2.5 sm:py-3 md:py-4">
@@ -446,8 +458,7 @@ export function NavBar() {
           {/* Theme toggle */}
           <button
             onClick={toggleTheme}
-            className="ml-2 w-9 h-9 rounded-full flex items-center justify-center border transition-colors"
-            style={{ borderColor: "var(--border)" }}
+            className="ml-2 w-9 h-9 rounded-full flex items-center justify-center border border-[var(--border)] transition-colors"
             aria-label="Переключить тему"
           >
             {isDark ? (
@@ -462,8 +473,7 @@ export function NavBar() {
         <div className="lg:hidden flex items-center gap-2">
           <button
             onClick={toggleTheme}
-            className="w-10 h-10 rounded-full flex items-center justify-center border"
-            style={{ borderColor: "var(--border)" }}
+            className="w-10 h-10 rounded-full flex items-center justify-center border border-[var(--border)]"
             aria-label="Переключить тему"
           >
             {isDark ? (

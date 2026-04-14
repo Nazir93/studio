@@ -6,6 +6,9 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight, X } from "lucide-react";
 import { PortfolioCase, PORTFOLIO_CASES } from "@/lib/portfolio-data";
 
+/** Кейсы: контент на всю ширину экрана с полями (без max-width у container) */
+const CASE_FULL_WIDTH = "w-full max-w-none px-4 sm:px-5 md:px-8 lg:px-10 xl:px-12";
+
 function useScrollVisible(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -236,14 +239,18 @@ function ParallaxShowcase({ label, dark = true }: { label: string; dark?: boolea
 function HeroCaseImage({ src, title, compact }: { src: string; title: string; compact?: boolean }) {
   const inner = (
     <div
-      className="relative w-full rounded-2xl border border-solid shadow-2xl md:rounded-3xl"
+      className={
+        compact
+          ? "relative w-full border border-solid shadow-sm lg:border-x-0 lg:shadow-none"
+          : "relative w-full border border-solid shadow-sm"
+      }
       style={{
         borderColor: "var(--border)",
-        boxShadow: "0 24px 80px rgba(0,0,0,0.12)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
       }}
     >
       <div
-        className="relative w-full overflow-hidden rounded-2xl md:rounded-3xl"
+        className="relative w-full overflow-hidden"
         style={{ backgroundColor: "var(--bg)", paddingBottom: "1px" }}
       >
         <PortfolioRasterImg
@@ -265,7 +272,7 @@ function HeroCaseImage({ src, title, compact }: { src: string; title: string; co
 
   if (compact) {
     return (
-      <div className="relative w-full" aria-label="Главный скриншот проекта">
+      <div className="relative w-full min-w-0" aria-label="Главный скриншот проекта">
         {inner}
       </div>
     );
@@ -277,7 +284,7 @@ function HeroCaseImage({ src, title, compact }: { src: string; title: string; co
       style={{ backgroundColor: "var(--bg)" }}
       aria-label="Главный скриншот проекта"
     >
-      <div className="container mx-auto px-4 md:px-6">{inner}</div>
+      <div className="px-4 md:px-6 lg:px-0">{inner}</div>
     </section>
   );
 }
@@ -295,14 +302,18 @@ function HeroCaseVideo({
 }) {
   const inner = (
     <div
-      className="relative w-full rounded-2xl border border-solid shadow-2xl md:rounded-3xl"
+      className={
+        compact
+          ? "relative w-full border border-solid shadow-sm lg:border-x-0 lg:shadow-none"
+          : "relative w-full border border-solid shadow-sm"
+      }
       style={{
         borderColor: "var(--border)",
-        boxShadow: "0 24px 80px rgba(0,0,0,0.12)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
       }}
     >
       <div
-        className="relative aspect-[16/10] md:aspect-[21/9] w-full min-h-[220px] max-h-[min(78vh,900px)] overflow-hidden rounded-2xl md:rounded-3xl"
+        className="relative aspect-[16/10] md:aspect-[21/9] w-full min-h-[220px] max-h-[min(78vh,900px)] overflow-hidden"
         style={{ backgroundColor: "var(--bg)" }}
       >
         <video
@@ -331,7 +342,7 @@ function HeroCaseVideo({
 
   if (compact) {
     return (
-      <div className="relative w-full" aria-label="Видео проекта">
+      <div className="relative w-full min-w-0" aria-label="Видео проекта">
         {inner}
       </div>
     );
@@ -339,7 +350,7 @@ function HeroCaseVideo({
 
   return (
     <section className="relative w-full py-8 md:py-12" style={{ backgroundColor: "var(--bg)" }} aria-label="Видео проекта">
-      <div className="container mx-auto px-4 md:px-6">{inner}</div>
+      <div className="px-4 md:px-6 lg:px-0">{inner}</div>
     </section>
   );
 }
@@ -355,20 +366,22 @@ function ShowcasePhoto({
 }) {
   return (
     <section
-      className="relative"
+      className="relative w-full min-w-0"
       style={{
         backgroundColor: dark ? "#0a0a0a" : "var(--bg-secondary)",
       }}
     >
-      <div className="container mx-auto px-4 py-10 md:py-14 md:px-6">
+      {/* На lg+ картинка на всю ширину вьюпорта; на мобилке — прежние поля */}
+      <div className="w-full px-4 py-10 md:px-6 md:py-14 lg:px-0 lg:py-12 xl:py-16">
         <div
-          className="relative mx-auto rounded-2xl border border-solid md:rounded-3xl"
+          className="relative mx-auto w-full max-w-full border border-solid shadow-sm lg:mx-0 lg:rounded-none lg:border-x-0 lg:shadow-none"
           style={{
             borderColor: dark ? "rgba(255,255,255,0.12)" : "var(--border)",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.07)",
           }}
         >
           <div
-            className="overflow-hidden rounded-2xl md:rounded-3xl"
+            className="overflow-hidden"
             style={{ backgroundColor: dark ? "#0a0a0a" : "var(--bg)", paddingBottom: "1px" }}
           >
             <PortfolioRasterImg
@@ -380,15 +393,17 @@ function ShowcasePhoto({
             />
           </div>
         </div>
-        {label.trim() ? (
+      </div>
+      {label.trim() ? (
+        <div className={`${CASE_FULL_WIDTH} pb-10 md:pb-14 lg:pb-12 xl:pb-16`}>
           <p
-            className="mt-4 text-center font-montserrat text-[10px] font-semibold uppercase tracking-[0.18em] md:mt-5"
+            className="text-center font-montserrat text-[10px] font-semibold uppercase tracking-[0.18em]"
             style={{ color: dark ? "rgba(255,255,255,0.45)" : "var(--text-subtle)" }}
           >
             {label}
           </p>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -406,7 +421,7 @@ function TextBlock({ leftText, rightText, accent }: { leftText: string; rightTex
         borderBottom: accent ? "1px solid var(--border)" : undefined,
       }}
     >
-      <div className="container mx-auto">
+      <div className={CASE_FULL_WIDTH}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20">
           <div
             className="transition-all duration-700 ease-out"
@@ -470,7 +485,7 @@ function NavLink({ href, label, direction }: { href: string; label: string; dire
           {direction === "prev" ? "Предыдущий проект" : "Следующий проект"}
         </span>
         <span
-          className="font-heading normal-case text-base font-bold md:text-lg transition-colors duration-700 break-words text-pretty"
+          className="font-heading normal-case text-[0.625rem] font-medium leading-tight sm:text-[0.65rem] md:text-[0.6875rem] transition-colors duration-700 break-words text-pretty"
           style={{ color: hovered ? "var(--bg)" : "var(--text)" }}
         >
           {label}
@@ -502,7 +517,7 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
     <article className="font-montserrat text-[15px] leading-normal antialiased md:text-base">
       {/* Hero */}
       <section className="pt-32 pb-16 md:pt-40 md:pb-20" style={{ backgroundColor: "var(--bg)" }}>
-        <div className="container mx-auto">
+        <div className={CASE_FULL_WIDTH}>
           {/* Back link */}
           <div
             className="transition-all duration-700"
@@ -624,22 +639,24 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
               ) : null}
             </div>
           )}
+        </div>
 
-          {(project.heroVideo || project.heroImage) && (
-            <div className="mb-14 md:mb-16">
-              {project.heroVideo ? (
-                <HeroCaseVideo
-                  src={project.heroVideo}
-                  poster={project.heroImage}
-                  title={project.title}
-                  compact
-                />
-              ) : (
-                <HeroCaseImage src={project.heroImage!} title={project.title} compact />
-              )}
-            </div>
-          )}
+        {(project.heroVideo || project.heroImage) && (
+          <div className="mb-14 w-full min-w-0 md:mb-16">
+            {project.heroVideo ? (
+              <HeroCaseVideo
+                src={project.heroVideo}
+                poster={project.heroImage}
+                title={project.title}
+                compact
+              />
+            ) : (
+              <HeroCaseImage src={project.heroImage!} title={project.title} compact />
+            )}
+          </div>
+        )}
 
+        <div className={CASE_FULL_WIDTH}>
           {/* Two columns: description + features */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
             <div
@@ -721,30 +738,30 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
           className="py-16 md:py-20"
           style={{ backgroundColor: "var(--bg)", borderTop: "1px solid var(--border)" }}
         >
-          <div className="container mx-auto px-4 md:px-6">
+          <div className={CASE_FULL_WIDTH}>
             {project.resultMetrics?.length ? (
               <>
                 <p
-                  className="mb-8 text-center text-[10px] font-bold uppercase tracking-[0.2em] md:mb-10"
+                  className="mb-5 text-center text-[9px] font-bold uppercase tracking-[0.2em] md:mb-6"
                   style={{ color: "var(--text-muted)" }}
                 >
                   Результаты
                 </p>
-                <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-3 lg:grid-cols-4 md:gap-8">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 md:gap-5">
                   {project.resultMetrics.map((m, i) => (
                     <div
                       key={`${m.label}-${i}`}
-                      className="rounded-xl border px-2.5 py-3 text-center sm:rounded-2xl sm:px-4 sm:py-5 md:px-5 md:py-6"
+                      className="rounded-lg border px-2 py-2.5 text-center sm:rounded-xl sm:px-3 sm:py-3 md:px-3.5 md:py-3.5"
                       style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
                     >
                       <p
-                        className="font-heading text-base font-bold leading-[1.15] tracking-tight sm:text-lg md:text-2xl lg:text-3xl"
+                        className="font-heading text-[11px] font-semibold leading-[1.2] tracking-tight sm:text-xs md:text-sm lg:text-base"
                         style={{ color: "var(--text)" }}
                       >
                         {m.value}
                       </p>
                       <p
-                        className="mt-1.5 text-[10px] leading-snug sm:mt-2 sm:text-xs md:text-sm"
+                        className="mt-1 text-[8px] leading-snug sm:text-[9px] md:text-[10px]"
                         style={{ color: "var(--text-muted)" }}
                       >
                         {m.label}
@@ -792,7 +809,7 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
 
       {/* Navigation between cases */}
       <section className="py-16 md:py-20" style={{ backgroundColor: "var(--bg)", borderTop: "1px solid var(--border)" }}>
-        <div className="container mx-auto">
+        <div className={CASE_FULL_WIDTH}>
           <div className="flex w-full min-w-0 flex-col gap-3 md:flex-row md:gap-4">
             {prevCase && (
               <NavLink href={`/portfolio/${prevCase.slug}`} label={prevCase.title} direction="prev" />

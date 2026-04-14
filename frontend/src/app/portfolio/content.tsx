@@ -6,7 +6,6 @@ import { PortfolioSplit } from "@/components/portfolio/portfolio-split";
 import { PortfolioSectorTabs } from "@/components/portfolio/portfolio-sector-tabs";
 import type { PortfolioSectorId } from "@/lib/portfolio-sectors";
 import { CasesVideoTitle } from "@/components/portfolio/cases-video-title";
-import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 
 type Props = {
   /** С серверной страницы — без useSearchParams / Suspense, без «мигания» при переходах */
@@ -14,15 +13,10 @@ type Props = {
 };
 
 export function PortfolioPageContent({ activeSector }: Props) {
-  const isDesktop = useIsDesktopLg();
-
   const filteredProjects = useMemo(() => {
     if (!activeSector) return PORTFOLIO_CASES;
     return PORTFOLIO_CASES.filter((p) => p.sector === activeSector);
   }, [activeSector]);
-
-  /** Превью справа — только на десктопе (lg+); на телефоне и планшете только список */
-  const showPreview = activeSector !== null && isDesktop;
 
   return (
     <section className="relative pt-32 pb-20 md:pt-40 md:pb-28" style={{ backgroundColor: "var(--bg)" }}>
@@ -41,7 +35,7 @@ export function PortfolioPageContent({ activeSector }: Props) {
               <p className="mt-2 text-sm opacity-80">Откройте полный список или выберите другой раздел.</p>
             </div>
           ) : (
-            <PortfolioSplit projects={filteredProjects} showPreview={showPreview} />
+            <PortfolioSplit projects={filteredProjects} />
           )}
         </div>
       </div>

@@ -5,7 +5,10 @@ import Link from "next/link";
 import { PORTFOLIO_CASES } from "@/lib/portfolio-data";
 import { useStickyHeaderPinned } from "@/lib/use-sticky-header-pinned";
 import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
+import { useTheme } from "@/lib/theme-context";
 import { PinnedCodeTypist } from "@/components/ui/pinned-code-typist";
+
+const PORTFOLIO_TAPE_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 interface PortfolioTapeItem {
   title: string;
@@ -25,8 +28,9 @@ const P: PortfolioTapeItem[] = PORTFOLIO_CASES.map((c) => ({
   year: c.year,
   area: c.area,
   href: `/portfolio/${c.slug}`,
-  image: null,
-  video: null,
+  /** Как в «Что умеем»: фон — постер; при наведении — heroVideo, если есть */
+  image: c.heroImage ?? null,
+  video: c.heroVideo ?? null,
 }));
 
 interface Column {
@@ -65,32 +69,58 @@ function clamp(v: number, lo: number, hi: number) {
   return Math.min(Math.max(v, lo), hi);
 }
 
-function PortfolioCell({ title, subtitle, tag, year, area, href, image, video }: PortfolioTapeItem) {
+function PortfolioCell({
+  title,
+  subtitle,
+  tag,
+  year,
+  area,
+  href,
+  image,
+  video,
+  videosEnabled,
+}: PortfolioTapeItem & { videosEnabled: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
+  const { isDark } = useTheme();
+  /** Как в «Что умеем»: ролик только lg+ */
+  const effectiveVideo = videosEnabled && video ? video : null;
+  const hasMedia = !!effectiveVideo;
 
   useEffect(() => {
     const v = videoRef.current;
-    if (!v) return;
+    if (!v || !effectiveVideo) return;
     if (hovered) {
       v.currentTime = 0;
       v.play().catch(() => {});
     } else {
       v.pause();
     }
-  }, [hovered]);
+  }, [hovered, effectiveVideo]);
 
   return (
     <Link
       href={href}
-      className="group relative flex shrink-0 flex-col justify-end overflow-hidden p-3 transition-colors md:p-5"
-      style={{ aspectRatio: "9 / 13", backgroundColor: "var(--bg-secondary)" }}
+      className="group relative flex shrink-0 flex-col overflow-hidden transition-colors"
+      style={{
+        aspectRatio: "9 / 13",
+        backgroundColor: hasMedia ? "#0a0a0a" : "var(--bg-secondary)",
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Фон */}
+      {/* Фон: при наличии видео на десктопе — чёрная пластина + лёгкая текстура; иначе постер / градиент */}
       <div className="pointer-events-none absolute inset-0">
-        {image ? (
+        {hasMedia ? (
+          <div
+            className="h-full w-full"
+            style={{
+              background:
+                "radial-gradient(ellipse at 30% 25%, var(--text-subtle) 0%, transparent 55%), radial-gradient(ellipse at 75% 70%, var(--text-subtle) 0%, transparent 45%)",
+              opacity: 0.15,
+            }}
+          />
+        ) : image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={image}
@@ -109,15 +139,15 @@ function PortfolioCell({ title, subtitle, tag, year, area, href, image, video }:
         )}
       </div>
 
-      {/* Видео при наведении */}
-      {video && (
+      {/* Видео при наведении (только lg+, как в ленте «Что умеем») */}
+      {effectiveVideo ? (
         <div
           className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-500"
-          style={{ opacity: hovered ? 1 : 0 }}
+          style={{ opacity: hovered ? 1 : 0, transitionTimingFunction: PORTFOLIO_TAPE_EASE }}
         >
           <video
             ref={videoRef}
-            src={video}
+            src={effectiveVideo}
             muted
             loop
             playsInline
@@ -129,67 +159,95 @@ function PortfolioCell({ title, subtitle, tag, year, area, href, image, video }:
             style={{ background: "linear-gradient(to top, var(--bg), transparent)" }}
           />
         </div>
-      )}
+      ) : null}
 
-      {/* Текст */}
+      {/* Текст — сетка как в TapeCell: линия сверху, заголовок по центру, подпись снизу */}
       <div
-        className="relative z-30 transition-all duration-300"
-        style={{ transform: hovered && video ? "translateY(-4px)" : "none" }}
+        className="absolute inset-0 z-30 flex flex-col justify-between gap-2 p-3 md:p-5"
+        style={{
+          transform: hovered && hasMedia ? "translateY(-2px)" : "translateY(0)",
+          transition: `transform 0.45s ${PORTFOLIO_TAPE_EASE}`,
+        }}
       >
-        <div className="flex items-center gap-2">
-          <span
-            className="font-matrix text-[7px] uppercase tracking-[0.2em] md:text-[8px]"
+        <div className="shrink-0">
+          <div
+            className="mb-2 h-px w-full origin-left rounded-full transition-transform duration-500"
             style={{
-              color:
-                hovered && video
-                  ? "color-mix(in srgb, var(--text) 58%, transparent)"
-                  : "var(--text-subtle)",
+              background:
+                "linear-gradient(90deg, color-mix(in srgb, var(--text) 65%, transparent), color-mix(in srgb, var(--text) 8%, transparent))",
+              transform: hovered ? "scaleX(1)" : "scaleX(0)",
+              transitionTimingFunction: PORTFOLIO_TAPE_EASE,
             }}
-          >
-            {tag}
-          </span>
-          <span
-            className="font-matrix text-[7px] uppercase tracking-[0.15em] md:text-[8px]"
-            style={{
-              color:
-                hovered && video
-                  ? "color-mix(in srgb, var(--text) 48%, transparent)"
-                  : "var(--text-subtle)",
-            }}
-          >
-            {year}
-          </span>
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className="font-matrix text-[7px] uppercase md:text-[8px]"
+              style={{
+                letterSpacing: hovered ? "0.2em" : "0.15em",
+                color: hovered ? "var(--text)" : "var(--text-muted)",
+                textShadow:
+                  !isDark ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.35)" : undefined,
+                transition: `letter-spacing 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease`,
+              }}
+            >
+              {tag}
+            </span>
+            <span
+              className="font-matrix text-[7px] uppercase md:text-[8px]"
+              style={{
+                letterSpacing: hovered ? "0.18em" : "0.12em",
+                color: hovered ? "var(--text)" : "var(--text-subtle)",
+                textShadow:
+                  !isDark ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.35)" : undefined,
+                transition: `letter-spacing 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease`,
+              }}
+            >
+              {year}
+            </span>
+          </div>
         </div>
-        <h3
-          className="mt-0.5 font-matrix text-xs uppercase leading-tight tracking-[0.04em] transition-colors duration-300 md:text-sm lg:text-base"
-          style={{
-            color: "var(--text)",
-            textShadow:
-              hovered && video
-                ? "0 1px 12px color-mix(in srgb, var(--bg) 65%, transparent)"
-                : undefined,
-          }}
-        >
-          {title}
-        </h3>
-        <p
-          className="mt-0.5 font-matrix text-[7px] uppercase tracking-[0.18em] transition-colors duration-300 md:text-[8px]"
-          style={{
-            color: hovered && video ? "color-mix(in srgb, var(--text) 72%, transparent)" : "var(--text-muted)",
-          }}
-        >
-          {subtitle}
-        </p>
-        {area && (
-          <p
-            className="mt-1 font-matrix text-[7px] uppercase tracking-[0.15em] transition-colors duration-300 md:text-[8px]"
+
+        <div className="flex min-h-0 flex-1 flex-col justify-center py-1">
+          <h3
+            className="w-full text-balance text-center font-matrix text-xs uppercase leading-tight tracking-[0.04em] transition-all duration-300 md:text-sm lg:text-base"
             style={{
-              color: hovered && video ? "color-mix(in srgb, var(--text) 50%, transparent)" : "var(--text-subtle)",
+              color: "var(--text)",
+              textShadow:
+                hovered && hasMedia
+                  ? "0 1px 12px color-mix(in srgb, var(--bg) 65%, transparent)"
+                  : undefined,
             }}
           >
-            {area}
+            {title}
+          </h3>
+        </div>
+
+        <div className="shrink-0 text-center">
+          <p
+            className="font-matrix text-[7px] uppercase tracking-[0.18em] transition-colors duration-300 md:text-[8px]"
+            style={{
+              color:
+                hovered && hasMedia
+                  ? "color-mix(in srgb, var(--text) 72%, transparent)"
+                  : "var(--text-muted)",
+            }}
+          >
+            {subtitle}
           </p>
-        )}
+          {area ? (
+            <p
+              className="mt-1 font-matrix text-[7px] uppercase tracking-[0.15em] transition-colors duration-300 md:text-[8px]"
+              style={{
+                color:
+                  hovered && hasMedia
+                    ? "color-mix(in srgb, var(--text) 50%, transparent)"
+                    : "var(--text-subtle)",
+              }}
+            >
+              {area}
+            </p>
+          ) : null}
+        </div>
       </div>
     </Link>
   );
@@ -203,6 +261,18 @@ function PortfolioStackCard(cell: PortfolioTapeItem) {
       className="block border-b px-4 py-5 transition-opacity active:opacity-90 last:border-b-0"
       style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
     >
+      {cell.image ? (
+        <div className="relative -mx-4 mb-4 aspect-[16/10] w-[calc(100%+2rem)] max-w-none overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={cell.image}
+            alt=""
+            className="h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      ) : null}
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-matrix text-[10px] uppercase tracking-[0.2em]" style={{ color: "var(--text-subtle)" }}>
           {cell.tag}
@@ -229,7 +299,17 @@ function PortfolioStackCard(cell: PortfolioTapeItem) {
   );
 }
 
-function PortfolioColumn({ col, ci, progress }: { col: Column; ci: number; progress: number }) {
+function PortfolioColumn({
+  col,
+  ci,
+  progress,
+  videosEnabled,
+}: {
+  col: Column;
+  ci: number;
+  progress: number;
+  videosEnabled: boolean;
+}) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [maxTravel, setMaxTravel] = useState(0);
@@ -280,7 +360,7 @@ function PortfolioColumn({ col, ci, progress }: { col: Column; ci: number; progr
             key={si}
             style={{ borderBottom: si < col.items.length - 1 ? `${GAP}px solid var(--border)` : undefined }}
           >
-            <PortfolioCell {...cell} />
+            <PortfolioCell {...cell} videosEnabled={videosEnabled} />
           </div>
         ))}
       </div>
@@ -292,7 +372,8 @@ export function PortfolioSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const stickyHeaderRef = useRef<HTMLDivElement>(null);
   const headerPinned = useStickyHeaderPinned(stickyHeaderRef);
-  const codeTypistEnabled = useIsDesktopLg();
+  const isDesktopLg = useIsDesktopLg();
+  const codeTypistEnabled = isDesktopLg;
   const [progress, setProgress] = useState(0);
   const rafRef = useRef(0);
 
@@ -390,7 +471,7 @@ export function PortfolioSection() {
         {/* Колонки */}
         <div className="relative z-10 flex h-full w-full bg-transparent">
           {COLUMNS.map((col, ci) => (
-            <PortfolioColumn key={ci} col={col} ci={ci} progress={progress} />
+            <PortfolioColumn key={ci} col={col} ci={ci} progress={progress} videosEnabled={isDesktopLg} />
           ))}
         </div>
       </div>

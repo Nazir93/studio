@@ -653,7 +653,7 @@ export function CapabilitiesTapeSection() {
       >
         <div className="flex min-w-0 flex-wrap items-baseline gap-2 md:gap-4">
           <h2
-            className="font-akony text-[0.95rem] uppercase leading-snug tracking-[0.14em] sm:text-lg md:text-2xl lg:text-4xl"
+            className="font-akony text-[0.82rem] uppercase leading-snug tracking-[0.12em] sm:text-[0.95rem] md:text-lg lg:text-xl xl:text-2xl"
             style={{ color: "var(--text)" }}
           >
             Что умеем

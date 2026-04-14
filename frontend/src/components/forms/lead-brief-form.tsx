@@ -130,8 +130,9 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
   };
 
   const pageTight = variant === "page";
+  /** На странице заявки: ≥16px на узких экранах — без принудительного зума iOS при фокусе */
   const inputClass = pageTight
-    ? "w-full border px-2 py-1 text-[11px] outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)] sm:px-2.5 sm:py-1.5 sm:text-[12px] md:text-[13px]"
+    ? "w-full border px-3 py-2.5 text-[16px] leading-snug outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)] sm:px-2.5 sm:py-1.5 sm:text-[12px] md:text-[13px]"
     : "w-full border px-4 py-3.5 text-sm outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:text-[15px]";
   const inputStyle = { borderColor: "var(--border)", backgroundColor: "var(--bg)", color: "var(--text)" };
   const gapClass = pageTight ? "gap-1.5 sm:gap-2" : "gap-4 sm:gap-5";

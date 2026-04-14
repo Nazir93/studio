@@ -10,9 +10,10 @@ import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 import { useTheme } from "@/lib/theme-context";
 import { cn } from "@/lib/utils";
 const BANNER_GHOST_VIDEO = "/videos/banner-title-ghost.mp4";
+/** Заголовок баннера: один ритм, без «разъезда» кеглей */
 const BANNER_GHOST_MEASURE_CLASS =
-  "font-akony text-[clamp(1.05rem,4.6vw,2.55rem)] font-normal leading-[0.95] tracking-[0.02em] uppercase " +
-  "sm:text-[clamp(1.15rem,4vw,2.85rem)] md:text-[clamp(1.25rem,3.4vw,3.2rem)] lg:text-[clamp(1.45rem,3.8vw,3.85rem)]";
+  "font-akony text-[clamp(0.95rem,3.8vw,2.2rem)] font-normal leading-[0.9] tracking-[0.02em] uppercase " +
+  "sm:text-[clamp(1.05rem,3.2vw,2.5rem)] md:text-[clamp(1.12rem,2.6vw,2.85rem)] lg:text-[clamp(1.25rem,2.8vw,3.25rem)]";
 
 const SLIDES = [
   {
@@ -86,44 +87,25 @@ const OFFER_LOGO = "/logo.png";
 /** Фон «киноплёнки» — только мобильный баннер (на десктопе не показываем) */
 const BANNER_FILM_VIDEO = "/videos/film-old-movies-effects.mp4";
 
-/** Круг с лого «Обсудить проект» — моб.: текст внутри круга под лого; десктоп: чёрный круг по центру */
+/** CTA «Обсудить проект»: моб. — обычная кнопка; lg+ — круг с лого */
 function BannerOfferCircle() {
   return (
     <Link
       href="/brief?source=banner-offer"
-      className="group relative z-[1] flex h-[7rem] w-[7rem] shrink-0 overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 min-[480px]:h-[7.75rem] min-[480px]:w-[7.75rem] lg:h-[min(11.5rem,22vw)] lg:w-[min(11.5rem,22vw)] lg:min-h-[10.5rem] lg:min-w-[10.5rem]"
+      className="group relative z-[1] ml-auto block w-full max-w-sm shrink-0 overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.01] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:max-w-xs lg:ml-0 lg:aspect-square lg:h-[min(11.5rem,22vw)] lg:w-[min(11.5rem,22vw)] lg:min-h-[10.5rem] lg:min-w-[10.5rem] lg:max-w-none"
       style={{
         borderColor: "var(--border)",
-        boxShadow: "0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 16px 40px rgba(0,0,0,0.35)",
+        boxShadow: "0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 12px 32px rgba(0,0,0,0.22)",
       }}
       aria-label="Обсудить проект — бриф"
     >
-      <span className="pointer-events-none absolute inset-0 bg-[var(--bg)]" aria-hidden />
-
-      {/* Мобильные / планшеты: лого сверху, подпись внизу внутри круга */}
-      <div className="absolute inset-0 flex flex-col lg:hidden">
-        <div className="relative min-h-0 flex-1 w-full">
-          <Image
-            src={OFFER_LOGO}
-            alt=""
-            fill
-            className="object-contain object-center p-2 pb-0 transition-transform duration-300 group-hover:scale-[1.03]"
-            sizes="112px"
-          />
-        </div>
-        <div
-          className="shrink-0 bg-gradient-to-t from-black/75 via-black/45 to-transparent px-2 pb-2 pt-3"
-          aria-hidden
-        >
-          <div className="font-akony text-[8px] font-normal uppercase leading-[1.1] tracking-[0.08em] text-white min-[400px]:text-[9px]">
-            <span className="block drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">Обсудить</span>
-            <span className="mt-0.5 block drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">проект</span>
-          </div>
-        </div>
-      </div>
+      {/* Мобильные / планшеты: одна кнопка, без лого */}
+      <span className="flex min-h-[3rem] w-full items-center justify-center bg-[var(--bg-secondary)] px-5 py-3.5 font-akony text-[13px] font-normal uppercase leading-none tracking-[0.1em] text-[var(--text)] active:opacity-95 lg:hidden">
+        Обсудить проект
+      </span>
 
       {/* Десктоп: лого + чёрный круг с текстом по центру */}
-      <div className="absolute inset-0 hidden lg:block">
+      <div className="absolute inset-0 hidden bg-[var(--bg)] lg:block">
         <Image
           src={OFFER_LOGO}
           alt=""
@@ -135,7 +117,7 @@ function BannerOfferCircle() {
           className="pointer-events-none absolute left-1/2 top-1/2 z-[2] flex aspect-square w-[54%] max-w-[7.25rem] min-w-[4.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black px-2 py-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] sm:min-w-[5rem] md:max-w-[8rem]"
           aria-hidden
         >
-          <span className="flex flex-col items-center gap-[0.45em] font-akony text-center font-normal uppercase leading-none tracking-[0.02em] text-[clamp(0.32rem,2.8vw,0.5rem)] text-white sm:gap-[0.52em] sm:text-[clamp(0.36rem,1.4vw,0.56rem)] md:gap-[0.58em] md:text-[clamp(0.42rem,1.25vw,0.6rem)]">
+          <span className="flex flex-col items-center gap-[0.45em] font-akony text-center font-normal uppercase leading-none tracking-[0.02em] text-[clamp(0.36rem,1.35vw,0.52rem)] text-white sm:gap-[0.52em] sm:text-[clamp(0.4rem,1.2vw,0.58rem)] md:gap-[0.58em] md:text-[clamp(0.44rem,1.1vw,0.62rem)]">
             <span className="block">Обсудить</span>
             <span className="block">проект</span>
           </span>
@@ -390,8 +372,9 @@ export function BannerSection() {
     <section
       className="relative min-h-0 overflow-hidden select-none"
       style={{
-        height: "100dvh",
-        minHeight: "min(600px, 100dvh)",
+        /* под шапку в потоке на главной — оставшаяся высота экрана (~5rem запас под нав + safe area) */
+        height: "calc(100dvh - 5rem)",
+        minHeight: "min(600px, calc(100dvh - 5rem))",
         backgroundColor: "var(--bg)",
         color: "var(--text)",
       }}
@@ -540,8 +523,8 @@ export function BannerSection() {
               "max-lg:[--banner-text-shadow:0_1px_0_rgba(255,255,255,0.95),0_0_18px_rgba(250,250,250,0.9),0_0_1px_rgba(0,0,0,0.12)] max-lg:[&_h1]:[text-shadow:var(--banner-text-shadow)] max-lg:[&_p]:[text-shadow:var(--banner-text-shadow)] max-lg:[&_.font-matrix]:[text-shadow:var(--banner-text-shadow)] max-lg:[&_.font-akony]:[text-shadow:var(--banner-text-shadow)]"
           )}
         >
-          <div className="relative z-[1] mb-4 flex min-w-0 items-start gap-2.5 sm:mb-6 sm:gap-4 lg:items-end">
-            <div className="flex shrink-0 flex-col items-center gap-2 pb-0 pt-0.5 sm:pb-2 sm:pt-0 lg:pb-1">
+          <div className="relative z-[1] mb-3 flex min-w-0 items-end gap-2.5 sm:mb-4 sm:gap-4">
+            <div className="flex shrink-0 flex-col items-center gap-2 pb-0.5 pt-0 sm:pb-1.5 sm:pt-0">
               <button
                 type="button"
                 onClick={goNext}
@@ -589,13 +572,14 @@ export function BannerSection() {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="mt-1 w-full min-w-0"
+                  className="mt-0.5 w-full min-w-0 sm:mt-1"
                 >
                   <MaskedVideoText
                     text={active.titleGhost}
                     videoSrc={BANNER_GHOST_VIDEO}
                     measureClassName={BANNER_GHOST_MEASURE_CLASS}
                     disableVideo={!allowHeavyMedia}
+                    textAlign="start"
                   />
                 </motion.div>
               </AnimatePresence>
@@ -606,7 +590,7 @@ export function BannerSection() {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="font-matrix uppercase text-[clamp(0.65rem,2.1vw,0.85rem)] sm:text-[clamp(0.7rem,1.8vw,0.9rem)] md:text-[0.95rem] tracking-[0.15em] mt-2 sm:mt-3"
+                  className="mt-1.5 font-matrix uppercase tracking-[0.15em] text-[clamp(0.58rem,1.85vw,0.78rem)] sm:mt-2 sm:text-[clamp(0.62rem,1.45vw,0.82rem)] md:text-[0.88rem]"
                   style={{ color: "var(--text-subtle)" }}
                 >
                   {active.subtitle}
@@ -615,41 +599,41 @@ export function BannerSection() {
             </div>
           </div>
 
-          {/* Строки описания — появляются одна за другой */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active.num}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="relative z-[1] flex flex-col gap-1.5 sm:gap-2 md:gap-2.5 max-w-xl"
-            >
-              {active.lines.map((line, i) => (
-                <motion.div
-                  key={i}
-                  custom={i}
-                  variants={lineVariants}
-                  className="flex items-center gap-3"
-                >
-                  <span
-                    className="w-4 h-[1px] shrink-0"
-                    style={{ backgroundColor: "var(--border)" }}
-                  />
-                  <p
-                    className="font-matrix uppercase text-[clamp(0.7rem,2vw,0.8125rem)] sm:text-[0.8125rem] md:text-[0.875rem] leading-relaxed tracking-[0.08em] sm:tracking-[0.12em]"
-                    style={{ color: "var(--text-muted)" }}
+          {/* Строки описания + CTA: на широком экране CTA справа в свободном месте */}
+          <div className="relative z-[1] mt-4 flex w-full min-w-0 flex-col gap-5 sm:mt-5 lg:flex-row lg:items-end lg:justify-between lg:gap-6 xl:gap-10">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.num}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                className="flex min-w-0 flex-1 flex-col gap-1.5 sm:gap-2 md:gap-2.5 lg:max-w-[min(40rem,50vw)] xl:max-w-[42rem]"
+              >
+                {active.lines.map((line, i) => (
+                  <motion.div
+                    key={i}
+                    custom={i}
+                    variants={lineVariants}
+                    className="flex items-center gap-3"
                   >
-                    {line}
-                  </p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Круг с лого — сразу под последней строкой списка (выровнено с текстом пунктов) */}
-          <div className="relative z-[1] mt-5 flex w-full max-w-xl items-center gap-3 sm:mt-6">
-            <span className="pointer-events-none w-4 shrink-0" aria-hidden />
-            <BannerOfferCircle />
+                    <span
+                      className="h-[1px] w-4 shrink-0"
+                      style={{ backgroundColor: "var(--border)" }}
+                    />
+                    <p
+                      className="font-matrix uppercase leading-relaxed tracking-[0.08em] text-[clamp(0.62rem,1.7vw,0.75rem)] sm:text-[0.75rem] sm:tracking-[0.1em] md:text-[0.8125rem]"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      {line}
+                    </p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </AnimatePresence>
+            <div className="flex shrink-0 justify-end lg:pb-0.5">
+              <BannerOfferCircle />
+            </div>
           </div>
         </motion.div>
 

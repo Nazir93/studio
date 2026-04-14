@@ -1,11 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Clapperboard, Palette, Pyramid } from "lucide-react";
-import { useStickyHeaderPinned } from "@/lib/use-sticky-header-pinned";
 import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
-import { PinnedCodeTypist } from "@/components/ui/pinned-code-typist";
 
 /** Демо и интерактивы — пополняется. */
 export const SHOWCASE_ITEMS = [
@@ -17,7 +14,6 @@ export const SHOWCASE_ITEMS = [
       "Кадры по скроллу, HUD, фоновое видео и газетная полоса — демо визуального языка студии.",
     href: "/gallery/film-reel",
     icon: "film" as const,
-    /** То же, что фон на странице киноплёнки */
     previewVideo: "/videos/film-old-movies-effects.mp4",
   },
   {
@@ -28,7 +24,6 @@ export const SHOWCASE_ITEMS = [
       "Альтернативная страница UX/UI: палео-контакт, Розеттский камень, кипу, каналы орошения — интерактивная витрина дизайна.",
     href: "/services/ux-ui-design/ancient",
     icon: "ancient" as const,
-    /** Фон первого экрана «Древность & мистика» */
     previewVideo: "/videos/ancient-paleo.mp4",
   },
   {
@@ -44,67 +39,15 @@ export const SHOWCASE_ITEMS = [
   },
 ] as const;
 
-const GAP = 4;
-/** Как у блока «Портфолио» — длинная секция + лента в sticky-viewport */
-const SECTION_HEIGHT_VH = 185;
-
 type ShowcaseItem = (typeof SHOWCASE_ITEMS)[number];
-
-type ColumnConfig = {
-  width: number;
-  speed: number;
-  itemIndex: 0 | 1 | 2;
-};
-
-const COLUMNS: ColumnConfig[] = [
-  { width: 1.15, speed: 0.52, itemIndex: 0 },
-  { width: 1, speed: 0.78, itemIndex: 1 },
-  { width: 0.9, speed: 0.62, itemIndex: 2 },
-];
-
-function clamp(v: number, lo: number, hi: number) {
-  return Math.min(Math.max(v, lo), hi);
-}
-
-/** Параллельные линии чуть косо к вертикали (90° = строго вертикальные полосы — берём ~86° / ~94°). */
-function SlantedLinesParallax({ progress }: { progress: number }) {
-  const ty = progress * 36;
-  const line = (angleDeg: number) =>
-    `repeating-linear-gradient(
-      ${angleDeg}deg,
-      transparent 0,
-      transparent 10px,
-      color-mix(in srgb, var(--border) 48%, transparent) 10px,
-      color-mix(in srgb, var(--border) 48%, transparent) 11px
-    )`;
-
-  return (
-    <div className="pointer-events-none absolute inset-0 z-[24] overflow-hidden" aria-hidden>
-      <div
-        className="absolute -inset-[30%] opacity-[0.13]"
-        style={{
-          backgroundImage: line(86),
-          transform: `translate3d(${progress * -6}px, ${ty * 0.2}px, 0)`,
-        }}
-      />
-      <div
-        className="absolute -inset-[30%] opacity-[0.09]"
-        style={{
-          backgroundImage: line(94),
-          transform: `translate3d(${progress * 5}px, ${ty * -0.15}px, 0)`,
-        }}
-      />
-    </div>
-  );
-}
 
 function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; previewVideosEnabled: boolean }) {
   return (
     <Link
       href={item.href}
       data-cursor-word="смотреть"
-      className="group relative flex shrink-0 flex-col justify-between overflow-hidden p-3 transition-colors md:p-5"
-      style={{ aspectRatio: "9 / 13", backgroundColor: "var(--bg-secondary)" }}
+      className="group relative flex min-h-[300px] shrink-0 flex-col justify-between overflow-hidden border p-3 transition-colors sm:min-h-[340px] md:p-5"
+      style={{ aspectRatio: "9 / 13", borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
     >
       {"previewVideo" in item && item.previewVideo && previewVideosEnabled && (
         <>
@@ -246,179 +189,53 @@ function ShowcaseStackCard({ item }: { item: ShowcaseItem }) {
   );
 }
 
-function ShowcaseColumn({
-  col,
-  ci,
-  progress,
-  previewVideosEnabled,
-}: {
-  col: ColumnConfig;
-  ci: number;
-  progress: number;
-  previewVideosEnabled: boolean;
-}) {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [maxTravel, setMaxTravel] = useState(0);
-
-  useEffect(() => {
-    const wrap = wrapRef.current;
-    const content = contentRef.current;
-    if (!wrap || !content) return;
-
-    const measure = () => {
-      const containerH = wrap.offsetHeight;
-      const contentH = content.scrollHeight;
-      setMaxTravel(Math.max(0, contentH - containerH));
-    };
-
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(wrap);
-    ro.observe(content);
-    window.addEventListener("resize", measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, []);
-
-  const y = -(progress * maxTravel * col.speed);
-
-  return (
-    <div
-      ref={wrapRef}
-      className="relative min-w-0 overflow-hidden"
-      style={{
-        flex: col.width,
-        borderRight: ci < COLUMNS.length - 1 ? `${GAP}px solid var(--border)` : undefined,
-      }}
-    >
-      <div ref={contentRef} className="flex flex-col will-change-transform" style={{ transform: `translateY(${y}px)` }}>
-        <div style={{ borderBottom: `${GAP}px solid var(--border)` }}>
-          <ShowcaseCell item={SHOWCASE_ITEMS[col.itemIndex]} previewVideosEnabled={previewVideosEnabled} />
-        </div>
-        {/* Нижний «ход» ленты — как у портфолио, чтобы параллакс был заметен */}
-        <div className="h-[min(52vh,420px)] shrink-0" aria-hidden />
-      </div>
-    </div>
-  );
-}
-
 export function WhatWeDoSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const stickyHeaderRef = useRef<HTMLDivElement>(null);
-  const headerPinned = useStickyHeaderPinned(stickyHeaderRef);
-  const [progress, setProgress] = useState(0);
-  const rafRef = useRef(0);
   const previewVideosEnabled = useIsDesktopLg();
-  const codeTypistEnabled = useIsDesktopLg();
-
-  const handleScroll = useCallback(() => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      const el = sectionRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const total = el.offsetHeight - window.innerHeight;
-      if (total <= 0) return;
-      setProgress(clamp(-rect.top / total, 0, 1));
-    });
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [handleScroll]);
 
   return (
     <section
-      ref={sectionRef}
       data-navbar
-      className="relative max-md:!h-auto max-md:min-h-0"
-      style={{ height: `${SECTION_HEIGHT_VH}vh`, backgroundColor: "var(--bg)", color: "var(--text)" }}
-      aria-label="Выбери себе дизайн"
+      className="relative border-t"
+      style={{ borderColor: "var(--border)", backgroundColor: "var(--bg)", color: "var(--text)" }}
+      aria-label="Демо и форматы"
     >
-      <div
-        ref={stickyHeaderRef}
-        className="sticky top-0 z-[40] flex flex-col gap-1 px-4 py-2 sm:flex-row sm:items-end sm:justify-between md:px-6 md:py-2"
-        style={{ backgroundColor: "var(--bg)", borderBottom: "1px solid var(--border)" }}
-      >
-        <div className="min-w-0 flex-1">
-          <h2
-            className="font-akony text-[0.95rem] uppercase leading-snug tracking-[0.14em] sm:text-lg md:text-2xl lg:text-3xl"
-            style={{ color: "var(--text)" }}
-          >
-            Выбери себе дизайн
-          </h2>
-          <div className="mt-1 min-h-[1.6rem] max-w-2xl sm:min-h-[2rem]">
-            {codeTypistEnabled && headerPinned ? (
-              <PinnedCodeTypist
-                text={
-                  '// дизайн: showcase[] — интерактивы, UX/UI\n// блок пополняем · gallery → демо'
-                }
-                charDelayMs={11}
-              />
-            ) : (
-              <p
-                className="max-w-[18rem] font-matrix text-[8px] uppercase leading-snug tracking-[0.2em] sm:max-w-none sm:text-[10px] md:text-[11px]"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Разные интерактивы и визуальные форматы — блок будем наполнять
-              </p>
-            )}
-          </div>
-        </div>
-        <Link
-          href="/gallery"
-          className="font-matrix shrink-0 text-[10px] uppercase tracking-[0.2em] transition-colors hover:text-[var(--accent)] md:text-xs"
-          style={{ color: "var(--text-subtle)" }}
+      <div className="container mx-auto px-4 py-14 md:px-6 md:py-20 lg:py-24">
+        <div
+          className="mb-10 flex flex-col gap-5 border-b pb-10 md:mb-12 md:flex-row md:items-end md:justify-between md:gap-8 md:pb-12"
+          style={{ borderColor: "var(--border)" }}
         >
-          галерея →
-        </Link>
-      </div>
-
-      <div className="border-t md:hidden" style={{ borderColor: "var(--border)" }}>
-        {SHOWCASE_ITEMS.map((item) => (
-          <ShowcaseStackCard key={item.id} item={item} />
-        ))}
-      </div>
-
-      <div className="sticky top-0 hidden h-[100dvh] w-full overflow-hidden md:block">
-        <div className="pointer-events-none absolute inset-0 z-[30] mix-blend-overlay" style={{ opacity: 0.12 }}>
-          <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <filter id="whatwedo-grain">
-              <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
-            </filter>
-            <rect width="100%" height="100%" filter="url(#whatwedo-grain)" />
-          </svg>
+          <div className="min-w-0 max-w-2xl">
+            <p className="font-matrix text-[9px] uppercase tracking-[0.28em] sm:text-[10px]" style={{ color: "var(--text-subtle)" }}>
+              Галерея · интерактивы
+            </p>
+            <h2
+              className="mt-2 font-akony text-xl uppercase leading-tight tracking-[0.1em] sm:text-2xl md:text-3xl lg:text-[2rem]"
+              style={{ color: "var(--text)" }}
+            >
+              Демо и форматы
+            </h2>
+            <p className="mt-3 max-w-xl font-body text-sm leading-relaxed sm:text-base" style={{ color: "var(--text-muted)" }}>
+              Живые страницы и визуальные эксперименты — откройте демо и посмотрите подход студии.
+            </p>
+          </div>
+          <Link
+            href="/gallery"
+            className="font-matrix shrink-0 text-[10px] uppercase tracking-[0.2em] transition-colors hover:text-[var(--accent)] md:text-xs"
+            style={{ color: "var(--text-subtle)" }}
+          >
+            вся галерея →
+          </Link>
         </div>
 
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-[30] h-20"
-          style={{ background: "linear-gradient(to bottom, var(--bg), transparent)" }}
-        />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[30] h-24"
-          style={{ background: "linear-gradient(to top, var(--bg), transparent)" }}
-        />
+        <div className="md:hidden" style={{ border: "1px solid var(--border)" }}>
+          {SHOWCASE_ITEMS.map((item) => (
+            <ShowcaseStackCard key={item.id} item={item} />
+          ))}
+        </div>
 
-        <SlantedLinesParallax progress={progress} />
-
-        <div className="relative z-10 flex h-full w-full min-h-0 bg-transparent">
-          {COLUMNS.map((col, ci) => (
-            <ShowcaseColumn
-              key={ci}
-              col={col}
-              ci={ci}
-              progress={progress}
-              previewVideosEnabled={previewVideosEnabled}
-            />
+        <div className="hidden gap-4 md:grid md:grid-cols-3 md:gap-5 lg:gap-6">
+          {SHOWCASE_ITEMS.map((item) => (
+            <ShowcaseCell key={item.id} item={item} previewVideosEnabled={previewVideosEnabled} />
           ))}
         </div>
       </div>

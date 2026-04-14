@@ -25,9 +25,9 @@ export default function HomePage() {
       >
         <BannerSection />
         <CapabilitiesTapeSection />
-        <WhatWeDoSection />
         <ViewAllServices />
         <PortfolioSection />
+        <WhatWeDoSection />
       </div>
       <DesktopSideNav visible={sideNavVisible} />
     </>

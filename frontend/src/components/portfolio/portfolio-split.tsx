@@ -1,256 +1,248 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import type { PortfolioCase } from "@/lib/portfolio-data";
-import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 
 type Props = {
   projects: PortfolioCase[];
-  /** При «Все» — только список; при фильтре по разделу — список + превью справа */
-  showPreview?: boolean;
 };
 
-export function PortfolioSplit({ projects, showPreview = true }: Props) {
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [mobileTab, setMobileTab] = useState<"list" | "preview">("list");
-  const [previewExpanded, setPreviewExpanded] = useState(false);
-  const collapseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const active = projects[activeIdx] ?? projects[0];
+function videoMime(src: string): string {
+  const lower = src.toLowerCase();
+  if (lower.endsWith(".webm")) return "video/webm";
+  if (lower.endsWith(".mov")) return "video/quicktime";
+  return "video/mp4";
+}
 
-  const expandPreview = useCallback(() => {
-    if (collapseTimerRef.current) {
-      clearTimeout(collapseTimerRef.current);
-      collapseTimerRef.current = null;
-    }
-    setPreviewExpanded(true);
-  }, []);
-
-  const scheduleCollapsePreview = useCallback(() => {
-    if (collapseTimerRef.current) clearTimeout(collapseTimerRef.current);
-    collapseTimerRef.current = setTimeout(() => {
-      setPreviewExpanded(false);
-      collapseTimerRef.current = null;
-    }, 180);
-  }, []);
-
-  const setRef = useCallback((el: HTMLDivElement | null, i: number) => {
-    itemRefs.current[i] = el;
-  }, []);
+/** Видео в списке: без звука, в цикле; играет только пока блок в зоне видимости */
+function PreviewVideo({
+  src,
+  poster,
+  label,
+  videoClassName,
+}: {
+  src: string;
+  poster?: string;
+  label: string;
+  /** По умолчанию — естественная высота; для фикс. контейнера (aspect-video) — absolute inset-0 h-full w-full */
+  videoClassName?: string;
+}) {
+  const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const nodes = itemRefs.current.filter(Boolean) as HTMLDivElement[];
-    if (nodes.length === 0) return;
-
-    const ratioByEl = new Map<Element, number>();
-    nodes.forEach((n) => ratioByEl.set(n, 0));
-
-    const obs = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          ratioByEl.set(e.target, e.intersectionRatio);
-        }
-        let bestIdx = 0;
-        let best = -1;
-        nodes.forEach((node, i) => {
-          const r = ratioByEl.get(node) ?? 0;
-          if (r > best) {
-            best = r;
-            bestIdx = i;
-          }
-        });
-        if (best > 0.08) setActiveIdx(bestIdx);
+    const v = ref.current;
+    if (!v) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) void v.play().catch(() => {});
+        else v.pause();
       },
-      { root: null, threshold: [0, 0.1, 0.2, 0.35, 0.5, 0.65, 0.8, 1], rootMargin: "-10% 0px -10% 0px" }
+      { rootMargin: "80px", threshold: 0.15 }
     );
-
-    nodes.forEach((n) => obs.observe(n));
-    return () => obs.disconnect();
-  }, [projects]);
-
-  useEffect(
-    () => () => {
-      if (collapseTimerRef.current) clearTimeout(collapseTimerRef.current);
-    },
-    []
-  );
-
-  useEffect(() => {
-    setActiveIdx((i) => (projects.length === 0 ? 0 : Math.min(i, projects.length - 1)));
-  }, [projects]);
-
-  function PreviewPanel({ className, expanded }: { className?: string; expanded?: boolean }) {
-    if (!active) return null;
-    return (
-      <div
-        className={cn(
-          "flex min-h-[240px] flex-col justify-between gap-6 rounded-xl border p-5 transition-[box-shadow] duration-300 sm:min-h-[260px] md:min-h-0 md:max-h-[min(560px,calc(100vh-7rem))] md:overflow-y-auto md:overscroll-contain md:p-6 lg:p-7",
-          "shadow-sm",
-          expanded && "md:shadow-md",
-          className
-        )}
-        style={{
-          borderColor: "var(--border)",
-          backgroundColor: "var(--bg-secondary)",
-        }}
-        key={active.id}
-      >
-        <div className="min-w-0">
-          <p
-            className="font-montserrat text-[10px] font-semibold uppercase tracking-[0.2em] md:text-[11px]"
-            style={{ color: "var(--text-subtle)" }}
-          >
-            {active.tag} · {active.year}
-          </p>
-          <h2
-            className={cn(
-              "mt-2 font-heading normal-case leading-[1.08] tracking-tight md:mt-3",
-              expanded
-                ? "text-xl md:text-2xl lg:text-3xl"
-                : "text-lg md:text-xl lg:text-2xl"
-            )}
-            style={{ color: "var(--text)" }}
-          >
-            {active.title}
-          </h2>
-          <p
-            className="mt-2 font-montserrat text-[11px] font-medium uppercase tracking-[0.1em] md:text-xs"
-            style={{ color: "var(--text-muted)" }}
-          >
-            {active.industry}
-          </p>
-          <p
-            className="mt-4 font-montserrat text-sm font-normal leading-relaxed md:mt-5 md:text-[15px] md:leading-relaxed"
-            style={{ color: "var(--text-muted)" }}
-          >
-            {active.shortDescription}
-          </p>
-        </div>
-        <Link
-          href={`/portfolio/${active.slug}`}
-          className="inline-flex shrink-0 items-center gap-2 font-montserrat text-xs font-semibold uppercase tracking-[0.12em] transition-opacity hover:opacity-80 md:text-[13px]"
-          style={{ color: "var(--accent)" }}
-        >
-          Открыть кейс
-          <ArrowUpRight size={18} strokeWidth={1.5} />
-        </Link>
-      </div>
-    );
-  }
+    io.observe(v);
+    return () => io.disconnect();
+  }, [src]);
 
   return (
-    <div
-      className={cn(
-        "grid w-full max-w-full gap-10 overflow-x-clip md:items-start",
-        showPreview
-          ? "md:grid-cols-[minmax(0,18rem)_minmax(280px,1fr)] md:gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(300px,1fr)] lg:gap-8 xl:gap-10"
-          : "md:grid-cols-1 md:gap-0"
-      )}
+    <video
+      ref={ref}
+      className={
+        videoClassName ??
+        "block h-auto w-full bg-black object-cover object-top"
+      }
+      poster={poster}
+      muted
+      playsInline
+      loop
+      preload="metadata"
+      aria-label={label}
     >
-      {showPreview && (
-        <div className="mb-2 flex gap-2 md:hidden" role="tablist" aria-label="Режим просмотра на мобильном">
-          {(
-            [
-              { id: "list" as const, label: "Список" },
-              { id: "preview" as const, label: "Превью" },
-            ] as const
-          ).map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={mobileTab === id}
-              onClick={() => setMobileTab(id)}
-              className={cn(
-                "flex-1 border px-4 py-2.5 font-montserrat text-[10px] font-semibold uppercase tracking-[0.15em] transition-colors",
-                mobileTab === id
-                  ? "border-[var(--accent)] text-[var(--text)]"
-                  : "border-[var(--border)] text-[var(--text-muted)]"
-              )}
-              style={{
-                backgroundColor: mobileTab === id ? "color-mix(in srgb, var(--accent) 10%, transparent)" : "transparent",
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      )}
+      <source src={src} type={videoMime(src)} />
+    </video>
+  );
+}
 
+/** Слоистое «окно браузера» с превью — без толстых рамок, мягкая тень */
+function BrowserPreviewStack({
+  imageSrc,
+  videoSrc,
+  label,
+}: {
+  imageSrc?: string;
+  videoSrc?: string;
+  label: string;
+}) {
+  return (
+    <div className="relative mx-auto w-full max-w-[min(100%,680px)] lg:max-w-[min(92vw,880px)]">
+      {/* Задний слой — лёгкая глубина */}
       <div
-        className={cn(
-          "min-w-0",
-          showPreview && mobileTab === "preview" && "hidden md:block"
-        )}
-        role="list"
-        aria-label="Список проектов"
-        onMouseEnter={showPreview ? expandPreview : undefined}
-        onMouseLeave={showPreview ? scheduleCollapsePreview : undefined}
+        className="pointer-events-none absolute left-[6%] top-[5%] z-0 hidden w-[86%] overflow-hidden rounded-lg shadow-md ring-1 ring-black/[0.06] sm:block dark:ring-white/[0.08]"
+        style={{ transform: "rotate(-1.5deg)" }}
+        aria-hidden
       >
-        {projects.map((p, i) => {
-          const isActive = i === activeIdx;
-          return (
-            <div
-              key={p.id}
-              ref={(el) => setRef(el, i)}
-              role="listitem"
-              data-index={i}
-              onMouseEnter={() => setActiveIdx(i)}
-              className="border-b transition-colors"
-              style={{ borderColor: "var(--border)" }}
-            >
-              <Link
-                href={`/portfolio/${p.slug}`}
-                onFocus={() => setActiveIdx(i)}
-                className={cn(
-                  "block py-2.5 outline-none transition-colors md:py-3",
-                  "focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-                )}
-                aria-current={isActive ? "true" : undefined}
-              >
-                <span
-                  className="block font-heading normal-case text-[0.8125rem] leading-snug tracking-tight transition-colors sm:text-sm md:text-[0.8125rem] md:leading-[1.2]"
-                  style={{ color: isActive ? "var(--text)" : "var(--text-muted)" }}
-                >
-                  {p.title}
-                </span>
-                <span
-                  className="mt-0.5 block font-montserrat text-[9px] font-medium uppercase tracking-[0.1em] md:text-[10px]"
-                  style={{ color: isActive ? "var(--accent)" : "var(--text-subtle)" }}
-                >
-                  {p.year} · {p.tag}
-                </span>
-              </Link>
-            </div>
-          );
-        })}
+        <div className="aspect-[16/10] bg-gradient-to-br from-neutral-200/90 to-neutral-300/60 dark:from-neutral-700/50 dark:to-neutral-800/40" />
       </div>
 
-      {/* Desktop: превью только при фильтре по разделу */}
-      {showPreview && (
-        <aside
-          className="hidden min-w-0 md:block"
-          onMouseEnter={expandPreview}
-          onMouseLeave={scheduleCollapsePreview}
-          data-preview-zone
-        >
-          <div className="sticky top-24 self-start md:top-28 lg:top-32">
-            <PreviewPanel expanded={previewExpanded} />
-          </div>
-        </aside>
-      )}
-
-      {/* Mobile: превью во вкладке «Превью» */}
-      {showPreview && (
-        <div className={cn("md:hidden", mobileTab === "list" && "hidden")}>
-          <p className="mb-3 font-montserrat text-[11px] font-medium uppercase tracking-[0.12em]" style={{ color: "var(--text-subtle)" }}>
-            Выбранный кейс · листайте список или откройте вкладку после выбора
-          </p>
-          <PreviewPanel expanded />
+      <div className="relative z-10 overflow-hidden rounded-lg shadow-[0_24px_56px_-18px_rgba(0,0,0,0.22)] ring-1 ring-black/[0.07] dark:shadow-[0_24px_50px_-12px_rgba(0,0,0,0.55)] dark:ring-white/[0.1]">
+        <div className="flex items-center gap-1.5 border-b border-black/[0.06] bg-[#ececec] px-3 py-2.5 dark:border-white/[0.08] dark:bg-[#252525]">
+          <span className="h-2 w-2 rounded-full bg-[#ff5f57]" />
+          <span className="h-2 w-2 rounded-full bg-[#febc2e]" />
+          <span className="h-2 w-2 rounded-full bg-[#28c840]" />
         </div>
-      )}
+        {videoSrc ? (
+          <PreviewVideo src={videoSrc} poster={imageSrc} label={label} />
+        ) : imageSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element -- пути из /public, разные DPR
+          <img
+            src={imageSrc}
+            alt=""
+            className="block h-auto w-full object-cover object-top"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <div
+            className="flex aspect-[16/10] items-center justify-center bg-neutral-200 text-xs text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
+            aria-hidden
+          >
+            Превью
+          </div>
+        )}
+        <div className="pointer-events-none absolute bottom-4 left-1/2 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border border-white/40 bg-white/95 text-neutral-800 shadow-md backdrop-blur-sm dark:border-white/15 dark:bg-black/55 dark:text-white">
+          <ArrowUpRight size={16} strokeWidth={1.75} aria-hidden />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function caseEyebrow(p: PortfolioCase): string {
+  if (p.clientNote) {
+    const first = p.clientNote.split(/[—–-]/)[0]?.trim();
+    if (first && first.length <= 52) return first;
+  }
+  if (p.location?.trim()) return p.location.trim();
+  return `${p.tag} · ${p.year}`;
+}
+
+function CaseRowDesktop({ project: p }: { project: PortfolioCase }) {
+  const img = p.heroImage ?? p.showcaseImage1;
+  const eyebrow = caseEyebrow(p);
+  const tagsLine = [p.type, p.industry].filter(Boolean).join(" · ");
+
+  return (
+    <Link
+      href={`/portfolio/${p.slug}`}
+      className="group block border-t transition-[background-color] duration-300 hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+      style={{ borderColor: "var(--border)" }}
+    >
+      <div
+        className="flex flex-col py-12 md:py-14 lg:py-14 xl:py-16"
+        style={{ backgroundColor: "color-mix(in srgb, var(--bg-secondary) 92%, var(--bg))" }}
+      >
+        {/* Заголовок на всю ширину секции (над превью и текстом) */}
+        <div className="w-full max-w-none px-4 pb-6 md:px-6 md:pb-7 lg:pb-8">
+          <p
+            className="font-montserrat text-[12px] font-medium leading-snug md:text-[13px]"
+            style={{ color: "var(--text-muted)" }}
+          >
+            {eyebrow}
+          </p>
+          <h2
+            className="mt-1.5 max-w-none font-heading normal-case text-[0.8rem] leading-[1.28] tracking-tight text-balance md:text-[0.82rem] lg:mt-2 lg:text-[0.8rem] xl:text-[0.85rem]"
+            style={{ color: "var(--text)" }}
+          >
+            {p.title}
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 items-start gap-8 md:gap-10 lg:grid-cols-[minmax(0,1.42fr)_minmax(0,0.58fr)] lg:gap-10 xl:gap-14">
+          <div className="relative flex min-h-[220px] justify-center px-4 md:px-6 lg:min-h-[300px] lg:justify-end lg:pr-2 xl:pr-4">
+            <div className="w-full">
+              <BrowserPreviewStack imageSrc={img} videoSrc={p.heroVideo} label={p.title} />
+            </div>
+          </div>
+
+          <div className="min-w-0 px-4 md:px-6 lg:px-4 lg:pr-8 xl:pr-10">
+            <p
+              className="font-montserrat text-[14px] font-normal leading-relaxed md:text-[14px] md:leading-[1.6]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              {p.shortDescription}
+            </p>
+            {tagsLine ? (
+              <p
+                className="mt-6 font-montserrat text-[11px] font-medium uppercase leading-relaxed tracking-[0.1em] md:text-[11px]"
+                style={{ color: "var(--text-subtle)" }}
+              >
+                {tagsLine}
+              </p>
+            ) : null}
+            <span className="mt-5 inline-flex items-center gap-1.5 font-montserrat text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)] opacity-0 transition-opacity duration-200 group-hover:opacity-100 md:mt-6">
+              Открыть кейс
+              <ArrowUpRight size={16} strokeWidth={1.5} />
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function CaseRowMobile({ project: p }: { project: PortfolioCase }) {
+  const img = p.heroImage ?? p.showcaseImage1;
+  const eyebrow = caseEyebrow(p);
+  return (
+    <Link
+      href={`/portfolio/${p.slug}`}
+      className="block border-b px-4 py-5 transition-colors active:bg-black/[0.03] dark:active:bg-white/[0.04]"
+      style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
+    >
+      <p className="font-montserrat text-[11px] font-medium leading-snug" style={{ color: "var(--text-muted)" }}>
+        {eyebrow}
+      </p>
+      <h3 className="mt-1.5 max-w-none font-heading normal-case text-[0.8rem] leading-snug tracking-tight" style={{ color: "var(--text)" }}>
+        {p.title}
+      </h3>
+      {p.heroVideo ? (
+        <div className="relative mb-3 mt-4 aspect-video w-full overflow-hidden rounded-md bg-black">
+          <PreviewVideo
+            src={p.heroVideo}
+            poster={img}
+            label={p.title}
+            videoClassName="absolute inset-0 h-full w-full object-cover object-top"
+          />
+        </div>
+      ) : img ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={img} alt="" className="mb-3 mt-4 aspect-video w-full object-cover object-top" loading="lazy" />
+      ) : null}
+      <p className="mt-2 line-clamp-3 font-montserrat text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
+        {p.shortDescription}
+      </p>
+      <span className="mt-3 inline-flex items-center gap-1 font-montserrat text-[11px] font-semibold uppercase tracking-[0.1em]" style={{ color: "var(--accent)" }}>
+        Подробнее
+        <ArrowUpRight size={14} />
+      </span>
+    </Link>
+  );
+}
+
+export function PortfolioSplit({ projects }: Props) {
+  return (
+    <div className="w-full max-w-full overflow-x-clip">
+      <div className="hidden md:block">
+        {projects.map((p) => (
+          <CaseRowDesktop key={p.id} project={p} />
+        ))}
+      </div>
+      <div className="md:hidden" role="list">
+        {projects.map((p) => (
+          <CaseRowMobile key={p.id} project={p} />
+        ))}
+      </div>
     </div>
   );
 }

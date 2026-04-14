@@ -5,8 +5,8 @@ import { useTheme } from "@/lib/theme-context";
 
 const SVG_FONT_WEIGHT = 400;
 
-function useMeasuredBox<T extends HTMLElement>() {
-  const ref = useRef<T | null>(null);
+function useMeasuredBox() {
+  const ref = useRef<HTMLDivElement | null>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
 
   useLayoutEffect(() => {
@@ -41,6 +41,11 @@ type Props = {
   className?: string;
   /** Без `<video>` — только обводка (мобильные / планшеты) */
   disableVideo?: boolean;
+  /**
+   * Как в вёрстке: баннер — вторая строка слева как первая (`start`);
+   * «КЕЙСЫ» — по центру блока (`middle`). Иначе SVG маска с `middle` при левом HTML даёт полосы фона и сдвиг.
+   */
+  textAlign?: "start" | "middle";
 };
 
 /**
@@ -53,23 +58,33 @@ export function MaskedVideoText({
   measureClassName,
   className = "",
   disableVideo = false,
+  textAlign = "start",
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
   const [fontPx, setFontPx] = useState(0);
+  const [svgTextStyle, setSvgTextStyle] = useState({
+    letterSpacing: "0px",
+    fontFamily: "var(--font-main), sans-serif",
+  });
   const [reduceMotion, setReduceMotion] = useState(false);
   const { isDark } = useTheme();
   const maskIdRaw = useId();
   const maskId = `mvt-${maskIdRaw.replace(/:/g, "")}`;
-  const { ref: wrapRef, box } = useMeasuredBox<HTMLDivElement>();
+  const { ref: wrapRef, box } = useMeasuredBox();
 
   useLayoutEffect(() => {
     const el = measureRef.current;
     if (!el) return;
 
     const sync = () => {
-      const raw = parseFloat(getComputedStyle(el).fontSize);
+      const cs = getComputedStyle(el);
+      const raw = parseFloat(cs.fontSize);
       setFontPx(Number.isFinite(raw) && raw > 0 ? raw : 0);
+      setSvgTextStyle({
+        letterSpacing: cs.letterSpacing || "0px",
+        fontFamily: cs.fontFamily || "var(--font-main), sans-serif",
+      });
     };
 
     sync();
@@ -80,12 +95,15 @@ export function MaskedVideoText({
       ro.disconnect();
       window.removeEventListener("resize", sync);
     };
-  }, [box.w, box.h, text]);
+  }, [box.w, box.h, text, textAlign]);
 
   const strokeColor = isDark ? "#ffffff" : "#141414";
 
   const ready = box.w >= 12 && box.h >= 12 && fontPx > 0;
+  const anchorMiddle = textAlign === "middle";
   const cx = box.w / 2;
+  const tx = anchorMiddle ? cx : 0;
+  const textAnchor = anchorMiddle ? "middle" : "start";
   const cy = box.w < 640 ? box.h * 0.515 : box.h * 0.52;
 
   const strokeWidthPx = !ready
@@ -117,20 +135,23 @@ export function MaskedVideoText({
   }, []);
 
   useEffect(() => {
-    if (!ready || reduceMotion) return;
+    if (!ready || reduceMotion || disableVideo) return;
     const v = videoRef.current;
     if (!v) return;
+    v.load();
     void v.play().catch(() => {});
-  }, [ready, reduceMotion, text, videoSrc]);
+  }, [ready, reduceMotion, disableVideo, text, videoSrc]);
 
   const strokeStyle = {
     color: "transparent" as const,
     WebkitTextStroke: "1.5px color-mix(in srgb, var(--text) 25%, transparent)",
   };
 
+  const alignClass = anchorMiddle ? "text-center" : "text-left";
+
   if (reduceMotion || disableVideo) {
     return (
-      <span className={`block ${measureClassName} ${className}`} style={strokeStyle}>
+      <span className={`block w-full ${alignClass} ${measureClassName} ${className}`} style={strokeStyle}>
         {text}
       </span>
     );
@@ -144,7 +165,7 @@ export function MaskedVideoText({
     >
       <div
         ref={measureRef}
-        className={`${measureClassName} invisible pointer-events-none select-none`}
+        className={`${measureClassName} ${alignClass} invisible pointer-events-none w-full select-none`}
         aria-hidden
       >
         {text}
@@ -152,7 +173,7 @@ export function MaskedVideoText({
 
       {!ready && (
         <span
-          className={`absolute left-0 top-0 block w-full ${measureClassName}`}
+          className={`absolute left-0 top-0 block w-full ${alignClass} ${measureClassName}`}
           style={strokeStyle}
           aria-hidden
         >
@@ -175,16 +196,17 @@ export function MaskedVideoText({
               >
                 <rect width={box.w} height={box.h} fill="black" />
                 <text
-                  x={cx}
+                  x={tx}
                   y={cy}
                   lang="ru"
-                  textAnchor="middle"
+                  textAnchor={textAnchor}
                   dominantBaseline="middle"
                   fill="white"
                   fontWeight={SVG_FONT_WEIGHT}
                   fontSize={fontPx}
                   style={{
-                    fontFamily: "var(--font-main), ui-sans-serif, system-ui, sans-serif",
+                    fontFamily: svgTextStyle.fontFamily,
+                    letterSpacing: svgTextStyle.letterSpacing,
                     textRendering: "optimizeLegibility",
                   }}
                 >
@@ -195,6 +217,7 @@ export function MaskedVideoText({
           </svg>
 
           <video
+            key={videoSrc}
             ref={videoRef}
             className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
             style={{
@@ -222,10 +245,10 @@ export function MaskedVideoText({
             aria-hidden
           >
             <text
-              x={cx}
+              x={tx}
               y={cy}
               lang="ru"
-              textAnchor="middle"
+              textAnchor={textAnchor}
               dominantBaseline="middle"
               fill="none"
               stroke={strokeColor}
@@ -235,7 +258,8 @@ export function MaskedVideoText({
               fontWeight={SVG_FONT_WEIGHT}
               fontSize={fontPx}
               style={{
-                fontFamily: "var(--font-main), ui-sans-serif, system-ui, sans-serif",
+                fontFamily: svgTextStyle.fontFamily,
+                letterSpacing: svgTextStyle.letterSpacing,
                 textRendering: "optimizeLegibility",
               }}
             >
