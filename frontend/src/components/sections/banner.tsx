@@ -5,15 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { MaskedVideoText } from "@/components/effects/masked-video-text";
 import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 import { useTheme } from "@/lib/theme-context";
 import { cn } from "@/lib/utils";
-const BANNER_GHOST_VIDEO = "/videos/banner-title-ghost.mp4";
 /** Заголовок баннера: один ритм, без «разъезда» кеглей */
 const BANNER_GHOST_MEASURE_CLASS =
   "font-akony text-[clamp(0.95rem,3.8vw,2.2rem)] font-normal leading-[0.9] tracking-[0.02em] uppercase " +
-  "sm:text-[clamp(1.05rem,3.2vw,2.5rem)] md:text-[clamp(1.12rem,2.6vw,2.85rem)] lg:text-[clamp(1.25rem,2.8vw,3.25rem)]";
+  "sm:text-[clamp(1.05rem,3.2vw,2.5rem)] md:text-[clamp(1.12rem,2.6vw,2.85rem)] " +
+  "lg:text-[clamp(1.3rem,2.95vw,3.5rem)] xl:text-[clamp(1.35rem,2.8vw,3.75rem)]";
 
 const SLIDES = [
   {
@@ -84,15 +83,13 @@ const SLIDES = [
 
 const SWITCH_SOUND = "/sounds/banner-switch.mp3";
 const OFFER_LOGO = "/logo.png";
-/** Фон «киноплёнки» — только мобильный баннер (на десктопе не показываем) */
-const BANNER_FILM_VIDEO = "/videos/film-old-movies-effects.mp4";
 
 /** CTA «Обсудить проект»: моб. — обычная кнопка; lg+ — круг с лого */
 function BannerOfferCircle() {
   return (
     <Link
       href="/brief?source=banner-offer"
-      className="group relative z-[1] ml-auto block w-full max-w-sm shrink-0 overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.01] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:max-w-xs lg:ml-0 lg:aspect-square lg:h-[min(11.5rem,22vw)] lg:w-[min(11.5rem,22vw)] lg:min-h-[10.5rem] lg:min-w-[10.5rem] lg:max-w-none"
+      className="group relative z-[1] ml-auto block w-full max-w-sm shrink-0 overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.01] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:max-w-xs lg:ml-0 lg:-translate-x-3 lg:aspect-square lg:h-[min(11.5rem,22vw)] lg:w-[min(11.5rem,22vw)] lg:min-h-[10.5rem] lg:min-w-[10.5rem] lg:max-w-none xl:-translate-x-5"
       style={{
         borderColor: "var(--border)",
         boxShadow: "0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 12px 32px rgba(0,0,0,0.22)",
@@ -399,50 +396,6 @@ export function BannerSection() {
       {/* Интерактивная сетка точек */}
       <DotGrid />
 
-      {/* Видео «киноплёнка» — только мобильная вёрстка баннера */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] overflow-hidden lg:hidden"
-        aria-hidden
-      >
-        <video
-          className={cn(
-            "absolute inset-0 h-full w-full scale-105 object-cover",
-            isDark ? "opacity-[0.42]" : "opacity-[0.34]"
-          )}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-        >
-          <source src={BANNER_FILM_VIDEO} type="video/mp4" />
-        </video>
-        <div
-          className="absolute inset-0"
-          style={{
-            background: isDark
-              ? "linear-gradient(to bottom, var(--bg) 0%, transparent 28%, transparent 72%, var(--bg) 100%), linear-gradient(to right, var(--bg) 0%, transparent 18%, transparent 82%, var(--bg) 100%)"
-              : "linear-gradient(to bottom, color-mix(in srgb, var(--bg) 96%, transparent) 0%, color-mix(in srgb, var(--bg) 55%, transparent) 18%, rgba(255,255,255,0.5) 42%, color-mix(in srgb, var(--bg) 55%, transparent) 78%, color-mix(in srgb, var(--bg) 96%, transparent) 100%), linear-gradient(to right, color-mix(in srgb, var(--bg) 92%, transparent) 0%, transparent 22%, transparent 78%, color-mix(in srgb, var(--bg) 92%, transparent) 100%)",
-          }}
-        />
-        {/* Светлая тема: лёгкая «дымка» под текстом баннера */}
-        {!isDark && (
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse 115% 65% at 50% 42%, rgba(250,250,250,0.82) 0%, rgba(250,250,250,0.28) 52%, transparent 72%)",
-            }}
-          />
-        )}
-        <div className="absolute left-3 top-[max(0.75rem,env(safe-area-inset-top))] flex items-center gap-2 sm:left-4">
-          <span className="h-2 w-2 shrink-0 rounded-full animate-pulse" style={{ backgroundColor: "#ff3333" }} />
-          <span className="font-matrix text-[8px] uppercase tracking-[0.2em] sm:text-[9px]" style={{ color: "#ff3333" }}>
-            rec
-          </span>
-        </div>
-      </div>
-
       {/* ===== CONTENT ===== */}
       <div className="relative z-[10] flex h-full min-h-0 flex-col justify-between">
         {/* ── TOP BAR ── Отключено: контакты и ссылки — в глобальной NavBar (иначе дубль с логотипом) */}
@@ -566,22 +519,17 @@ export function BannerSection() {
                 </motion.h1>
               </AnimatePresence>
               <AnimatePresence mode="wait">
-                <motion.div
+                <motion.p
                   key={active.titleGhost}
-                  variants={subtitleVariants}
+                  variants={titleVariants}
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="mt-0.5 w-full min-w-0 sm:mt-1"
+                  className={cn(BANNER_GHOST_MEASURE_CLASS, "mt-0.5 block w-full min-w-0 sm:mt-1")}
+                  style={{ color: "var(--text)" }}
                 >
-                  <MaskedVideoText
-                    text={active.titleGhost}
-                    videoSrc={BANNER_GHOST_VIDEO}
-                    measureClassName={BANNER_GHOST_MEASURE_CLASS}
-                    disableVideo={!allowHeavyMedia}
-                    textAlign="start"
-                  />
-                </motion.div>
+                  {active.titleGhost}
+                </motion.p>
               </AnimatePresence>
               <AnimatePresence mode="wait">
                 <motion.p

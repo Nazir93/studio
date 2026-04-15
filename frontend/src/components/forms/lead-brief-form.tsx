@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, ChevronDown, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { z } from "zod";
 import { leadFormSchema } from "@/lib/schemas";
 import { PHONE, PHONE_RAW } from "@/lib/constants";
@@ -130,13 +131,22 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
   };
 
   const pageTight = variant === "page";
-  /** На странице заявки: ≥16px на узких экранах — без принудительного зума iOS при фокусе */
-  const inputClass = pageTight
-    ? "w-full border px-3 py-2.5 text-[16px] leading-snug outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)] sm:px-2.5 sm:py-1.5 sm:text-[12px] md:text-[13px]"
-    : "w-full border px-4 py-3.5 text-sm outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] sm:text-[15px]";
-  const inputStyle = { borderColor: "var(--border)", backgroundColor: "var(--bg)", color: "var(--text)" };
-  const gapClass = pageTight ? "gap-1.5 sm:gap-2" : "gap-4 sm:gap-5";
-  const labelMb = pageTight ? "mb-0" : "mb-1.5";
+  /** На странице: ≥16px на узких экранах — без зума iOS при фокусе */
+  const controlPad = pageTight
+    ? "px-3.5 py-3 text-[16px] leading-snug sm:px-3 sm:py-2.5 sm:text-[13px] md:text-[14px]"
+    : "px-4 py-3.5 text-[15px] sm:text-sm";
+  const controlSurface = cn(
+    "w-full rounded-xl border outline-none transition-[border-color,box-shadow,background-color] duration-200",
+    "border-[color-mix(in_srgb,var(--border)_72%,transparent)]",
+    "bg-[color-mix(in_srgb,var(--text)_4%,var(--bg))] text-[var(--text)]",
+    "shadow-[inset_0_1px_0_color-mix(in_srgb,var(--text)_6%,transparent)]",
+    "placeholder:text-[color-mix(in_srgb,var(--text-muted)_78%,transparent)]",
+    "focus-visible:border-[color-mix(in_srgb,var(--accent)_50%,var(--border))]",
+    "focus-visible:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_20%,transparent),inset_0_1px_0_color-mix(in_srgb,var(--text)_8%,transparent)]",
+    controlPad
+  );
+  const gapClass = pageTight ? "gap-3 sm:gap-3.5" : "gap-4 sm:gap-5";
+  const labelMb = pageTight ? "mb-1" : "mb-1.5";
 
   if (done && variant === "page") {
     return (
@@ -180,16 +190,26 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
         >
           Тема обращения <span style={{ color: "var(--accent)" }}>*</span>
         </label>
-        <select className={`${inputClass} cursor-pointer appearance-none`} style={inputStyle} {...register("service")}>
-          <option value="" style={{ backgroundColor: "var(--bg)", color: "var(--text-muted)" }}>
-            Выберите вариант
-          </option>
-          {SERVICE_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value} style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}>
-              {o.value}
+        <div className="relative">
+          <select
+            className={cn(controlSurface, "cursor-pointer appearance-none pr-11")}
+            {...register("service")}
+          >
+            <option value="" className="bg-[var(--bg)] text-[var(--text-muted)]">
+              Выберите вариант
             </option>
-          ))}
-        </select>
+            {SERVICE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value} className="bg-[var(--bg)] text-[var(--text)]">
+                {o.value}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 opacity-45"
+            style={{ color: "var(--text-muted)" }}
+            aria-hidden
+          />
+        </div>
         {errors.service && <p className="mt-1 text-xs text-red-400">{errors.service.message}</p>}
       </div>
 
@@ -204,8 +224,7 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
           <input
             type="text"
             autoComplete="name"
-            className={inputClass}
-            style={inputStyle}
+            className={controlSurface}
             placeholder="Как к вам обращаться"
             {...register("name")}
           />
@@ -222,8 +241,7 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
             type="tel"
             inputMode="tel"
             autoComplete="tel"
-            className={inputClass}
-            style={inputStyle}
+            className={controlSurface}
             placeholder="+7 …"
             {...register("phone")}
           />
@@ -241,8 +259,7 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
         <input
           type="email"
           autoComplete="email"
-          className={inputClass}
-          style={inputStyle}
+          className={controlSurface}
           placeholder="name@company.ru"
           {...register("email")}
         />
@@ -258,8 +275,11 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
         </label>
         <textarea
           rows={pageTight ? 2 : 4}
-          className={`${inputClass} min-h-0 flex-1 ${pageTight ? "max-h-[4.25rem] resize-none sm:max-h-[5rem] md:max-h-[5.5rem]" : "resize-y min-h-[100px]"}`}
-          style={inputStyle}
+          className={cn(
+            controlSurface,
+            "min-h-0 flex-1 leading-relaxed",
+            pageTight ? "max-h-[4.25rem] resize-none sm:max-h-[5rem] md:max-h-[5.5rem]" : "min-h-[112px] resize-y"
+          )}
           placeholder="Сроки, бюджет, ссылка на ТЗ…"
           {...register("message")}
         />
@@ -271,18 +291,36 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
         control={control}
         render={({ field }) => (
           <label
-            className={`flex shrink-0 cursor-pointer items-start gap-2 leading-tight sm:gap-3 ${pageTight ? "text-[10px] sm:text-xs" : "text-xs sm:text-sm"}`}
+            className={cn(
+              "flex shrink-0 cursor-pointer items-start gap-3 rounded-xl border border-transparent p-1 -m-1 transition-colors sm:gap-3.5",
+              "hover:border-[color-mix(in_srgb,var(--border)_45%,transparent)]",
+              pageTight ? "text-[10px] sm:text-xs" : "text-xs sm:text-sm"
+            )}
             style={{ color: "var(--text-muted)" }}
           >
             <input
               type="checkbox"
-              className={`mt-0.5 shrink-0 accent-[var(--accent)] ${pageTight ? "h-3.5 w-3.5 sm:h-4 sm:w-4" : "h-4 w-4"}`}
+              className="peer sr-only"
               checked={field.value === true}
               onBlur={field.onBlur}
               ref={field.ref}
               onChange={(e) => field.onChange(e.target.checked)}
             />
-            <span>
+            <span
+              className={cn(
+                "mt-0.5 flex shrink-0 items-center justify-center rounded-md border transition-[border-color,background-color,box-shadow]",
+                "border-[color-mix(in_srgb,var(--border)_75%,transparent)]",
+                "bg-[color-mix(in_srgb,var(--text)_4%,var(--bg))]",
+                "shadow-[inset_0_1px_0_color-mix(in_srgb,var(--text)_6%,transparent)]",
+                "peer-focus-visible:ring-2 peer-focus-visible:ring-[color-mix(in_srgb,var(--accent)_35%,transparent)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--bg)]",
+                "peer-checked:border-[var(--accent)] peer-checked:bg-[var(--accent)] peer-checked:[&>svg]:opacity-100",
+                pageTight ? "h-[18px] w-[18px] sm:h-5 sm:w-5" : "h-5 w-5"
+              )}
+              aria-hidden
+            >
+              <Check strokeWidth={3} className="h-2.5 w-2.5 text-[var(--bg)] opacity-0 transition-opacity" />
+            </span>
+            <span className="leading-snug">
               Согласен с{" "}
               <a href="/privacy" className="underline underline-offset-2 hover:opacity-80" target="_blank" rel="noopener noreferrer">
                 политикой конфиденциальности
@@ -300,7 +338,12 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
       <button
         type="submit"
         disabled={isSubmitting}
-        className={`mt-0.5 flex w-full shrink-0 items-center justify-center gap-2 border font-matrix uppercase tracking-[0.2em] transition-opacity disabled:opacity-50 ${pageTight ? "py-1.5 text-[9px] sm:py-2 sm:text-[10px] md:text-xs" : "py-4 text-xs sm:py-4 sm:text-sm"}`}
+        className={cn(
+          "mt-1 flex w-full shrink-0 items-center justify-center gap-2 rounded-xl border font-matrix uppercase tracking-[0.2em]",
+          "bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] transition-[opacity,box-shadow] hover:opacity-95 hover:shadow-[0_0_0_1px_color-mix(in_srgb,var(--accent)_40%,transparent)]",
+          "disabled:opacity-50",
+          pageTight ? "py-2.5 text-[9px] sm:py-3 sm:text-[10px] md:text-xs" : "py-3.5 text-xs sm:py-4 sm:text-sm"
+        )}
         style={{ borderColor: "var(--accent)", color: "var(--text)" }}
       >
         {isSubmitting ? (

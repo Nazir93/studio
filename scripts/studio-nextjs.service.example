@@ -1,0 +1,24 @@
+# Скопировать в /etc/systemd/system/studio-nextjs.service
+# Пользователь и пути подставить свои (ниже — пример для /opt/studio)
+
+[Unit]
+Description=Studio Next.js (standalone)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/studio/frontend/.next/standalone
+Environment=NODE_ENV=production
+Environment=PORT=3000
+# Только localhost — снаружи доступ через системный Nginx
+Environment=HOSTNAME=127.0.0.1
+# TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID — в этом файле (заявки с сайта в Telegram)
+EnvironmentFile=-/opt/studio/frontend/.env.production
+ExecStart=/usr/bin/node /opt/studio/frontend/.next/standalone/server.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

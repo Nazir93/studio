@@ -104,40 +104,50 @@ function PortfolioCell({
       className="group relative flex shrink-0 flex-col overflow-hidden transition-colors"
       style={{
         aspectRatio: "9 / 13",
-        backgroundColor: hasMedia ? "#0a0a0a" : "var(--bg-secondary)",
+        /** В покое — чёрная пластина; контент «внутри» приглушён, при hover выделяется */
+        backgroundColor: "#0a0a0a",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Фон: при наличии видео на десктопе — чёрная пластина + лёгкая текстура; иначе постер / градиент */}
-      <div className="pointer-events-none absolute inset-0">
-        {hasMedia ? (
-          <div
-            className="h-full w-full"
-            style={{
-              background:
-                "radial-gradient(ellipse at 30% 25%, var(--text-subtle) 0%, transparent 55%), radial-gradient(ellipse at 75% 70%, var(--text-subtle) 0%, transparent 45%)",
-              opacity: 0.15,
-            }}
-          />
-        ) : image ? (
-          // eslint-disable-next-line @next/next/no-img-element
+      {/* Лёгкая текстура на чёрном */}
+      <div
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        style={{
+          background:
+            "radial-gradient(ellipse at 30% 25%, var(--text-subtle) 0%, transparent 55%), radial-gradient(ellipse at 75% 70%, var(--text-subtle) 0%, transparent 45%)",
+          opacity: hovered ? 0.22 : 0.12,
+          transition: `opacity 0.45s ${PORTFOLIO_TAPE_EASE}`,
+        }}
+      />
+
+      {/* Постер: почти не виден, проявляется при наведении (если нет видео) */}
+      {image && !hasMedia ? (
+        <div className="pointer-events-none absolute inset-0 z-[5] overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image}
             alt=""
-            className="h-full w-full object-cover opacity-50 transition-all duration-700 group-hover:opacity-70 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <div
-            className="h-full w-full"
+            className="h-full w-full object-cover transition-all duration-700 ease-out"
             style={{
-              background:
-                "radial-gradient(ellipse at 25% 20%, var(--text-subtle) 0%, transparent 50%), radial-gradient(ellipse at 70% 75%, var(--text-subtle) 0%, transparent 40%)",
-              opacity: 0.12,
+              opacity: hovered ? 0.5 : 0,
+              transform: hovered ? "scale(1.03)" : "scale(1.06)",
             }}
           />
-        )}
-      </div>
+        </div>
+      ) : null}
+
+      {/* Нет ни картинки ни видео — только чуть градиента поверх чёрного */}
+      {!image && !hasMedia ? (
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at 25% 20%, var(--text-subtle) 0%, transparent 50%), radial-gradient(ellipse at 70% 75%, var(--text-subtle) 0%, transparent 40%)",
+            opacity: 0.1,
+          }}
+        />
+      ) : null}
 
       {/* Видео при наведении (только lg+, как в ленте «Что умеем») */}
       {effectiveVideo ? (
@@ -165,7 +175,7 @@ function PortfolioCell({
       <div
         className="absolute inset-0 z-30 flex flex-col justify-between gap-2 p-3 md:p-5"
         style={{
-          transform: hovered && hasMedia ? "translateY(-2px)" : "translateY(0)",
+          transform: hovered ? "translateY(-3px)" : "translateY(0)",
           transition: `transform 0.45s ${PORTFOLIO_TAPE_EASE}`,
         }}
       >
@@ -183,11 +193,16 @@ function PortfolioCell({
             <span
               className="font-matrix text-[7px] uppercase md:text-[8px]"
               style={{
-                letterSpacing: hovered ? "0.2em" : "0.15em",
-                color: hovered ? "var(--text)" : "var(--text-muted)",
+                letterSpacing: hovered ? "0.2em" : "0.12em",
+                color: hovered ? "var(--text)" : "var(--text-subtle)",
+                opacity: hovered ? 1 : 0.45,
                 textShadow:
-                  !isDark ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.35)" : undefined,
-                transition: `letter-spacing 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease`,
+                  hovered && !isDark
+                    ? "0 0 10px rgba(255,255,255,0.9)"
+                    : hovered && isDark
+                      ? "0 0 14px color-mix(in srgb, var(--text) 35%, transparent)"
+                      : undefined,
+                transition: `letter-spacing 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease, opacity 0.35s ease`,
               }}
             >
               {tag}
@@ -195,11 +210,16 @@ function PortfolioCell({
             <span
               className="font-matrix text-[7px] uppercase md:text-[8px]"
               style={{
-                letterSpacing: hovered ? "0.18em" : "0.12em",
+                letterSpacing: hovered ? "0.18em" : "0.1em",
                 color: hovered ? "var(--text)" : "var(--text-subtle)",
+                opacity: hovered ? 1 : 0.4,
                 textShadow:
-                  !isDark ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.35)" : undefined,
-                transition: `letter-spacing 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease`,
+                  hovered && !isDark
+                    ? "0 0 10px rgba(255,255,255,0.85)"
+                    : hovered && isDark
+                      ? "0 0 12px color-mix(in srgb, var(--text) 28%, transparent)"
+                      : undefined,
+                transition: `letter-spacing 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease, opacity 0.35s ease`,
               }}
             >
               {year}
@@ -209,13 +229,17 @@ function PortfolioCell({
 
         <div className="flex min-h-0 flex-1 flex-col justify-center py-1">
           <h3
-            className="w-full text-balance text-center font-matrix text-xs uppercase leading-tight tracking-[0.04em] transition-all duration-300 md:text-sm lg:text-base"
+            className="w-full text-balance text-center font-matrix text-xs uppercase leading-tight tracking-[0.04em] transition-all duration-400 md:text-sm lg:text-base"
             style={{
-              color: "var(--text)",
-              textShadow:
-                hovered && hasMedia
-                  ? "0 1px 12px color-mix(in srgb, var(--bg) 65%, transparent)"
-                  : undefined,
+              color: hovered ? "var(--text)" : "var(--text-muted)",
+              opacity: hovered ? 1 : 0.38,
+              transform: hovered ? "scale(1.02)" : "scale(1)",
+              textShadow: hovered
+                ? isDark
+                  ? "0 0 20px color-mix(in srgb, var(--text) 25%, transparent), 0 2px 16px rgba(0,0,0,0.45)"
+                  : "0 0 18px rgba(255,255,255,0.55), 0 1px 0 rgba(255,255,255,0.2)"
+                : "none",
+              transition: `opacity 0.35s ease, transform 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease, text-shadow 0.35s ease`,
             }}
           >
             {title}
@@ -224,24 +248,20 @@ function PortfolioCell({
 
         <div className="shrink-0 text-center">
           <p
-            className="font-matrix text-[7px] uppercase tracking-[0.18em] transition-colors duration-300 md:text-[8px]"
+            className="font-matrix text-[7px] uppercase tracking-[0.18em] transition-all duration-300 md:text-[8px]"
             style={{
-              color:
-                hovered && hasMedia
-                  ? "color-mix(in srgb, var(--text) 72%, transparent)"
-                  : "var(--text-muted)",
+              color: hovered ? "var(--text-muted)" : "var(--text-subtle)",
+              opacity: hovered ? 0.92 : 0.35,
             }}
           >
             {subtitle}
           </p>
           {area ? (
             <p
-              className="mt-1 font-matrix text-[7px] uppercase tracking-[0.15em] transition-colors duration-300 md:text-[8px]"
+              className="mt-1 font-matrix text-[7px] uppercase tracking-[0.15em] transition-all duration-300 md:text-[8px]"
               style={{
-                color:
-                  hovered && hasMedia
-                    ? "color-mix(in srgb, var(--text) 50%, transparent)"
-                    : "var(--text-subtle)",
+                color: hovered ? "var(--text-subtle)" : "var(--text-subtle)",
+                opacity: hovered ? 0.75 : 0.3,
               }}
             >
               {area}

@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/constants";
+import { getAllBlogSlugs } from "@/lib/blog-data";
+import { getAllExpertiseSlugs } from "@/lib/expertise-data";
 import { getAllCaseSlugs } from "@/lib/portfolio-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -31,5 +33,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...portfolioPages];
+  const blogPosts: MetadataRoute.Sitemap = getAllBlogSlugs().map((slug) => ({
+    url: `${baseUrl}/blog/${slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.55,
+  }));
+
+  const expertisePages: MetadataRoute.Sitemap = getAllExpertiseSlugs().map((slug) => ({
+    url: `${baseUrl}/expertise/${slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.65,
+  }));
+
+  return [...staticPages, ...portfolioPages, ...blogPosts, ...expertisePages];
 }

@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     const token = uuidv4();
     const source = body.source || "unknown";
 
-    const telegramOk = await sendTelegramNotification(
+    const telegramResult = await sendTelegramNotification(
       formatLeadMessage({
         name: parsed.data.name,
         phone: parsed.data.phone,
@@ -67,12 +67,24 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    if (!telegramOk) {
-      console.error("[LEAD] Telegram delivery failed; check TELEGRAM_* env and bot/chat (user must /start bot in private chat)");
+    if (!telegramResult.ok) {
+      const { reason } = telegramResult;
+      if (reason === "missing_env") {
+        console.error(
+          "[LEAD] Нет TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID в окружении процесса (standalone: проверьте путь в systemd EnvironmentFile и restart)"
+        );
+      } else {
+        console.error(
+          "[LEAD] Telegram не доставил заявку:",
+          reason,
+          "— токен/chat_id, /start боту в личке, для группы id вида -100…"
+        );
+      }
       return NextResponse.json(
         {
           error:
             "Не удалось отправить заявку в мессенджер. Позвоните нам или напишите в Telegram — мы на связи.",
+          code: reason,
         },
         { status: 503 }
       );

@@ -1,123 +1,176 @@
-# Деплой на Ubuntu VPS (Docker + Nginx)
+# Деплой на Ubuntu VPS
 
-Порядок действий после входа по SSH (например, `root@...`).
+## Про SSL, «90 дней» и оплату
 
-## 1. Базовые пакеты и firewall
+- **Let's Encrypt бесплатен** — платить УЦ не нужно. Срок жизни одного выпуска сертификата **~90 дней** — это норма у LE, а не «потом платить».
+- **Автообновление**: на Ubuntu пакет `certbot` ставит **systemd timer** / cron: раз в несколько месяцев запускается `certbot renew`, сертификат продлевается **без вашего участия** (пока домен указывает на сервер и открыт порт 80 или настроен DNS для плагина).
+- Предложение хостинга про **только DNS (acme-записи) без автообновления** — это **обходной путь**, когда нельзя проверить домен по HTTP. У вас в проекте уже есть **HTTP-проверка** (`/.well-known/acme-challenge/`) — ею можно пользоваться и **с Docker**, и **без Docker**; это как раз путь с **автопродлением**.
+
+Ниже два варианта: **без Docker** (как «на другом сервере»: системный Nginx + Certbot) и **с Docker** (как в `docker-compose.yml`).
+
+---
+
+## Вариант A — без Docker (Nginx + Certbot на хосте, авто SSL)
+
+Подходит, если не хотите занимать 80/443 контейнером и привыкли к классической схеме.
+
+### 1. Пакеты, firewall
 
 ```bash
 apt update && apt upgrade -y
-apt install -y ca-certificates curl git ufw
+apt install -y ca-certificates curl git ufw nginx certbot python3-certbot-nginx
 ufw allow OpenSSH
 ufw allow 80/tcp
 ufw allow 443/tcp
 ufw --force enable
-ufw status
 ```
 
-## 2. Docker (официальный скрипт)
+**Важно:** на этом же сервере не должно быть другого процесса на `:80` и `:443` (иначе конфликт). Если раньше поднимали Docker с пробросом портов — остановите: `cd /opt/studio && docker compose down`.
+
+### 2. Node.js 20 (LTS)
 
 ```bash
-curl -fsSL https://get.docker.com | sh
-systemctl enable --now docker
-docker compose version
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs
+node -v && npm -v
 ```
 
-При нехватке RAM на этапе `npm run build` можно добавить swap (1–2 ГБ), затем повторить сборку.
-
-## 3. Код проекта
+### 3. Код и переменные
 
 ```bash
 mkdir -p /opt && cd /opt
 git clone https://github.com/Nazir93/studio.git
 cd studio
-# дальше все команды из каталога /opt/studio
-```
-
-Если репозиторий другой — подставьте свой URL.
-
-## 4. Переменные окружения приложения
-
-```bash
 cp frontend/.env.production.example frontend/.env.production
 nano frontend/.env.production
 ```
 
-Обязательно задайте:
+Задайте `NEXT_PUBLIC_SITE_URL=https://code1618.ru`, Telegram и т.д.
 
-- `NEXT_PUBLIC_SITE_URL` — `https://ваш-домен.ru` (или временно `http://IP` только для теста без HTTPS)
-- `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` — для заявок с сайта
-- при необходимости `NEXT_PUBLIC_YANDEX_METRIKA_ID` / `NEXT_PUBLIC_GA_ID`
-
-Файл `frontend/.env.production` на сервере не коммитится (см. `.gitignore`).
-
-После **любого** изменения `frontend/.env.production` пересоздайте контейнер приложения, иначе старые переменные останутся в памяти:
+### 4. Сборка Next.js (standalone)
 
 ```bash
-docker compose up -d --force-recreate nextjs
+cd /opt/studio/frontend
+npm ci
+npm run build
+cp -r public .next/standalone/public
+mkdir -p .next/standalone/.next
+cp -r .next/static .next/standalone/.next/static
 ```
 
-### Заявки в Telegram не приходят
+После **каждого** `git pull` и новой сборки команды `cp -r public ...` и `cp -r .next/static ...` нужно повторить (можно оформить маленьким скриптом `deploy.sh`).
 
-- Убедитесь, что в контейнере есть переменные: `docker compose exec nextjs sh -c 'printenv | grep TELEGRAM'`
-- **Личный чат:** вы один раз написали боту `/start` (без этого Bot API не шлёт вам сообщения).
-- **Группа:** `TELEGRAM_CHAT_ID` вида `-100…`, бот добавлен в группу.
-- Ошибки API смотрите в логах: `docker compose logs -f nextjs` (строки `[TELEGRAM]`).
-- С сервера должен быть доступ в интернет: `docker compose exec nextjs wget -qO- https://api.telegram.org`
-
-## 5. SSL для Nginx (иначе контейнер nginx не поднимет `:443`)
-
-Без файлов в `nginx/ssl/` блок HTTPS не стартует.
-
-### Заход по IP (Chrome «Неподдерживаемый сертификат» / NET::ERR_CERT_COMMON_NAME_INVALID)
-
-Если сертификат выпущен на **hostname** или **домен**, а в браузере открываете **https://IP** — имя не совпадает, браузер **блокирует** HTTPS. Варианты:
-
-- открывать **`http://IP`** (без S), или
-- выпустить самоподписанный сертификат с **SAN = IP** (подставьте свой IP):
+### 5. Systemd
 
 ```bash
-mkdir -p nginx/ssl
-IP="ВАШ_IP_СЮДА"
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout nginx/ssl/privkey.pem \
-  -out nginx/ssl/fullchain.pem \
-  -subj "/CN=$IP" \
-  -addext "subjectAltName=IP:$IP"
-chmod 600 nginx/ssl/privkey.pem
-docker compose restart nginx
+sudo cp /opt/studio/scripts/studio-nextjs.service.example /etc/systemd/system/studio-nextjs.service
+sudo nano /etc/systemd/system/studio-nextjs.service
 ```
 
-После этого `https://IP` всё равно будет «не доверенный» (самоподписанный), но **дойти до сайта** можно через «Дополнительные → перейти».
+Проверьте `User`, `WorkingDirectory`, `ExecStart`, `EnvironmentFile`. Рабочий каталог процесса — каталог **standalone**, где лежит `server.js`:
 
-### Домен (без IP в браузере)
+`WorkingDirectory=/opt/studio/frontend/.next/standalone`  
+`ExecStart=/usr/bin/node /opt/studio/frontend/.next/standalone/server.js`
+
+Выдайте права пользователю сервиса на каталоги проекта (`chown -R www-data:www-data /opt/studio/frontend` или отдельный пользователь `studio`).
 
 ```bash
-mkdir -p nginx/ssl
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout nginx/ssl/privkey.pem \
-  -out nginx/ssl/fullchain.pem \
-  -subj "/CN=ваш-домен.ru"
-chmod 600 nginx/ssl/privkey.pem
+sudo systemctl daemon-reload
+sudo systemctl enable --now studio-nextjs
+sudo systemctl status studio-nextjs
+curl -sI http://127.0.0.1:3000 | head -3
 ```
 
-Выпуск Let’s Encrypt и редирект HTTP→HTTPS — см. `nginx/README-RU.md`.
+### 6. Nginx как reverse proxy
 
-## 6. Сборка и запуск
+Пример vhost: `nginx/studio-site.example.conf` — скопируйте в `/etc/nginx/sites-available/studio`, замените `server_name`, включите сайт:
 
 ```bash
+sudo ln -sf /etc/nginx/sites-available/studio /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Пока без HTTPS сайт должен открываться по `http://ваш-домен` (A-запись на IP сервера).
+
+### 7. Сертификат Let’s Encrypt (автообновление из коробки)
+
+```bash
+sudo certbot --nginx -d ваш-домен.ru -d www.ваш-домен.ru
+```
+
+Certbot сам допишет `listen 443 ssl` и пути к `/etc/letsencrypt/live/...`. Проверка продления:
+
+```bash
+sudo certbot renew --dry-run
+systemctl list-timers | grep certbot
+```
+
+Платить за LE не нужно; таймер будет продлевать сертификаты.
+
+### Заявки в Telegram не приходят (без Docker)
+
+API `/api/leads` отвечает **503**, если бот не смог отправить сообщение. Чаще всего на сервере **нет переменных** в процессе Node или неверный чат.
+
+1. **Файл с секретами** должен совпадать с `EnvironmentFile` в unit-файле (по умолчанию `frontend/.env.production`):
+
+   ```bash
+   sudo grep -E '^(TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID)=' /opt/studio/frontend/.env.production
+   ```
+
+   Оба ключа не должны быть пустыми. В кавычках или без — как в примере `.env.production.example`.
+
+2. **Перезапуск после правки** `.env.production`:
+
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl restart studio-nextjs
+   ```
+
+3. **Логи** (ищите `[TELEGRAM]` / `[LEAD]`):
+
+   ```bash
+   sudo journalctl -u studio-nextjs -n 80 --no-pager
+   ```
+
+4. **Личный чат:** напишите боту **`/start`**. **Группа:** `TELEGRAM_CHAT_ID` вида `-100…`, бот добавлен в группу.
+
+5. Проверка с сервера (подставьте токен и chat id из `.env.production`):
+
+   ```bash
+   curl -sS "https://api.telegram.org/bot<TOKEN>/getMe"
+   ```
+
+### 8. Обновление после `git push`
+
+```bash
+cd /opt/studio
+git pull
+cd frontend
+npm ci
+npm run build
+cp -r public .next/standalone/public
+mkdir -p .next/standalone/.next
+cp -r .next/static .next/standalone/.next/static
+sudo systemctl restart studio-nextjs
+```
+
+---
+
+## Вариант B — Docker + Nginx в контейнере
+
+Порядок: firewall → Docker → клон → `frontend/.env.production` → SSL в `nginx/ssl/` → `docker compose build && up`.
+
+Подробности по самоподписанным сертификатам и webroot для Certbot — см. **`nginx/README-RU.md`**.
+
+Кратко: порты **80/443 у контейнера `nginx` — это нормально** для этого стека: это тот же Nginx, только в Docker. Let’s Encrypt по **HTTP-01 (webroot)** можно выпускать **с автопродлением** (`certbot renew` + копирование в `nginx/ssl/` + `docker compose restart nginx`), см. скрипт `scripts/letsencrypt-renew.sh`.
+
+```bash
+cd /opt/studio
 docker compose build --no-cache
 docker compose up -d
-docker compose ps
-docker compose logs -f --tail=50
 ```
 
-Проверка nginx: `docker compose exec nginx nginx -t`
-
-Сайт: сначала проверьте **`http://IP`**. HTTPS по IP — только если в сертификате есть SAN с этим IP (см. раздел 5).
-
-Если при `docker compose up` ошибка **Docker Hub pull rate limit** для образа nginx: в репозитории уже указан `public.ecr.aws/docker/library/nginx:alpine` (не Docker Hub). Выполните `git pull` и снова `docker compose pull && docker compose up -d`. Альтернатива: `docker login` на Docker Hub.
-
-## 7. Обновление после `git push`
+Обновление:
 
 ```bash
 cd /opt/studio
@@ -126,8 +179,30 @@ docker compose build --no-cache
 docker compose up -d
 ```
 
-## 8. Полезно
+После смены `frontend/.env.production`:
 
-- Логи Next.js: `docker compose logs -f nextjs`
-- Перезапуск только nginx после смены сертификатов: `docker compose restart nginx`
-- Домен: A-запись на публичный IP VPS (см. вывод `hostname -I` или панель хостинга)
+```bash
+docker compose up -d --force-recreate nextjs
+```
+
+### Заявки в Telegram не приходят
+
+- `docker compose exec nextjs sh -c 'printenv | grep TELEGRAM'`
+- Личный чат: вы написали боту `/start`
+- Группа: `TELEGRAM_CHAT_ID` вида `-100…`, бот в группе
+- Логи: `docker compose logs -f nextjs` (строки `[TELEGRAM]`)
+
+---
+
+## Полезно
+
+| Задача | Без Docker | Docker |
+|--------|------------|--------|
+| Логи приложения | `journalctl -u studio-nextjs -f` | `docker compose logs -f nextjs` |
+| Рестарт приложения | `systemctl restart studio-nextjs` | `docker compose restart nextjs` |
+| Проверка Nginx | `nginx -t` | `docker compose exec nginx nginx -t` |
+
+- Домен: **A-запись** на публичный IP VPS.
+- Заход по **https://IP** с публичным доверенным сертификатом обычно **невозможен** (сертификаты выдают на доменное имя). Для проверки используйте **домен** или временно `http://IP`.
+
+При нехватке RAM на `npm run build` добавьте swap 1–2 ГБ.

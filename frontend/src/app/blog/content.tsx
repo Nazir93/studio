@@ -1,21 +1,15 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-
-type PostItem = {
-  id: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  date: string;
-};
+import type { BlogPost } from "@/lib/blog-data";
 
 function PostCard({
   post,
   index,
 }: {
-  post: PostItem;
+  post: BlogPost;
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -38,19 +32,19 @@ function PostCard({
   return (
     <div
       ref={ref}
-      className="group cursor-pointer transition-all duration-700 ease-out"
+      className="transition-all duration-700 ease-out"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(40px)",
         transitionDelay: `${(index % 3) * 100}ms`,
       }}
     >
-      <div
-        className="relative overflow-hidden flex flex-col justify-between h-[360px] p-6 md:p-8 transition-transform duration-500 group-hover:scale-[0.98]"
+      <Link
+        href={`/blog/${post.slug}`}
+        className="group relative flex h-[360px] flex-col justify-between overflow-hidden rounded-[20px] border p-6 transition-transform duration-500 hover:scale-[0.98] md:p-8"
         style={{
           backgroundColor: "var(--bg-secondary)",
-          border: "1px solid var(--border)",
-          borderRadius: "20px",
+          borderColor: "var(--border)",
         }}
       >
         {/* Image placeholder */}
@@ -99,12 +93,12 @@ function PostCard({
             {post.excerpt}
           </p>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }
 
-export function BlogPageContent({ posts }: { posts: PostItem[] }) {
+export function BlogPageContent({ posts }: { posts: readonly BlogPost[] }) {
   return (
     <section className="pt-32 pb-20 md:pt-40 md:pb-28" style={{ backgroundColor: "var(--bg)" }}>
       <div className="container mx-auto">
@@ -122,7 +116,7 @@ export function BlogPageContent({ posts }: { posts: PostItem[] }) {
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
           {posts.map((post, i) => (
-            <PostCard key={post.id} post={post} index={i} />
+            <PostCard key={post.slug} post={post} index={i} />
           ))}
         </div>
       </div>

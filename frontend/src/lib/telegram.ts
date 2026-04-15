@@ -1,11 +1,20 @@
-/** Успешная доставка в Telegram (false — нет env, сеть или ответ ok: false) */
-export async function sendTelegramNotification(message: string): Promise<boolean> {
+export type TelegramSendFailure =
+  | "missing_env"
+  | "telegram_rejected"
+  | "network";
+
+/** Успешная доставка в Telegram */
+export async function sendTelegramNotification(
+  message: string
+): Promise<{ ok: true } | { ok: false; reason: TelegramSendFailure }> {
   const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
 
   if (!botToken || !chatId) {
-    console.warn("[TELEGRAM] Задайте TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID в окружении");
-    return false;
+    console.warn(
+      "[TELEGRAM] Задайте TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID (для systemd: EnvironmentFile=…/.env.production, затем daemon-reload и restart сервиса)"
+    );
+    return { ok: false, reason: "missing_env" };
   }
 
   try {
@@ -30,12 +39,12 @@ export async function sendTelegramNotification(message: string): Promise<boolean
         data?.description ?? res.status,
         data?.error_code != null ? `(code ${data.error_code})` : ""
       );
-      return false;
+      return { ok: false, reason: "telegram_rejected" };
     }
-    return true;
+    return { ok: true };
   } catch (error) {
     console.error("[TELEGRAM] Failed to send notification:", error);
-    return false;
+    return { ok: false, reason: "network" };
   }
 }
 

@@ -44,7 +44,7 @@ export const SERVICES = [
       "Monday.com, процессы, AI-сотрудники и RPA: меньше рутины в маркетинге, продажах и операционке.",
     icon: "zap" as const,
     coverImage: null as string | null,
-    videoUrl: "/videos/ai.mp4",
+    videoUrl: null as string | null,
   },
   {
     id: "testing",

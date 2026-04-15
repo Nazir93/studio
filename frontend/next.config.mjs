@@ -42,6 +42,14 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: "/videos/:path*",
+        headers: [
+          /** Снижает шанс сбоев кэша/диапазонов в части браузеров при больших mp4 */
+          { key: "Accept-Ranges", value: "bytes" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },

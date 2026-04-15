@@ -34,9 +34,8 @@ function ServiceCard({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  /** Видео подключаем вместе с появлением карточки — один observer, без одновременной загрузки всех mp4 */
-  const [loadVideo, setLoadVideo] = useState(false);
   const Icon = SERVICE_ICONS[service.icon];
+  const num = String(index + 1).padStart(2, "0");
 
   useEffect(() => {
     const el = ref.current;
@@ -45,14 +44,13 @@ function ServiceCard({
       ([entry]) => {
         if (!entry.isIntersecting) return;
         setVisible(true);
-        if (service.videoUrl) setLoadVideo(true);
         observer.disconnect();
       },
       { threshold: 0.08, rootMargin: "140px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [service.videoUrl]);
+  }, []);
 
   return (
     <div
@@ -67,87 +65,67 @@ function ServiceCard({
       <Link
         href={service.slug}
         data-cursor-word="смотреть"
-        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--bg-secondary)_88%,var(--bg)_12%)] transition-all duration-500 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--text)_22%,transparent)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.07)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--bg-secondary)_90%,var(--bg)_10%)] transition-all duration-500 hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--text)_20%,transparent)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_16px_48px_rgba(0,0,0,0.4)]"
       >
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px opacity-70 transition-opacity group-hover:opacity-100"
+          className="pointer-events-none absolute inset-x-0 top-0 z-[3] h-px opacity-80 transition-opacity group-hover:opacity-100"
           style={{
             background:
-              "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--text) 35%, transparent) 40%, color-mix(in srgb, var(--text) 35%, transparent) 60%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--accent) 45%, transparent) 45%, color-mix(in srgb, var(--text) 25%, transparent) 55%, transparent 100%)",
           }}
           aria-hidden
         />
 
-        {/* Превью */}
-        <div className="relative aspect-[16/10] overflow-hidden border-b" style={{ borderColor: "var(--border)" }}>
-          {service.videoUrl ? (
-            loadVideo ? (
-              <video
-                className="h-full w-full object-cover opacity-90 transition-[opacity,transform] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                aria-hidden
-              >
-                <source src={service.videoUrl} type="video/mp4" />
-              </video>
-            ) : (
-              <div
-                className="flex h-full w-full items-center justify-center bg-[color-mix(in_srgb,var(--bg-secondary)_92%,var(--bg)_8%)]"
-                aria-hidden
-              >
-                <span
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl border opacity-70"
-                  style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-                >
-                  <Icon size={24} strokeWidth={1.35} />
-                </span>
-              </div>
-            )
-          ) : (
-            <div
-              className="flex h-full w-full items-center justify-center transition-colors duration-500 group-hover:bg-[color-mix(in_srgb,var(--bg-secondary)_88%,var(--bg)_12%)]"
-              style={{
-                background:
-                  "linear-gradient(145deg, color-mix(in srgb, var(--bg-secondary) 92%, transparent) 0%, var(--bg) 100%)",
-              }}
-            >
-              <span
-                className="flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 group-hover:border-[color-mix(in_srgb,var(--text)_35%,transparent)] group-hover:text-[var(--text)]"
-                style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-                aria-hidden
-              >
-                <Icon size={26} strokeWidth={1.35} />
-              </span>
-            </div>
-          )}
+        {/* Превью: единый вид для всех услуг (без видео) */}
+        <div className="relative aspect-[16/10] overflow-hidden border-b border-[var(--border)]">
           <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[color-mix(in_srgb,var(--bg)_55%,transparent)] via-transparent to-transparent opacity-80"
+            className="absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(ellipse 85% 65% at 18% 28%, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 52%),
+                radial-gradient(ellipse 75% 55% at 88% 78%, color-mix(in srgb, var(--text) 8%, transparent) 0%, transparent 48%),
+                linear-gradient(168deg, color-mix(in srgb, var(--bg-secondary) 94%, var(--bg) 6%) 0%, var(--bg) 100%)
+              `,
+            }}
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0 opacity-[0.4] dark:opacity-[0.22]"
+            style={{
+              backgroundImage:
+                "radial-gradient(color-mix(in srgb, var(--text) 18%, transparent) 1px, transparent 1px)",
+              backgroundSize: "16px 16px",
+            }}
+            aria-hidden
+          />
+          <span
+            className="absolute left-4 top-3 z-[2] font-matrix text-[10px] uppercase tracking-[0.28em] tabular-nums"
+            style={{ color: "var(--text-subtle)" }}
+          >
+            {num}
+          </span>
+          <div className="absolute inset-0 z-[1] flex items-center justify-center">
+            <span
+              className="flex h-[3.85rem] w-[3.85rem] items-center justify-center rounded-2xl border bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_36px_rgba(0,0,0,0.07)] backdrop-blur-[3px] transition-all duration-500 group-hover:scale-[1.07] group-hover:border-[color-mix(in_srgb,var(--accent)_35%,var(--border))] group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_14px_44px_rgba(0,0,0,0.12)] dark:bg-[color-mix(in_srgb,var(--bg-secondary)_55%,transparent)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_10px_36px_rgba(0,0,0,0.35)] dark:group-hover:shadow-[0_14px_44px_rgba(0,0,0,0.5)]"
+              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+            >
+              <Icon
+                size={28}
+                strokeWidth={1.35}
+                className="transition-colors duration-300 group-hover:text-[var(--text)]"
+                aria-hidden
+              />
+            </span>
+          </div>
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[55%] bg-gradient-to-t from-[color-mix(in_srgb,var(--bg)_78%,transparent)] via-[color-mix(in_srgb,var(--bg)_20%,transparent)] to-transparent opacity-95"
             aria-hidden
           />
         </div>
 
         <div className="relative z-[2] flex flex-1 flex-col p-5 md:p-6">
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <span
-              className="font-matrix text-[10px] uppercase tracking-[0.22em] tabular-nums"
-              style={{ color: "var(--text-subtle)" }}
-            >
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <span
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-all duration-300 group-hover:border-[color-mix(in_srgb,var(--text)_40%,transparent)] group-hover:text-[var(--text)]"
-              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-              aria-hidden
-            >
-              <Icon size={18} strokeWidth={1.35} />
-            </span>
-          </div>
-
           <h2
-            className="font-akony text-lg uppercase leading-tight tracking-[0.08em] transition-colors duration-300 group-hover:opacity-95 md:text-xl"
+            className="font-akony text-lg uppercase leading-tight tracking-[0.08em] transition-colors duration-300 group-hover:text-[color-mix(in_srgb,var(--text)_92%,var(--accent)_8%)] md:text-xl"
             style={{ color: "var(--text)" }}
           >
             {service.title}
@@ -159,7 +137,7 @@ function ServiceCard({
             {service.shortDescription}
           </p>
 
-          <div className="mt-5 flex items-center gap-2 font-matrix text-[9px] uppercase tracking-[0.2em] transition-colors group-hover:text-[var(--accent)] md:text-[10px]">
+          <div className="mt-5 flex items-center gap-2 font-matrix text-[9px] uppercase tracking-[0.2em] text-[var(--text-muted)] transition-colors group-hover:text-[var(--accent)] md:text-[10px]">
             Подробнее
             <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </div>

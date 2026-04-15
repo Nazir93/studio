@@ -42,17 +42,25 @@ export const SHOWCASE_ITEMS = [
 type ShowcaseItem = (typeof SHOWCASE_ITEMS)[number];
 
 function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; previewVideosEnabled: boolean }) {
+  const isArtistic = item.id === "artistic";
+  /** Кино и древность: плоская карточка, превью и насыщенный слой — только при наведении */
+  const hoverReveal = item.id === "film" || item.id === "ancient";
+
   return (
     <Link
       href={item.href}
       data-cursor-word="смотреть"
       className="group relative flex min-h-[300px] shrink-0 flex-col justify-between overflow-hidden border p-3 transition-colors sm:min-h-[340px] md:p-5"
-      style={{ aspectRatio: "9 / 13", borderColor: "var(--border)", backgroundColor: "var(--bg-secondary)" }}
+      style={{
+        aspectRatio: "9 / 13",
+        borderColor: "var(--border)",
+        backgroundColor: isArtistic ? "transparent" : "var(--bg-secondary)",
+      }}
     >
       {"previewVideo" in item && item.previewVideo && previewVideosEnabled && (
         <>
           <video
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-105 object-cover opacity-0 transition-[opacity,transform] duration-700 ease-out group-hover:scale-100 group-hover:opacity-100"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-105 object-cover opacity-0 transition-[opacity,transform] duration-700 ease-out group-hover:scale-100 group-hover:opacity-100 group-focus-within:scale-100 group-focus-within:opacity-100"
             autoPlay
             muted
             loop
@@ -63,11 +71,11 @@ function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; prev
             <source src={item.previewVideo} type="video/mp4" />
           </video>
           <div
-            className="pointer-events-none absolute inset-0 z-[1] bg-[var(--bg-secondary)] transition-opacity duration-500 group-hover:opacity-[0.15]"
+            className="pointer-events-none absolute inset-0 z-[1] bg-[var(--bg-secondary)] transition-opacity duration-500 group-hover:opacity-[0.12] group-focus-within:opacity-[0.12]"
             aria-hidden
           />
           <div
-            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[color-mix(in_srgb,var(--bg-secondary)_92%,transparent)] via-[color-mix(in_srgb,var(--bg)_45%,transparent)] to-[color-mix(in_srgb,var(--bg-secondary)_95%,transparent)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[color-mix(in_srgb,var(--bg-secondary)_92%,transparent)] via-[color-mix(in_srgb,var(--bg)_45%,transparent)] to-[color-mix(in_srgb,var(--bg-secondary)_95%,transparent)] opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100"
             aria-hidden
           />
         </>
@@ -75,19 +83,21 @@ function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; prev
       {"previewGradient" in item && item.previewGradient && (
         <>
           <div
-            className="pointer-events-none absolute inset-0 z-0 opacity-[0.88] transition-[opacity,transform] duration-700 ease-out group-hover:opacity-100"
+            className="pointer-events-none absolute inset-0 z-0 opacity-100"
             style={{ background: item.previewGradient }}
             aria-hidden
           />
           <div
-            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[color-mix(in_srgb,var(--bg-secondary)_55%,transparent)] via-transparent to-[color-mix(in_srgb,var(--bg)_75%,transparent)] opacity-60 transition-opacity duration-500 group-hover:opacity-40"
+            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[color-mix(in_srgb,#0c0b0a_20%,transparent)] via-transparent to-[color-mix(in_srgb,var(--bg)_55%,transparent)] opacity-50"
             aria-hidden
           />
         </>
       )}
 
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-1 opacity-80 transition-opacity group-hover:opacity-100"
+        className={`pointer-events-none absolute inset-x-0 top-0 z-[2] h-1 transition-opacity duration-500 ${
+          hoverReveal ? "opacity-0 group-hover:opacity-90 group-focus-within:opacity-90" : "opacity-80"
+        }`}
         style={{
           background:
             item.id === "film"
@@ -101,7 +111,9 @@ function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; prev
         <div className="relative flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p
-              className="font-matrix text-[7px] uppercase tracking-[0.2em] md:text-[8px]"
+              className={`font-matrix text-[7px] uppercase tracking-[0.2em] md:text-[8px] ${
+                hoverReveal ? "opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100" : ""
+              }`}
               style={{ color: item.id === "artistic" ? "rgba(245,240,235,0.55)" : "var(--text-muted)" }}
             >
               {item.subtitle}
@@ -109,13 +121,17 @@ function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; prev
             <h3
               className={`font-akony mt-1.5 text-base uppercase leading-tight tracking-[0.08em] md:text-lg lg:text-xl ${
                 item.id === "artistic" ? "text-[#f5f0eb]" : ""
-              }`}
+              } ${hoverReveal ? "opacity-[0.4] transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100" : ""}`}
             >
               {item.title}
             </h3>
           </div>
           <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] md:h-10 md:w-10"
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors md:h-10 md:w-10 ${
+              hoverReveal
+                ? "opacity-[0.35] transition-[opacity,colors] duration-500 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] group-hover:opacity-100 group-focus-within:border-[var(--accent)] group-focus-within:text-[var(--accent)] group-focus-within:opacity-100"
+                : "group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]"
+            }`}
             style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
             aria-hidden
           >
@@ -129,14 +145,25 @@ function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; prev
           </span>
         </div>
         <p
-          className="relative mt-3 font-body text-[10px] leading-relaxed md:text-[11px] lg:text-xs"
+          className={`relative mt-3 font-body text-[10px] leading-relaxed md:text-[11px] lg:text-xs ${
+            hoverReveal ? "opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100" : ""
+          }`}
           style={{ color: item.id === "artistic" ? "rgba(245,240,235,0.78)" : undefined }}
         >
           {item.description}
         </p>
-        <div className="relative mt-3 flex items-center gap-2 font-matrix text-[8px] uppercase tracking-[0.18em] transition-colors group-hover:text-[var(--accent)] md:text-[9px]">
+        <div
+          className={`relative mt-3 flex items-center gap-2 font-matrix text-[8px] uppercase tracking-[0.18em] md:text-[9px] ${
+            hoverReveal
+              ? "opacity-0 transition-[opacity,transform,color] duration-500 group-hover:text-[var(--accent)] group-hover:opacity-100 group-focus-within:text-[var(--accent)] group-focus-within:opacity-100"
+              : "transition-colors group-hover:text-[var(--accent)]"
+          }`}
+        >
           {item.id === "film" ? "Открыть демо" : "Открыть раздел"}
-          <ArrowRight size={12} className="transition-transform group-hover:translate-x-1" />
+          <ArrowRight
+            size={12}
+            className={`transition-transform ${hoverReveal ? "group-hover:translate-x-1 group-focus-within:translate-x-1" : "group-hover:translate-x-1"}`}
+          />
         </div>
       </div>
     </Link>
