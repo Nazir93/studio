@@ -53,12 +53,22 @@ nano frontend/.env.production
 cd /opt/studio/frontend
 npm ci
 npm run build
-cp -r public .next/standalone/public
-mkdir -p .next/standalone/.next
-cp -r .next/static .next/standalone/.next/static
 ```
 
-После **каждого** `git pull` и новой сборки команды `cp -r public ...` и `cp -r .next/static ...` нужно повторить (можно оформить маленьким скриптом `deploy.sh`).
+После `next build` скрипт **`postbuild`** (`frontend/scripts/copy-standalone-assets.mjs`) сам копирует в `.next/standalone` каталоги **`public`** и **`.next/static`**. Без них сайт откроется **без стилей** (запросы к `/_next/static/...` дадут 404).
+
+Собирайте только через **`npm run build`**, не голым `next build` — иначе копирование не выполнится.
+
+Если стили всё равно пропали, на сервере проверьте:
+
+```bash
+ls -la /opt/studio/frontend/.next/standalone/.next/static 2>/dev/null | head
+curl -sI "http://127.0.0.1:3000/_next/static/" | head -5
+```
+
+В каталоге `standalone/.next/static` должны быть подпапки `chunks`, `css` и т.д.
+
+После **каждого** `git pull` снова: `npm ci` (при смене зависимостей), `npm run build`, затем `sudo systemctl restart studio-nextjs`.
 
 ### 5. Systemd
 
@@ -148,11 +158,10 @@ git pull
 cd frontend
 npm ci
 npm run build
-cp -r public .next/standalone/public
-mkdir -p .next/standalone/.next
-cp -r .next/static .next/standalone/.next/static
 sudo systemctl restart studio-nextjs
 ```
+
+(`npm run build` запускает копирование `public` и `.next/static` в standalone — см. п. 4.)
 
 ---
 

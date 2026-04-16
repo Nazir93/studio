@@ -64,7 +64,7 @@ export function SectionTitle({
 }) {
   return (
     <div className={cn("mb-16 md:mb-20", className)}>
-      <h2 className="font-body text-xl font-semibold sm:text-2xl md:text-3xl lg:text-4xl mb-4 leading-snug">
+      <h2 className="font-body section-block-title font-semibold mb-4 leading-snug">
         {children}
       </h2>
       {subtitle && (

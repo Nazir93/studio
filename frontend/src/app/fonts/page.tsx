@@ -44,7 +44,7 @@ export default function FontsPage() {
           ← На главную
         </Link>
 
-        <h1 className="font-blackops text-4xl sm:text-5xl md:text-6xl text-[#262626] mb-2">
+        <h1 className="font-blackops text-[clamp(1.75rem,4.5vw+0.75rem,3.75rem)] sm:text-5xl md:text-6xl text-[#262626] mb-2 text-balance">
           Шрифты проекта
         </h1>
         <p className="text-[#8e8e8e] text-sm sm:text-base mb-16">

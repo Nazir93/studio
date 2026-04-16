@@ -104,7 +104,7 @@ export function BlogPageContent({ posts }: { posts: readonly BlogPost[] }) {
       <div className="container mx-auto">
         {/* Title */}
         <h1
-          className="font-heading text-[16vw] md:text-[11vw] lg:text-[9.5vw] leading-[0.88] tracking-tighter mb-6"
+          className="font-heading page-hero-display-title tracking-tighter mb-6"
           style={{ color: "var(--text)" }}
         >
           БЛОГ

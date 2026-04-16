@@ -29,7 +29,7 @@ export function ExpertiseArticle({ page }: { page: ExpertisePageData }) {
           <p className="font-matrix text-[10px] uppercase tracking-[0.28em] md:text-[11px]" style={{ color: "var(--accent)" }}>
             {page.subtitle}
           </p>
-          <h1 className="mt-3 font-heading text-3xl leading-[1.08] tracking-tight sm:text-4xl md:text-[2.65rem]">
+          <h1 className="mt-3 font-heading page-inset-hero-title leading-[1.08] tracking-tight">
             {page.title}
           </h1>
           <p className="mt-5 font-body text-base leading-relaxed md:text-lg" style={{ color: "var(--text-muted)" }}>

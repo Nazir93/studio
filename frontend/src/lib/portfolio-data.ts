@@ -530,6 +530,61 @@ export const PORTFOLIO_CASES: PortfolioCase[] = [
       { src: "/portfolio/bushe/gallery-reviews.jpg", label: "Отзывы к заказам" },
     ],
   },
+  {
+    id: "17",
+    sector: "corporate-soft",
+    slug: "crm-neftegaz",
+    title: "Инновационная CRM для нефтегазовой отрасли",
+    tag: "Концепт",
+    industry: "НЕФТЬ И ГАЗ, CRM, ENERGY",
+    type: "UX/UI, ДАШБОРДЫ, АНАЛИТИКА",
+    year: "2024",
+    area: "Upstream · Midstream · Downstream · Company Efficiency",
+    location: "Международный заказчик",
+    shortDescription:
+      "Концепт CRM для нефтегазовой отрасли: сбор и анализ данных по upstream, midstream и downstream на понятных дашбордах. Дизайн интерфейса с чёткой иерархией, крупной типографикой и логичной цветовой кодировкой — от трендов добычи до транспорта, рынка и эффективности оборудования.",
+    clientNote: "Крупный международный заказчик — запрос на платформу, которой ещё не было на рынке",
+    heroDescription:
+      "Заказчик обратился с задачей разработать CRM, которая собирала бы данные с разных направлений нефтегазового бизнеса и показывала бы их на визуально понятных дашбордах. Нужно было спроектировать дизайн так, чтобы снизить порог входа: в отрасли мало публичных референсов, а существующие решения часто перегружены и слабо дифференцируют важное и второстепенное.",
+    features: [
+      "Четыре крупных раздела: Oil & Gas Production (upstream), Transportation (midstream), Customer and Market Analytics (downstream), Company Efficiency",
+      "Дашборды с KPI, трендами, фильтрами и подсказками (tooltips)",
+      "Таблицы скважин с сортировкой, статусами и цветовыми акцентами",
+      "Графики транспорта, расходов, загрузки трубопроводов, heatmap доставки, downstream-аналитика рынка",
+      "Экран эффективности компании: мультипликаторы, распределения доходов/расходов, MTTR/MTBF и надёжность оборудования",
+    ],
+    goals:
+      "Объединить разнопрофильные задачи трёх направлений (добыча, транспорт, переработка и рынок) в одной визуальной системе, чтобы аналитика в реальном времени и прогнозы были доступны без долгого обучения интерфейсу.",
+    leftText1:
+      "Вызов: отрасль закрыта для публичного ресерча — почти негде взять эталонные экраны; типичный софт устарел визуально и по UX. При этом upstream, midstream и downstream в продуктовой логике сильно различаются: для добычи нужны скважины и давления, для транспорта — маршруты и ёмкости, для downstream — цены и спрос.\n\nМы пересмотрели презентации платформ, статьи и сайты аналогов, чтобы собрать хотя бы опорные паттерны.",
+    rightText1:
+      "Задача заказчика — «платформа, которой ещё нет»: единый сервис, который тянет данные с оборудования и из смежных систем и показывает и детальные метрики, и общую картину по предприятию.\n\nГлавная боль существующих интерфейсов: нет ясной иерархии, мелкие шрифты и графики, похожие оттенки без легенды — пользователь теряет время на ориентацию.",
+    showcaseLabel1: "Контекст отрасли и постановка задачи",
+    showcaseLabel2: "Upstream: тренды добычи и скважины",
+    showcaseLabel3: "Midstream: транспорт объёмов",
+    leftText2:
+      "Мы выстроили логику навигации: разделы меню, шапка, сценарии по экранам. На дашборде добычи ключевые показатели вынесены наверх; для динамики добавлены стрелки и проценты. График Oil and Gas Production Trends с фильтрами по скважинам и регионам; топ-5 скважин — горизонтальные бары «план/факт»; таблица Well Details — сортировка и цвета статусов.\n\nТранспорт: объёмы во времени, расходы по категориям, загрузка трубопроводов, heatmap сроков доставки и утилизация транспорта.",
+    rightText2:
+      "Downstream: блоки KPI по рынку, динамика цен, прогнозы и объёмы по регионам. Company Efficiency: нормализованные мультипликаторы с выбором серий, круговые распределения доходов и расходов по сегментам, внизу — MTTR, MTBF, надёжность по оборудованию. Верхние финансовые карточки сравнивают текущий период с предыдущим.\n\nДанные на дашборды приходят с датчиков и из интеграций; интерфейс фокусируется на быстром считывании и сравнении.",
+    heroImage: "/portfolio/crm-neftegaz/hero.png",
+    showcaseImage1: "/portfolio/crm-neftegaz/context.png",
+    showcaseImage2: "/portfolio/crm-neftegaz/four-sections.png",
+    showcaseImage3: "/portfolio/crm-neftegaz/production-trends.png",
+    techStack: ["Figma", "Miro"],
+    imageGallery: [
+      { src: "/portfolio/crm-neftegaz/top5-wells.png", label: "Топ-5 скважин по добыче" },
+      { src: "/portfolio/crm-neftegaz/well-details.png", label: "Таблица Well Details" },
+      { src: "/portfolio/crm-neftegaz/transport-volumes.png", label: "Объёмы транспортировки нефти и газа" },
+      { src: "/portfolio/crm-neftegaz/transport-costs.png", label: "Транспортные расходы по категориям" },
+      { src: "/portfolio/crm-neftegaz/pipeline-utilization.png", label: "Загрузка трубопроводов (Pipeline Capacity)" },
+      { src: "/portfolio/crm-neftegaz/delivery-heatmap.png", label: "Среднее время доставки по маршрутам и месяцам" },
+      { src: "/portfolio/crm-neftegaz/downstream-kpi.png", label: "Downstream: ключевые рыночные метрики" },
+      { src: "/portfolio/crm-neftegaz/downstream-charts.png", label: "Динамика цен и прогнозы спроса" },
+      { src: "/portfolio/crm-neftegaz/company-efficiency.png", label: "Company Efficiency: обзор" },
+      { src: "/portfolio/crm-neftegaz/normalized-multiples.png", label: "Нормализованные мультипликаторы" },
+      { src: "/portfolio/crm-neftegaz/equipment-efficiency.png", label: "Эффективность оборудования (MTTR, MTBF)" },
+    ],
+  },
 ];
 
 export function getCaseBySlug(slug: string): PortfolioCase | undefined {

@@ -288,7 +288,7 @@ export function ServicesSection() {
     >
       <div className="container mx-auto">
         <h2
-          className="font-body text-2xl font-semibold sm:text-3xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight mb-3 sm:mb-4 uppercase"
+          className="font-body section-display-title font-semibold leading-[0.95] tracking-tight mb-3 sm:mb-4 uppercase"
           style={{ color: "var(--text)" }}
         >
           УСЛУГИ

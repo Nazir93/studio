@@ -10,7 +10,7 @@ export default function NotFound() {
       <NotFoundLogger />
       <div className="text-center px-4">
         <h1
-          className="font-heading text-[25vw] md:text-[20vw] leading-[0.85] tracking-tighter select-none"
+          className="font-heading text-[clamp(4.5rem,22vw,14rem)] md:text-[clamp(6rem,18vw,16rem)] leading-[0.85] tracking-tighter select-none"
           style={{ color: "var(--text)", opacity: 0.06 }}
         >
           404

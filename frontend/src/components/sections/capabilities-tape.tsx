@@ -6,6 +6,13 @@ import { useTheme } from "@/lib/theme-context";
 import { useStickyHeaderPinned } from "@/lib/use-sticky-header-pinned";
 import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 import { PinnedCodeTypist } from "@/components/ui/pinned-code-typist";
+import {
+  TAPE_CELL_EASE,
+  darkTitleCharShadow,
+  darkTitleFilter,
+  lightNeonFilter,
+  lightNeonTitleChar,
+} from "@/lib/tape-hover-visual";
 
 interface TapeItem {
   title: string;
@@ -290,31 +297,6 @@ function CodeRainOverlay({ active }: { active: boolean }) {
   return <canvas ref={canvasRef} className="h-full w-full" />;
 }
 
-/** Белое «неоновое» свечение вокруг тёмного текста в светлой теме */
-function lightNeonTitleChar(hovered: boolean): string {
-  return hovered
-    ? "0 0 4px #fff, 0 0 10px rgba(255,255,255,0.95), 0 0 22px rgba(255,255,255,0.65), 0 0 36px rgba(255,255,255,0.4), 0 1px 0 rgba(255,255,255,0.9)"
-    : "0 0 6px rgba(255,255,255,1), 0 0 14px rgba(255,255,255,0.55), 0 0 1px rgba(255,255,255,1)";
-}
-
-function lightNeonFilter(hovered: boolean): string {
-  return hovered
-    ? "drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 22px rgba(255,255,255,0.55)) drop-shadow(0 2px 8px rgba(255,255,255,0.35))"
-    : "drop-shadow(0 0 8px rgba(255,255,255,0.85)) drop-shadow(0 0 16px rgba(255,255,255,0.4))";
-}
-
-function darkTitleCharShadow(hovered: boolean): string {
-  return hovered
-    ? "0 0 1.2em color-mix(in srgb, var(--text) 45%, transparent), 0 0 2em color-mix(in srgb, var(--text) 20%, transparent), 0 1px 0 color-mix(in srgb, var(--text) 35%, transparent)"
-    : "none";
-}
-
-function darkTitleFilter(hovered: boolean): string {
-  return hovered
-    ? "drop-shadow(0 3px 14px color-mix(in srgb, var(--text) 22%, transparent)) drop-shadow(0 0 28px color-mix(in srgb, var(--text) 18%, transparent))"
-    : "none";
-}
-
 function TapeCell({
   title,
   subtitle,
@@ -344,7 +326,7 @@ function TapeCell({
     }
   }, [hovered, effectiveVideo]);
 
-  const ease = "cubic-bezier(0.22, 1, 0.36, 1)";
+  const ease = TAPE_CELL_EASE;
 
   return (
     <Link
@@ -653,7 +635,7 @@ export function CapabilitiesTapeSection() {
       >
         <div className="flex min-w-0 flex-wrap items-baseline gap-2 md:gap-4">
           <h2
-            className="font-akony text-[0.82rem] uppercase leading-snug tracking-[0.12em] sm:text-[0.95rem] md:text-lg lg:text-xl xl:text-2xl"
+            className="font-akony section-tape-heading uppercase leading-snug tracking-[0.12em]"
             style={{ color: "var(--text)" }}
           >
             Что умеем

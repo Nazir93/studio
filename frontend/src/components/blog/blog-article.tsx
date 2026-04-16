@@ -33,7 +33,7 @@ export function BlogArticle({ post }: { post: BlogPost }) {
               · {post.readTime}
             </span>
           </div>
-          <h1 className="font-heading text-3xl leading-[1.1] tracking-tight sm:text-4xl md:text-[2.75rem]">
+          <h1 className="font-heading page-inset-hero-title leading-[1.1] tracking-tight">
             {post.title}
           </h1>
           <p className="mt-5 font-body text-base leading-relaxed md:text-lg" style={{ color: "var(--text-muted)" }}>

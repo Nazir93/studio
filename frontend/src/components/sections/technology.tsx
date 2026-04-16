@@ -184,7 +184,7 @@ export function TechnologySection() {
 
                   {/* Number */}
                   <div
-                    className="font-matrix text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-none mb-3 sm:mb-4 tabular-nums"
+                    className="font-matrix text-[clamp(2.25rem,11vw,3.75rem)] sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-none mb-3 sm:mb-4 tabular-nums"
                     style={{ color: "var(--text)", opacity: 0.08 }}
                   >
                     {step.number}

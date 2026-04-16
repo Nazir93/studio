@@ -177,7 +177,7 @@ export function HeroSection() {
                   }}
                 >
                   <h2
-                    className="font-matrix text-[12vw] font-bold leading-[0.85] text-center whitespace-nowrap opacity-[0.06]"
+                    className="font-matrix text-[clamp(2.5rem,10vw,9rem)] font-bold leading-[0.85] text-center whitespace-nowrap opacity-[0.06] max-w-full px-2"
                     style={{ color: HERO.text }}
                   >
                     CODE1618
@@ -282,7 +282,7 @@ export function HeroSection() {
         <div className="min-h-[70vh] flex flex-col justify-center px-5 sm:px-8 py-12">
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
             <h2
-              className="font-matrix text-[28vw] font-bold leading-[0.85] text-center whitespace-nowrap opacity-[0.07]"
+              className="font-matrix text-[clamp(2.5rem,12vw,3.75rem)] font-bold leading-[0.85] text-center whitespace-nowrap opacity-[0.07] max-w-full px-2"
               style={{ color: HERO.text }}
             >
               CODE1618

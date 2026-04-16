@@ -7,8 +7,15 @@ import { useStickyHeaderPinned } from "@/lib/use-sticky-header-pinned";
 import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 import { useTheme } from "@/lib/theme-context";
 import { PinnedCodeTypist } from "@/components/ui/pinned-code-typist";
+import {
+  TAPE_CELL_EASE,
+  darkTitleCharShadow,
+  darkTitleFilter,
+  lightNeonFilter,
+  lightNeonTitleChar,
+} from "@/lib/tape-hover-visual";
 
-const PORTFOLIO_TAPE_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+const PORTFOLIO_TAPE_EASE = TAPE_CELL_EASE;
 
 interface PortfolioTapeItem {
   title: string;
@@ -83,9 +90,13 @@ function PortfolioCell({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
   const { isDark } = useTheme();
-  /** Как в «Что умеем»: ролик только lg+ */
   const effectiveVideo = videosEnabled && video ? video : null;
   const hasMedia = !!effectiveVideo;
+  const titleLines = title.split("\n");
+  const bottomTags = [tag, year].filter(Boolean);
+  const hoverLine = area?.trim() || "";
+  const ease = PORTFOLIO_TAPE_EASE;
+  const liftOnHover = hovered && (!!effectiveVideo || !!image);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -102,58 +113,38 @@ function PortfolioCell({
     <Link
       href={href}
       className="group relative flex shrink-0 flex-col overflow-hidden transition-colors"
-      style={{
-        aspectRatio: "9 / 13",
-        /** В покое — чёрная пластина; контент «внутри» приглушён, при hover выделяется */
-        backgroundColor: "#0a0a0a",
-      }}
+      style={{ aspectRatio: "9 / 13", backgroundColor: "var(--bg-secondary)" }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Лёгкая текстура на чёрном */}
-      <div
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        style={{
-          background:
-            "radial-gradient(ellipse at 30% 25%, var(--text-subtle) 0%, transparent 55%), radial-gradient(ellipse at 75% 70%, var(--text-subtle) 0%, transparent 45%)",
-          opacity: hovered ? 0.22 : 0.12,
-          transition: `opacity 0.45s ${PORTFOLIO_TAPE_EASE}`,
-        }}
-      />
-
-      {/* Постер: почти не виден, проявляется при наведении (если нет видео) */}
-      {image && !hasMedia ? (
-        <div className="pointer-events-none absolute inset-0 z-[5] overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+      <div className="pointer-events-none absolute inset-0">
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={image}
             alt=""
-            className="h-full w-full object-cover transition-all duration-700 ease-out"
+            className="h-full w-full object-cover transition-all duration-700"
             style={{
-              opacity: hovered ? 0.5 : 0,
-              transform: hovered ? "scale(1.03)" : "scale(1.06)",
+              opacity: hovered ? 0.7 : 0.5,
+              transform: hovered ? "scale(1.03)" : "scale(1)",
             }}
           />
-        </div>
-      ) : null}
+        ) : (
+          <div
+            className="h-full w-full"
+            style={{
+              background:
+                "radial-gradient(ellipse at 30% 25%, var(--text-subtle) 0%, transparent 55%), radial-gradient(ellipse at 75% 70%, var(--text-subtle) 0%, transparent 45%)",
+              opacity: 0.15,
+            }}
+          />
+        )}
+      </div>
 
-      {/* Нет ни картинки ни видео — только чуть градиента поверх чёрного */}
-      {!image && !hasMedia ? (
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse at 25% 20%, var(--text-subtle) 0%, transparent 50%), radial-gradient(ellipse at 70% 75%, var(--text-subtle) 0%, transparent 40%)",
-            opacity: 0.1,
-          }}
-        />
-      ) : null}
-
-      {/* Видео при наведении (только lg+, как в ленте «Что умеем») */}
       {effectiveVideo ? (
         <div
           className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-500"
-          style={{ opacity: hovered ? 1 : 0, transitionTimingFunction: PORTFOLIO_TAPE_EASE }}
+          style={{ opacity: hovered ? 1 : 0, transitionTimingFunction: ease }}
         >
           <video
             ref={videoRef}
@@ -171,102 +162,126 @@ function PortfolioCell({
         </div>
       ) : null}
 
-      {/* Текст — сетка как в TapeCell: линия сверху, заголовок по центру, подпись снизу */}
       <div
-        className="absolute inset-0 z-30 flex flex-col justify-between gap-2 p-3 md:p-5"
+        className="absolute inset-0 z-30 flex flex-col justify-between gap-3 p-3 md:p-5"
         style={{
-          transform: hovered ? "translateY(-3px)" : "translateY(0)",
-          transition: `transform 0.45s ${PORTFOLIO_TAPE_EASE}`,
+          transform: liftOnHover ? "translateY(-2px)" : "translateY(0)",
+          transition: `transform 0.45s ${ease}`,
         }}
       >
         <div className="shrink-0">
           <div
-            className="mb-2 h-px w-full origin-left rounded-full transition-transform duration-500"
+            className="mb-2 h-px w-full origin-left scale-x-0 rounded-full transition-transform duration-500"
             style={{
               background:
                 "linear-gradient(90deg, color-mix(in srgb, var(--text) 65%, transparent), color-mix(in srgb, var(--text) 8%, transparent))",
               transform: hovered ? "scaleX(1)" : "scaleX(0)",
-              transitionTimingFunction: PORTFOLIO_TAPE_EASE,
+              transitionTimingFunction: ease,
             }}
           />
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className="font-matrix text-[7px] uppercase md:text-[8px]"
-              style={{
-                letterSpacing: hovered ? "0.2em" : "0.12em",
-                color: hovered ? "var(--text)" : "var(--text-subtle)",
-                opacity: hovered ? 1 : 0.45,
-                textShadow:
-                  hovered && !isDark
-                    ? "0 0 10px rgba(255,255,255,0.9)"
-                    : hovered && isDark
-                      ? "0 0 14px color-mix(in srgb, var(--text) 35%, transparent)"
-                      : undefined,
-                transition: `letter-spacing 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease, opacity 0.35s ease`,
-              }}
-            >
-              {tag}
-            </span>
-            <span
-              className="font-matrix text-[7px] uppercase md:text-[8px]"
-              style={{
-                letterSpacing: hovered ? "0.18em" : "0.1em",
-                color: hovered ? "var(--text)" : "var(--text-subtle)",
-                opacity: hovered ? 1 : 0.4,
-                textShadow:
-                  hovered && !isDark
-                    ? "0 0 10px rgba(255,255,255,0.85)"
-                    : hovered && isDark
-                      ? "0 0 12px color-mix(in srgb, var(--text) 28%, transparent)"
-                      : undefined,
-                transition: `letter-spacing 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease, opacity 0.35s ease`,
-              }}
-            >
-              {year}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex min-h-0 flex-1 flex-col justify-center py-1">
-          <h3
-            className="w-full text-balance text-center font-matrix text-xs uppercase leading-tight tracking-[0.04em] transition-all duration-400 md:text-sm lg:text-base"
-            style={{
-              color: hovered ? "var(--text)" : "var(--text-muted)",
-              opacity: hovered ? 1 : 0.38,
-              transform: hovered ? "scale(1.02)" : "scale(1)",
-              textShadow: hovered
-                ? isDark
-                  ? "0 0 20px color-mix(in srgb, var(--text) 25%, transparent), 0 2px 16px rgba(0,0,0,0.45)"
-                  : "0 0 18px rgba(255,255,255,0.55), 0 1px 0 rgba(255,255,255,0.2)"
-                : "none",
-              transition: `opacity 0.35s ease, transform 0.45s ${PORTFOLIO_TAPE_EASE}, color 0.35s ease, text-shadow 0.35s ease`,
-            }}
-          >
-            {title}
-          </h3>
-        </div>
-
-        <div className="shrink-0 text-center">
           <p
-            className="font-matrix text-[7px] uppercase tracking-[0.18em] transition-all duration-300 md:text-[8px]"
+            className="font-matrix text-[8px] uppercase md:text-[9px]"
             style={{
-              color: hovered ? "var(--text-muted)" : "var(--text-subtle)",
-              opacity: hovered ? 0.92 : 0.35,
+              letterSpacing: hovered ? "0.28em" : "0.22em",
+              color: hovered ? "var(--text)" : "var(--text-muted)",
+              textShadow:
+                !isDark ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.35)" : undefined,
+              transition: `letter-spacing 0.45s ${ease}, color 0.35s ease, text-shadow 0.35s ease`,
             }}
           >
             {subtitle}
           </p>
-          {area ? (
-            <p
-              className="mt-1 font-matrix text-[7px] uppercase tracking-[0.15em] transition-all duration-300 md:text-[8px]"
-              style={{
-                color: hovered ? "var(--text-subtle)" : "var(--text-subtle)",
-                opacity: hovered ? 0.75 : 0.3,
-              }}
-            >
-              {area}
-            </p>
-          ) : null}
+        </div>
+
+        <div className="flex min-h-0 flex-1 flex-col justify-center py-1">
+          <h3
+            className={`w-full text-center text-balance uppercase leading-[1.12] transition-all duration-500 ease-out ${
+              hovered
+                ? "font-blackops text-[clamp(0.9rem,4vmin,1.5rem)] tracking-[0.08em] md:text-[clamp(1rem,3.5vmin,1.75rem)] lg:text-[clamp(1.1rem,3vmin,2rem)]"
+                : "font-matrix text-xs font-medium tracking-[0.04em] md:text-sm lg:text-base"
+            }`}
+            style={{
+              color: "var(--text)",
+              filter: isDark ? darkTitleFilter(hovered) : lightNeonFilter(hovered),
+            }}
+          >
+            {(() => {
+              let charIndex = 0;
+              return titleLines.map((line, lineIdx) => (
+                <span key={`${title}-L${lineIdx}`} className="block w-full">
+                  {line.split("").map((ch, i) => {
+                    const idx = charIndex++;
+                    return (
+                      <span
+                        key={`${title}-${lineIdx}-${i}-${ch}`}
+                        className="inline-block"
+                        style={{
+                          transform: hovered ? "translateY(-1px) scale(1.03)" : "translateY(0) scale(1)",
+                          opacity: 1,
+                          textShadow: isDark ? darkTitleCharShadow(hovered) : lightNeonTitleChar(hovered),
+                          transition: `text-shadow 0.5s ${ease}, transform 0.45s ${ease}`,
+                          transitionDelay: hovered ? `${20 + idx * 16}ms` : "0ms",
+                        }}
+                      >
+                        {ch === " " ? "\u00a0" : ch}
+                      </span>
+                    );
+                  })}
+                </span>
+              ));
+            })()}
+          </h3>
+        </div>
+
+        <div className="shrink-0">
+          <div
+            className="grid transition-[grid-template-rows] duration-500"
+            style={{
+              gridTemplateRows: hovered ? "1fr" : "0fr",
+              transitionTimingFunction: ease,
+            }}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <div className="flex flex-wrap gap-1.5" aria-hidden={!hovered}>
+                {bottomTags.map((t, i) => (
+                  <span
+                    key={`${t}-${i}`}
+                    className="font-matrix text-[7px] uppercase tracking-[0.12em] md:text-[8px]"
+                    style={{
+                      padding: "3px 7px",
+                      borderRadius: "4px",
+                      border: "1px solid var(--border)",
+                      backgroundColor: "color-mix(in srgb, var(--text) 9%, transparent)",
+                      color: "var(--text)",
+                      boxShadow: !isDark ? "0 0 10px rgba(255,255,255,0.85), 0 0 20px rgba(255,255,255,0.35)" : undefined,
+                      textShadow: !isDark ? "0 0 8px rgba(255,255,255,0.9)" : undefined,
+                      transform: hovered ? "translateY(0)" : "translateY(14px)",
+                      opacity: hovered ? 1 : 0,
+                      transition: `transform 0.4s ${ease}, opacity 0.35s ease, box-shadow 0.35s ease, text-shadow 0.35s ease`,
+                      transitionDelay: hovered ? `${85 + i * 40}ms` : `${(bottomTags.length - 1 - i) * 30}ms`,
+                    }}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+              {hoverLine ? (
+                <p
+                  className="mt-2 max-w-full font-matrix text-[9px] leading-snug md:text-[10px]"
+                  style={{
+                    color: "var(--text-muted)",
+                    textShadow: !isDark ? "0 0 8px rgba(255,255,255,0.9), 0 0 16px rgba(255,255,255,0.35)" : undefined,
+                    transform: hovered ? "translateY(0)" : "translateY(10px)",
+                    opacity: hovered ? 1 : 0,
+                    transition: `transform 0.45s ${ease}, opacity 0.4s ease, text-shadow 0.35s ease`,
+                    transitionDelay: hovered ? `${100 + bottomTags.length * 40}ms` : "0ms",
+                  }}
+                >
+                  {hoverLine}
+                </p>
+              ) : null}
+            </div>
+          </div>
         </div>
       </div>
     </Link>
@@ -435,7 +450,7 @@ export function PortfolioSection() {
       >
         <div className="flex min-w-0 flex-wrap items-baseline gap-2 md:gap-4">
           <h2
-            className="font-akony text-[0.95rem] uppercase leading-snug tracking-[0.14em] sm:text-lg md:text-2xl lg:text-4xl"
+            className="font-akony section-tape-heading uppercase leading-snug tracking-[0.14em]"
             style={{ color: "var(--text)" }}
           >
             Портфолио

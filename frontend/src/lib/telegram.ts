@@ -17,22 +17,40 @@ export async function sendTelegramNotification(
     return { ok: false, reason: "missing_env" };
   }
 
+  const TELEGRAM_MAX = 4096;
+
   try {
-    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: "HTML",
-        disable_web_page_preview: true,
-      }),
-    });
-    const data = (await res.json().catch(() => null)) as {
-      ok?: boolean;
-      description?: string;
-      error_code?: number;
-    } | null;
+    const textHtml = message.length > TELEGRAM_MAX ? `${message.slice(0, TELEGRAM_MAX - 20)}…` : message;
+
+    const sendOnce = async (payload: Record<string, unknown>) => {
+      const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, disable_web_page_preview: true, ...payload }),
+      });
+      const data = (await res.json().catch(() => null)) as {
+        ok?: boolean;
+        description?: string;
+        error_code?: number;
+      } | null;
+      return { res, data };
+    };
+
+    let { res, data } = await sendOnce({ text: textHtml, parse_mode: "HTML" });
+
+    const desc = data?.description ?? "";
+    const parseEntityFail =
+      !res.ok &&
+      (desc.includes("parse") || desc.includes("entity") || data?.error_code === 400);
+
+    if (!res.ok || data?.ok === false) {
+      if (parseEntityFail) {
+        const plain = textHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+        const plainCut = plain.length > TELEGRAM_MAX ? `${plain.slice(0, TELEGRAM_MAX - 20)}…` : plain;
+        ({ res, data } = await sendOnce({ text: plainCut }));
+      }
+    }
+
     if (!res.ok || data?.ok === false) {
       console.error(
         "[TELEGRAM] sendMessage failed:",

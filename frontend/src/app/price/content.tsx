@@ -163,7 +163,7 @@ export function PricePageContent() {
           >
             {SITE_NAME} / Прайс
           </p>
-          <h1 className="font-heading text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight mb-4 sm:mb-6">
+          <h1 className="font-heading page-inset-hero-title leading-[0.95] tracking-tight mb-4 sm:mb-6">
             СТАВКИ И ФОРМАТЫ
           </h1>
           <p

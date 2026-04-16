@@ -155,7 +155,7 @@ export function BlogSection() {
       <div className="container mx-auto">
         {/* Title */}
         <h2
-          className="font-body text-2xl font-semibold sm:text-3xl md:text-5xl lg:text-6xl leading-[0.95] tracking-tight mb-10 sm:mb-14 md:mb-20 uppercase"
+          className="font-body section-display-title font-semibold leading-[0.95] tracking-tight mb-10 sm:mb-14 md:mb-20 uppercase"
           style={{ color: "var(--text)" }}
         >
           БЛОГ
