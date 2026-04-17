@@ -1,7 +1,7 @@
 /**
  * После `next build` с output: "standalone" Next.js кладёт server.js в `.next/standalone`,
  * но не копирует туда `public` и `.next/static`. Без них сайт открывается без CSS/JS.
- * Скрипт вызывается из npm `postbuild`.
+ * Скрипт вызывается из `npm run build` (после `next build`).
  */
 import fs from "fs";
 import path from "path";

@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
-    "build": "next build",
-    "postbuild": "node scripts/copy-standalone-assets.mjs",
+    "build": "next build && node scripts/copy-standalone-assets.mjs",
     "start": "next start",
     "lint": "next lint"
   },

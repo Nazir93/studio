@@ -33,19 +33,22 @@ interface PortfolioTapeItem {
   video: string | null;
 }
 
-/** В ленте на главной — только кейсы с heroVideo (hover-ролик как в «Что умеем») */
-const PORTFOLIO_TAPE_ITEMS: PortfolioTapeItem[] = PORTFOLIO_CASES.filter((c) => Boolean(c.heroVideo)).map(
-  (c) => ({
-    title: c.title,
-    subtitle: c.type,
-    tag: c.tag,
-    year: c.year,
-    area: c.area,
-    href: `/portfolio/${c.slug}`,
-    image: c.heroImage ?? null,
-    video: c.heroVideo ?? null,
-  })
-);
+/**
+ * Лента на главной: нужен визуал — heroVideo (ролик при наведении) или хотя бы heroImage.
+ * Раньше отсекались только с картинкой — такие кейсы были на /portfolio, но не в ленте.
+ */
+const PORTFOLIO_TAPE_ITEMS: PortfolioTapeItem[] = PORTFOLIO_CASES.filter(
+  (c) => Boolean(c.heroVideo || c.heroImage)
+).map((c) => ({
+  title: c.title,
+  subtitle: c.type,
+  tag: c.tag,
+  year: c.year,
+  area: c.area,
+  href: `/portfolio/${c.slug}`,
+  image: c.heroImage ?? null,
+  video: c.heroVideo ?? null,
+}));
 
 const PORTFOLIO_TAPE_COUNT = PORTFOLIO_TAPE_ITEMS.length;
 
@@ -65,25 +68,31 @@ interface Column {
 
 function buildPortfolioTapeColumns(items: PortfolioTapeItem[]): Column[] {
   const m = items.length;
-  if (m === 0) {
-    return [
-      { width: 1, speed: 0.5, items: [] },
-      { width: 1.5, speed: 0.85, items: [] },
-      { width: 1.7, speed: 0.65, items: [] },
-      { width: 1.1, speed: 0.95, items: [] },
-    ];
-  }
-  const pick = (...ix: number[]) => ix.map((i) => items[i % m]);
-  const col4right = m > 5 ? 5 : m === 5 ? 4 : m === 4 ? 1 : 0;
-  return [
-    { width: 1, speed: 0.5, items: pick(0, 4, 2) },
-    { width: 1.5, speed: 0.85, items: pick(1, 3) },
-    { width: 1.7, speed: 0.65, items: pick(2, 0, 3) },
-    { width: 1.1, speed: 0.95, items: pick(3, col4right) },
+  const empty: Column[] = [
+    { width: 1, speed: 0.5, items: [] },
+    { width: 1.5, speed: 0.85, items: [] },
+    { width: 1.7, speed: 0.65, items: [] },
+    { width: 1.1, speed: 0.95, items: [] },
   ];
+  if (m === 0) return empty;
+
+  /** Раскладка по 4 колонкам: 0,4,8… | 1,5,9… — иначе при >6 кейсах новые не попадали в ленту */
+  const widths = [1, 1.5, 1.7, 1.1] as const;
+  const speeds = [0.5, 0.85, 0.65, 0.95] as const;
+  return widths.map((width, j) => {
+    const colItems: PortfolioTapeItem[] = [];
+    for (let i = j; i < m; i += 4) {
+      colItems.push(items[i]);
+    }
+    return { width, speed: speeds[j], items: colItems };
+  });
 }
 
 const TAPE_COLUMNS = buildPortfolioTapeColumns(PORTFOLIO_TAPE_ITEMS);
+
+/** На телефонах и планшетах (< lg) — только превью, не весь список */
+const PORTFOLIO_HOME_PREVIEW_COUNT = 5;
+const PORTFOLIO_TAPE_ITEMS_HOME_PREVIEW = PORTFOLIO_TAPE_ITEMS.slice(0, PORTFOLIO_HOME_PREVIEW_COUNT);
 
 const SECTION_HEIGHT_VH = 200;
 const GAP = 4;
@@ -476,7 +485,7 @@ export function PortfolioSection() {
       ref={sectionRef}
       id="portfolio"
       data-cursor-word="смотреть"
-      className="relative max-md:!h-auto max-md:min-h-0"
+      className="relative max-lg:!h-auto max-lg:min-h-0"
       style={{ height: `${SECTION_HEIGHT_VH}vh`, backgroundColor: "var(--bg)", color: "var(--text)" }}
       aria-label="Портфолио"
     >
@@ -495,7 +504,7 @@ export function PortfolioSection() {
           </h2>
           {codeTypistEnabled && headerPinned ? (
             <PinnedCodeTypist
-              text={`// портфолио: withVideo.length === ${PORTFOLIO_TAPE_COUNT}`}
+              text={`// портфолио: в ленте ${PORTFOLIO_TAPE_COUNT} (видео или постер)`}
               charDelayMs={11}
             />
           ) : (
@@ -512,17 +521,27 @@ export function PortfolioSection() {
           className="font-matrix text-[10px] uppercase tracking-[0.2em] transition-colors hover:text-[var(--accent)] md:text-xs"
           style={{ color: "var(--text-subtle)" }}
         >
-          все проекты →
+          <span className="lg:hidden">все →</span>
+          <span className="hidden lg:inline">все проекты →</span>
         </Link>
       </div>
 
-      <div className="border-t md:hidden" style={{ borderColor: "var(--border)" }}>
-        {PORTFOLIO_TAPE_ITEMS.map((cell) => (
+      <div className="border-t lg:hidden" style={{ borderColor: "var(--border)" }}>
+        {PORTFOLIO_TAPE_ITEMS_HOME_PREVIEW.map((cell) => (
           <PortfolioStackCard key={cell.href} {...cell} />
         ))}
+        <div className="px-4 py-6 sm:px-6" style={{ borderColor: "var(--border)" }}>
+          <Link
+            href="/portfolio"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border px-5 py-4 font-matrix text-[10px] uppercase tracking-[0.22em] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] sm:text-[11px] sm:tracking-[0.24em]"
+            style={{ borderColor: "var(--border)", color: "var(--text)" }}
+          >
+            Смотреть все кейсы
+          </Link>
+        </div>
       </div>
 
-      <div className="sticky top-0 hidden h-[100dvh] w-full overflow-hidden md:block">
+      <div className="sticky top-0 hidden h-[100dvh] w-full overflow-hidden lg:block">
         {/* Верхний / нижний fade */}
         <div
           className="pointer-events-none absolute inset-x-0 top-0 z-30 h-20"

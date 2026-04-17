@@ -124,8 +124,13 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
         if (variant === "page") setDone(true);
         onSuccess?.();
       } else {
-        const err = await response.json().catch(() => ({}));
-        alert(err.error || "Не удалось отправить. Позвоните: " + PHONE);
+        const err = await response.json().catch(() => ({})) as {
+          error?: string;
+          hint?: string;
+          code?: string;
+        };
+        const extra = err.hint ? `\n\n${err.hint}` : err.code ? `\n\n(код: ${err.code})` : "";
+        alert((err.error || "Не удалось отправить. Позвоните: " + PHONE) + extra);
       }
     } catch {
       alert("Ошибка сети. Позвоните: " + PHONE);
@@ -186,7 +191,7 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className={`relative flex min-h-0 flex-1 flex-col ${gapClass} max-md:overflow-visible md:overflow-hidden`}
+      className={`relative flex min-h-0 w-full min-w-0 flex-1 flex-col ${gapClass}`}
     >
       <div className="min-h-0 shrink-0">
         <label
@@ -271,7 +276,7 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
         {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email.message}</p>}
       </div>
 
-      <div className="flex min-h-0 flex-col md:flex-1 md:overflow-hidden">
+      <div className="flex min-h-0 w-full min-w-0 flex-col">
         <label
           className={`${labelMb} block shrink-0 font-matrix uppercase tracking-[0.16em] sm:tracking-[0.18em] ${pageTight ? "text-[9px] sm:text-[10px]" : "text-[10px]"}`}
           style={{ color: "var(--text-subtle)" }}
@@ -284,7 +289,7 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
             controlSurface,
             "leading-relaxed",
             pageTight
-              ? "min-h-[7rem] max-h-[min(52dvh,22rem)] overflow-y-auto resize-y sm:min-h-[5.5rem] sm:max-h-[12rem] md:min-h-0 md:max-h-none md:flex-1 md:resize-none"
+              ? "min-h-[7rem] max-h-[min(52dvh,22rem)] resize-y overflow-y-auto sm:min-h-[6rem] sm:max-h-[14rem] md:min-h-[10rem] md:max-h-[min(50dvh,20rem)] md:resize-y"
               : "min-h-[112px] flex-1 resize-y"
           )}
           placeholder="Сроки, бюджет, ссылка на ТЗ…"

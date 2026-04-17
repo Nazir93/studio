@@ -49,7 +49,7 @@ export const TerminalWindow = forwardRef<HTMLDivElement, TerminalWindowProps>(
         <div
           className={cn(
             "min-h-0 p-3 sm:p-5 md:p-6",
-            scrollableContent ? "overflow-x-auto" : "overflow-hidden",
+            scrollableContent ? "overflow-x-auto" : "min-h-0 overflow-x-hidden overflow-y-visible",
             innerClassName
           )}
         >

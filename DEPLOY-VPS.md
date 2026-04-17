@@ -19,7 +19,7 @@ sudo systemctl restart studio-nextjs
 ```
 
 - **`chown`** нужен, если `npm run build` идёт под **root**, а сервис в systemd с **`User=www-data`**. Без этого **`next/image`** не создаёт кэш → **EACCES** в логах.
-- Сборка только через **`npm run build`**: в проекте **`postbuild`** подмешивает **`public`** и **`.next/static`** в standalone; иначе пропадут стили.
+- Сборка только через **`npm run build`** (из каталога `frontend`): скрипт **`build`** сам вызывает копирование **`public`** и **`.next/static`** в **`.next/standalone`**. Если запустить голый **`next build`** без этого шага — сайт откроется **без CSS/JS**. После деплоя сделайте жёсткое обновление страницы (Ctrl+F5), если видели «старый» интерфейс из кэша.
 
 Проверка:
 
@@ -95,7 +95,11 @@ sudo certbot --nginx -d code1618.ru -d www.code1618.ru
 | Рестарт | `sudo systemctl restart studio-nextjs` |
 | Проверка Nginx | `sudo nginx -t` |
 
-Заявки в Telegram: переменные в **`frontend/.env.production`**, после правки — **`sudo systemctl restart studio-nextjs`**. Боту в личке **`/start`**; для группы **`TELEGRAM_CHAT_ID=-100…`**, бот в группе.
+Заявки в Telegram: переменные в **`frontend/.env.production`** (если строки **пустые** — берутся значения из кода в `telegram.ts`). После правки — **`sudo systemctl restart studio-nextjs`**.
+
+- В **личку** боту обязательно **`/start`** иначе API вернёт «chat not found» / «bot was blocked».
+- Для **группы**: `TELEGRAM_CHAT_ID=-100…`, бот добавлен в группу и не удалён.
+- Не работает — смотрите лог: **`sudo journalctl -u studio-nextjs -n 100 --no-pager | grep -E 'TELEGRAM|LEAD'`** (там текст ошибки от Telegram).
 
 Мало RAM на `npm run build` — добавьте swap 1–2 ГБ.
 

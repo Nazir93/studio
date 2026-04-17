@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { leadFormSchema } from "@/lib/schemas";
 import { v4 as uuidv4 } from "uuid";
-import { sendTelegramNotification, formatLeadMessage } from "@/lib/telegram";
+import {
+  sendTelegramNotification,
+  formatLeadMessage,
+  userFacingTelegramHint,
+} from "@/lib/telegram";
 
 export const dynamic = "force-dynamic";
 
 const RATE_LIMIT_MAP = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = 3;
+/** Лимит на IP: при частых тестах заявки «молчат» с 429 — не путать с Telegram */
+const RATE_LIMIT_MAX = 12;
 const RATE_LIMIT_WINDOW = 10 * 60 * 1000;
 
 function checkRateLimit(ip: string): boolean {
@@ -68,7 +73,8 @@ export async function POST(request: NextRequest) {
     );
 
     if (!telegramResult.ok) {
-      const { reason } = telegramResult;
+      const { reason, telegramDescription } = telegramResult;
+      const hint = userFacingTelegramHint(reason, telegramDescription);
       if (reason === "missing_env") {
         console.error(
           "[LEAD] Нет TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID в окружении процесса (standalone: проверьте путь в systemd EnvironmentFile и restart)"
@@ -77,6 +83,7 @@ export async function POST(request: NextRequest) {
         console.error(
           "[LEAD] Telegram не доставил заявку:",
           reason,
+          telegramDescription ?? "",
           "— токен/chat_id, /start боту в личке, для группы id вида -100…"
         );
       }
@@ -85,6 +92,7 @@ export async function POST(request: NextRequest) {
           error:
             "Не удалось отправить заявку в мессенджер. Позвоните нам или напишите в Telegram — мы на связи.",
           code: reason,
+          hint,
         },
         { status: 503 }
       );
