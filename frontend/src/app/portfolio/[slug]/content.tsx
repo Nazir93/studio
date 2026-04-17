@@ -408,6 +408,63 @@ function ShowcasePhoto({
   );
 }
 
+function ShowcasePair({
+  leftSrc,
+  rightSrc,
+  label,
+  dark = true,
+}: {
+  leftSrc: string;
+  rightSrc: string;
+  label?: string;
+  dark?: boolean;
+}) {
+  const border = dark ? "rgba(255,255,255,0.12)" : "var(--border)";
+  const bg = dark ? "#0a0a0a" : "var(--bg)";
+  return (
+    <section
+      className="relative w-full min-w-0"
+      style={{ backgroundColor: dark ? "#0a0a0a" : "var(--bg-secondary)" }}
+    >
+      <div className="w-full px-4 py-10 md:px-6 md:py-14 lg:px-0 lg:py-12 xl:py-16">
+        <div
+          className="mx-auto grid max-w-full grid-cols-1 gap-4 border border-solid shadow-sm md:grid-cols-2 md:gap-3 lg:mx-0 lg:gap-4 lg:border-x-0 lg:shadow-none"
+          style={{ borderColor: border, boxShadow: "0 8px 28px rgba(0,0,0,0.07)" }}
+        >
+          <div className="min-w-0 overflow-hidden" style={{ backgroundColor: bg, paddingBottom: "1px" }}>
+            <PortfolioRasterImg
+              src={leftSrc}
+              alt={label ? `${label} — фрагмент слева` : "Скриншот слева"}
+              className="mx-auto block h-auto max-h-[min(80vh,1000px)] w-full object-contain object-center md:object-right"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div className="min-w-0 overflow-hidden" style={{ backgroundColor: bg, paddingBottom: "1px" }}>
+            <PortfolioRasterImg
+              src={rightSrc}
+              alt={label ? `${label} — фрагмент справа` : "Скриншот справа"}
+              className="mx-auto block h-auto max-h-[min(80vh,1000px)] w-full object-contain object-center md:object-left"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      </div>
+      {label?.trim() ? (
+        <div className={`${CASE_FULL_WIDTH} pb-10 md:pb-14 lg:pb-12 xl:pb-16`}>
+          <p
+            className="text-center font-montserrat text-[10px] font-semibold uppercase tracking-[0.18em]"
+            style={{ color: dark ? "rgba(255,255,255,0.45)" : "var(--text-subtle)" }}
+          >
+            {label}
+          </p>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 function TextBlock({ leftText, rightText, accent }: { leftText: string; rightText: string; accent?: boolean }) {
   const { ref, visible } = useScrollVisible(0.2);
 
@@ -485,7 +542,7 @@ function NavLink({ href, label, direction }: { href: string; label: string; dire
           {direction === "prev" ? "Предыдущий проект" : "Следующий проект"}
         </span>
         <span
-          className="font-heading normal-case text-[0.625rem] font-medium leading-tight sm:text-[0.65rem] md:text-[0.6875rem] transition-colors duration-700 break-words text-pretty"
+          className="font-heading normal-case text-[0.625rem] font-medium leading-tight sm:text-[0.65rem] md:text-[0.6875rem] transition-colors duration-700 text-pretty [overflow-wrap:break-word] [word-break:normal]"
           style={{ color: hovered ? "var(--bg)" : "var(--text)" }}
         >
           {label}
@@ -715,6 +772,14 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
 
       {/* Text block 1 */}
       <TextBlock leftText={project.leftText1} rightText={project.rightText1} />
+
+      {project.showcasePair ? (
+        <ShowcasePair
+          leftSrc={project.showcasePair.left}
+          rightSrc={project.showcasePair.right}
+          label={project.showcasePair.label}
+        />
+      ) : null}
 
       {/* Showcase 2 (опционально) */}
       {project.showcaseImage2 || project.showcaseLabel2 ? (

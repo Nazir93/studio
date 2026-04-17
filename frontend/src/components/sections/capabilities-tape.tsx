@@ -8,11 +8,16 @@ import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 import { PinnedCodeTypist } from "@/components/ui/pinned-code-typist";
 import {
   TAPE_CELL_EASE,
+  capabilitiesHoverCharShadow,
+  capabilitiesHoverSubtitleShadow,
+  capabilitiesHoverTitleColor,
+  capabilitiesHoverTitleFilter,
   darkTitleCharShadow,
   darkTitleFilter,
   lightNeonFilter,
   lightNeonTitleChar,
 } from "@/lib/tape-hover-visual";
+import { TapeTitleLineSegments } from "@/lib/tape-title-chars";
 
 interface TapeItem {
   title: string;
@@ -131,7 +136,7 @@ function TapeStackCard(item: TapeItem) {
         {item.subtitle}
       </p>
       <h3
-        className="font-akony mt-2 text-[0.95rem] uppercase leading-snug tracking-[0.06em] sm:text-[1.05rem] sm:leading-tight sm:tracking-[0.07em] md:text-lg"
+        className="font-akony mt-2 text-[0.95rem] uppercase leading-snug tracking-[0.06em] text-pretty [hyphens:none] sm:text-[1.05rem] sm:leading-tight sm:tracking-[0.07em] md:text-lg"
         style={{ color: "var(--text)" }}
       >
         {titleLines.map((line, i) => (
@@ -141,7 +146,7 @@ function TapeStackCard(item: TapeItem) {
         ))}
       </h3>
       <p
-        className="mt-3 font-body text-xs leading-relaxed sm:text-[13px]"
+        className="mt-3 font-body text-xs leading-relaxed text-pretty [overflow-wrap:break-word] [word-break:normal] [hyphens:none] sm:text-[13px]"
         style={{ color: "var(--text-muted)" }}
       >
         {item.desc}
@@ -162,7 +167,7 @@ function TapeStackCard(item: TapeItem) {
         ))}
       </div>
       <p
-        className="mt-3 font-matrix text-[10px] leading-snug tracking-[0.06em]"
+        className="mt-3 font-matrix text-[10px] leading-snug tracking-[0.06em] text-pretty [overflow-wrap:break-word] [word-break:normal] [hyphens:none]"
         style={{ color: "var(--text-subtle)" }}
       >
         {item.hoverLine}
@@ -332,11 +337,11 @@ function TapeCell({
     <Link
       href={href}
       className="group relative flex shrink-0 flex-col overflow-hidden transition-colors"
-      style={{ aspectRatio: "9 / 13", backgroundColor: "var(--bg-secondary)" }}
+      style={{ aspectRatio: "9 / 13", backgroundColor: "var(--bg)" }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Фон — изображение или градиент */}
+      {/* Фон: постер или сплошной цвет темы (тёмная — чёрный, светлая — белый); видео — только при hover */}
       <div className="pointer-events-none absolute inset-0">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -346,14 +351,7 @@ function TapeCell({
             className="h-full w-full object-cover opacity-50 transition-all duration-700 group-hover:opacity-70 group-hover:scale-[1.03]"
           />
         ) : (
-          <div
-            className="h-full w-full"
-            style={{
-              background:
-                "radial-gradient(ellipse at 30% 25%, var(--text-subtle) 0%, transparent 55%), radial-gradient(ellipse at 75% 70%, var(--text-subtle) 0%, transparent 45%)",
-              opacity: 0.15,
-            }}
-          />
+          <div className="h-full w-full" style={{ backgroundColor: "var(--bg)" }} />
         )}
       </div>
 
@@ -371,6 +369,7 @@ function TapeCell({
             playsInline
             preload="metadata"
             className="h-full w-full object-cover"
+            style={{ backgroundColor: "var(--bg)" }}
           />
           <div
             className="absolute inset-x-0 bottom-0 h-1/3"
@@ -415,9 +414,12 @@ function TapeCell({
             className="font-matrix text-[8px] uppercase md:text-[9px]"
             style={{
               letterSpacing: hovered ? "0.28em" : "0.22em",
-              color: hovered ? "var(--text)" : "var(--text-muted)",
-              textShadow:
-                !isDark ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.35)" : undefined,
+              color: hovered ? "#000000" : "var(--text-muted)",
+              textShadow: hovered
+                ? capabilitiesHoverSubtitleShadow(true)
+                : !isDark
+                  ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.35)"
+                  : undefined,
               transition: `letter-spacing 0.45s ${ease}, color 0.35s ease, text-shadow 0.35s ease`,
             }}
           >
@@ -427,41 +429,43 @@ function TapeCell({
 
         <div className="flex min-h-0 flex-1 flex-col justify-center py-1">
           <h3
-            className={`w-full text-center text-balance uppercase leading-[1.12] transition-all duration-500 ease-out ${
+            className={`w-full text-balance text-center uppercase leading-[1.12] [hyphens:none] transition-all duration-500 ease-out ${
               hovered
                 ? "font-blackops text-[clamp(0.9rem,4vmin,1.5rem)] tracking-[0.08em] md:text-[clamp(1rem,3.5vmin,1.75rem)] lg:text-[clamp(1.1rem,3vmin,2rem)]"
                 : "font-matrix text-xs font-medium tracking-[0.04em] md:text-sm lg:text-base"
             }`}
             style={{
-              color: "var(--text)",
-              filter: isDark ? darkTitleFilter(hovered) : lightNeonFilter(hovered),
+              color: capabilitiesHoverTitleColor(hovered),
+              filter: hovered
+                ? capabilitiesHoverTitleFilter(true)
+                : isDark
+                  ? darkTitleFilter(false)
+                  : lightNeonFilter(false),
             }}
           >
-            {(() => {
-              let charIndex = 0;
-              return titleLines.map((line, lineIdx) => (
-                <span key={`${title}-L${lineIdx}`} className="block w-full">
-                  {line.split("").map((ch, i) => {
-                    const idx = charIndex++;
-                    return (
-                      <span
-                        key={`${title}-${lineIdx}-${i}-${ch}`}
-                        className="inline-block"
-                        style={{
-                          transform: hovered ? "translateY(-1px) scale(1.03)" : "translateY(0) scale(1)",
-                          opacity: 1,
-                          textShadow: isDark ? darkTitleCharShadow(hovered) : lightNeonTitleChar(hovered),
-                          transition: `text-shadow 0.5s ${ease}, transform 0.45s ${ease}`,
-                          transitionDelay: hovered ? `${20 + idx * 16}ms` : "0ms",
-                        }}
-                      >
-                        {ch === " " ? "\u00a0" : ch}
-                      </span>
-                    );
-                  })}
+            <TapeTitleLineSegments
+              lines={titleLines}
+              titleKey={title}
+              renderChar={({ ch, globalIdx: idx }) => (
+                <span
+                  key={`${title}-${idx}-${ch}`}
+                  className="inline-block"
+                  style={{
+                    transform: hovered ? "translateY(-1px) scale(1.03)" : "translateY(0) scale(1)",
+                    opacity: 1,
+                    textShadow: hovered
+                      ? capabilitiesHoverCharShadow(true)
+                      : isDark
+                        ? darkTitleCharShadow(false)
+                        : lightNeonTitleChar(false),
+                    transition: `text-shadow 0.5s ${ease}, transform 0.45s ${ease}`,
+                    transitionDelay: hovered ? `${20 + idx * 16}ms` : "0ms",
+                  }}
+                >
+                  {ch}
                 </span>
-              ));
-            })()}
+              )}
+            />
           </h3>
         </div>
 
@@ -482,11 +486,19 @@ function TapeCell({
                     style={{
                       padding: "3px 7px",
                       borderRadius: "4px",
-                      border: "1px solid var(--border)",
-                      backgroundColor: "color-mix(in srgb, var(--text) 9%, transparent)",
-                      color: "var(--text)",
-                      boxShadow: !isDark ? "0 0 10px rgba(255,255,255,0.85), 0 0 20px rgba(255,255,255,0.35)" : undefined,
-                      textShadow: !isDark ? "0 0 8px rgba(255,255,255,0.9)" : undefined,
+                      border: "1px solid rgba(0,0,0,0.2)",
+                      backgroundColor: hovered ? "rgba(255,255,255,0.35)" : "color-mix(in srgb, var(--text) 9%, transparent)",
+                      color: hovered ? "#000000" : "var(--text)",
+                      boxShadow: hovered
+                        ? "0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(255,255,255,0.45)"
+                        : !isDark
+                          ? "0 0 10px rgba(255,255,255,0.85), 0 0 20px rgba(255,255,255,0.35)"
+                          : undefined,
+                      textShadow: hovered
+                        ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.5)"
+                        : !isDark
+                          ? "0 0 8px rgba(255,255,255,0.9)"
+                          : undefined,
                       transform: hovered ? "translateY(0)" : "translateY(14px)",
                       opacity: hovered ? 1 : 0,
                       transition: `transform 0.4s ${ease}, opacity 0.35s ease, box-shadow 0.35s ease, text-shadow 0.35s ease`,
@@ -498,10 +510,14 @@ function TapeCell({
                 ))}
               </div>
               <p
-                className="mt-2 max-w-full font-matrix text-[9px] leading-snug md:text-[10px]"
+                className="mt-2 max-w-full font-matrix text-[9px] leading-snug text-pretty [overflow-wrap:break-word] [word-break:normal] [hyphens:none] md:text-[10px]"
                 style={{
-                  color: "var(--text-muted)",
-                  textShadow: !isDark ? "0 0 8px rgba(255,255,255,0.9), 0 0 16px rgba(255,255,255,0.35)" : undefined,
+                  color: hovered ? "rgba(0,0,0,0.82)" : "var(--text-muted)",
+                  textShadow: hovered
+                    ? capabilitiesHoverSubtitleShadow(true)
+                    : !isDark
+                      ? "0 0 8px rgba(255,255,255,0.9), 0 0 16px rgba(255,255,255,0.35)"
+                      : undefined,
                   transform: hovered ? "translateY(0)" : "translateY(10px)",
                   opacity: hovered ? 1 : 0,
                   transition: `transform 0.45s ${ease}, opacity 0.4s ease, text-shadow 0.35s ease`,
@@ -663,17 +679,6 @@ export function CapabilitiesTapeSection() {
       </div>
 
       <div className="sticky top-0 hidden h-[100dvh] w-full overflow-hidden md:block">
-        {/* Шероховатость / зерно */}
-        <div className="pointer-events-none absolute inset-0 z-30 mix-blend-overlay" style={{ opacity: 0.15 }}>
-          <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">
-            <filter id="tape-grain">
-              <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
-            </filter>
-            <rect width="100%" height="100%" filter="url(#tape-grain)" />
-          </svg>
-        </div>
-
         {/* Верхний / нижний fade */}
         <div
           className="pointer-events-none absolute inset-x-0 top-0 z-30 h-20"

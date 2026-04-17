@@ -1,3 +1,8 @@
+/** JetBrains Mono без Google Fonts — шапка/навигация и `font-matrix` не падают в Courier при сбое сети */
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/700.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -21,6 +26,7 @@
 
   /* Монохром в духе Instagram: без цветных акцентов */
   :root {
+    --font-matrix: "JetBrains Mono", ui-monospace, "Segoe UI Mono", "Roboto Mono", Menlo, Consolas, monospace;
     --bg: #0A0A0A;
     --bg-secondary: #111111;
     --text: #FFFFFF;
@@ -72,6 +78,8 @@
     -webkit-overflow-scrolling: touch;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
   }
 
   @supports (overflow: clip) {
@@ -153,8 +161,9 @@
     font-size: clamp(1.5rem, 3.6vw + 0.45rem, 2.125rem);
     line-height: 0.95;
     letter-spacing: -0.03em;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
   }
   @media (min-width: 640px) {
     .page-hero-display-title {
@@ -175,6 +184,9 @@
     font-size: clamp(1.3125rem, 2.85vw + 0.55rem, 2.625rem);
     line-height: 0.98;
     letter-spacing: -0.02em;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
   }
   @media (min-width: 640px) {
     .section-display-title {
@@ -192,8 +204,9 @@
     }
   }
 
-  /** Липкие полосы «Что умеем» / «Портфолио» */
+  /** Липкие полосы «Что умеем» / «Портфолио» — явный font-family: next/font задаёт --font-main на <html> */
   .section-tape-heading {
+    font-family: var(--font-main), ui-sans-serif, system-ui, sans-serif;
     font-size: clamp(0.78rem, 2.15vw + 0.42rem, 1.85rem);
     line-height: 1.12;
   }
@@ -217,8 +230,9 @@
   .page-inset-hero-title {
     font-size: clamp(1.0625rem, 3.2vw + 0.45rem, 2.5rem);
     line-height: 1.06;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
   }
   @media (min-width: 640px) {
     .page-inset-hero-title {
@@ -240,6 +254,9 @@
   .section-block-title {
     font-size: clamp(1.0625rem, 2.35vw + 0.5rem, 2.125rem);
     line-height: 1.2;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
   }
   @media (min-width: 640px) {
     .section-block-title {

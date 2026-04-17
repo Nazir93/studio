@@ -117,7 +117,7 @@ function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; prev
               {item.subtitle}
             </p>
             <h3
-              className="mt-1 font-akony text-sm uppercase leading-snug tracking-[0.07em] sm:text-[0.95rem] md:text-base"
+              className="mt-1 font-akony text-sm uppercase leading-snug tracking-[0.07em] text-pretty [hyphens:none] sm:text-[0.95rem] md:text-base"
               style={{ color: "var(--text)" }}
             >
               {item.title}
@@ -132,7 +132,10 @@ function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; prev
           </span>
         </div>
 
-        <p className="font-body text-[10px] leading-relaxed md:text-[11px]" style={{ color: "var(--text-muted)" }}>
+        <p
+          className="font-body text-[10px] leading-relaxed text-pretty [overflow-wrap:break-word] [word-break:normal] [hyphens:none] md:text-[11px]"
+          style={{ color: "var(--text-muted)" }}
+        >
           {item.description}
         </p>
 
@@ -174,12 +177,15 @@ function ShowcaseStackCard({ item }: { item: ShowcaseItem }) {
           {item.subtitle}
         </p>
         <h3
-          className="font-akony mt-1 text-[0.95rem] uppercase leading-snug tracking-[0.07em] sm:text-base md:text-[1.05rem]"
+          className="font-akony mt-1 text-[0.95rem] uppercase leading-snug tracking-[0.07em] text-pretty [hyphens:none] sm:text-base md:text-[1.05rem]"
           style={{ color: "var(--text)" }}
         >
           {item.title}
         </h3>
-        <p className="mt-2 font-body text-xs leading-relaxed sm:text-[13px]" style={{ color: "var(--text-muted)" }}>
+        <p
+          className="mt-2 font-body text-xs leading-relaxed text-pretty [overflow-wrap:break-word] [word-break:normal] [hyphens:none] sm:text-[13px]"
+          style={{ color: "var(--text-muted)" }}
+        >
           {item.description}
         </p>
         <div

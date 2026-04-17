@@ -9,11 +9,16 @@ import { useTheme } from "@/lib/theme-context";
 import { PinnedCodeTypist } from "@/components/ui/pinned-code-typist";
 import {
   TAPE_CELL_EASE,
+  capabilitiesHoverCharShadow,
+  capabilitiesHoverSubtitleShadow,
+  capabilitiesHoverTitleColor,
+  capabilitiesHoverTitleFilter,
   darkTitleCharShadow,
   darkTitleFilter,
   lightNeonFilter,
   lightNeonTitleChar,
 } from "@/lib/tape-hover-visual";
+import { TapeTitleLineSegments } from "@/lib/tape-title-chars";
 
 const PORTFOLIO_TAPE_EASE = TAPE_CELL_EASE;
 
@@ -28,17 +33,29 @@ interface PortfolioTapeItem {
   video: string | null;
 }
 
-const P: PortfolioTapeItem[] = PORTFOLIO_CASES.map((c) => ({
-  title: c.title,
-  subtitle: c.type,
-  tag: c.tag,
-  year: c.year,
-  area: c.area,
-  href: `/portfolio/${c.slug}`,
-  /** Как в «Что умеем»: фон — постер; при наведении — heroVideo, если есть */
-  image: c.heroImage ?? null,
-  video: c.heroVideo ?? null,
-}));
+/** В ленте на главной — только кейсы с heroVideo (hover-ролик как в «Что умеем») */
+const PORTFOLIO_TAPE_ITEMS: PortfolioTapeItem[] = PORTFOLIO_CASES.filter((c) => Boolean(c.heroVideo)).map(
+  (c) => ({
+    title: c.title,
+    subtitle: c.type,
+    tag: c.tag,
+    year: c.year,
+    area: c.area,
+    href: `/portfolio/${c.slug}`,
+    image: c.heroImage ?? null,
+    video: c.heroVideo ?? null,
+  })
+);
+
+const PORTFOLIO_TAPE_COUNT = PORTFOLIO_TAPE_ITEMS.length;
+
+function formatProjectCountLabel(count: number): string {
+  const m10 = count % 10;
+  const m100 = count % 100;
+  if (m10 === 1 && m100 !== 11) return `${count} проект`;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return `${count} проекта`;
+  return `${count} проектов`;
+}
 
 interface Column {
   width: number;
@@ -46,28 +63,27 @@ interface Column {
   items: PortfolioTapeItem[];
 }
 
-const COLUMNS: Column[] = [
-  {
-    width: 1,
-    speed: 0.5,
-    items: [P[0], P[4], P[2]],
-  },
-  {
-    width: 1.5,
-    speed: 0.85,
-    items: [P[1], P[3]],
-  },
-  {
-    width: 1.7,
-    speed: 0.65,
-    items: [P[2], P[0], P[3]],
-  },
-  {
-    width: 1.1,
-    speed: 0.95,
-    items: [P[3], P[4]],
-  },
-];
+function buildPortfolioTapeColumns(items: PortfolioTapeItem[]): Column[] {
+  const m = items.length;
+  if (m === 0) {
+    return [
+      { width: 1, speed: 0.5, items: [] },
+      { width: 1.5, speed: 0.85, items: [] },
+      { width: 1.7, speed: 0.65, items: [] },
+      { width: 1.1, speed: 0.95, items: [] },
+    ];
+  }
+  const pick = (...ix: number[]) => ix.map((i) => items[i % m]);
+  const col4right = m > 5 ? 5 : m === 5 ? 4 : m === 4 ? 1 : 0;
+  return [
+    { width: 1, speed: 0.5, items: pick(0, 4, 2) },
+    { width: 1.5, speed: 0.85, items: pick(1, 3) },
+    { width: 1.7, speed: 0.65, items: pick(2, 0, 3) },
+    { width: 1.1, speed: 0.95, items: pick(3, col4right) },
+  ];
+}
+
+const TAPE_COLUMNS = buildPortfolioTapeColumns(PORTFOLIO_TAPE_ITEMS);
 
 const SECTION_HEIGHT_VH = 200;
 const GAP = 4;
@@ -91,12 +107,12 @@ function PortfolioCell({
   const [hovered, setHovered] = useState(false);
   const { isDark } = useTheme();
   const effectiveVideo = videosEnabled && video ? video : null;
+  /** Как в «Что умеем»: lift только при hover-видео */
   const hasMedia = !!effectiveVideo;
   const titleLines = title.split("\n");
   const bottomTags = [tag, year].filter(Boolean);
   const hoverLine = area?.trim() || "";
   const ease = PORTFOLIO_TAPE_EASE;
-  const liftOnHover = hovered && (!!effectiveVideo || !!image);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -113,47 +129,52 @@ function PortfolioCell({
     <Link
       href={href}
       className="group relative flex shrink-0 flex-col overflow-hidden transition-colors"
-      style={{ aspectRatio: "9 / 13", backgroundColor: "var(--bg-secondary)" }}
+      style={{ aspectRatio: "9 / 13", backgroundColor: "var(--bg)" }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* Без наведения — сплошная колонка цвета темы; постер только как poster у video (не подсвечиваем картинку в покое) */}
       <div className="pointer-events-none absolute inset-0">
-        {image ? (
+        {effectiveVideo ? (
+          <div className="h-full w-full" style={{ backgroundColor: "var(--bg)" }} />
+        ) : image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={image}
             alt=""
-            className="h-full w-full object-cover transition-all duration-700"
-            style={{
-              opacity: hovered ? 0.7 : 0.5,
-              transform: hovered ? "scale(1.03)" : "scale(1)",
-            }}
+            className="h-full w-full object-cover opacity-50 transition-all duration-700 group-hover:opacity-70 group-hover:scale-[1.03]"
           />
         ) : (
-          <div
-            className="h-full w-full"
-            style={{
-              background:
-                "radial-gradient(ellipse at 30% 25%, var(--text-subtle) 0%, transparent 55%), radial-gradient(ellipse at 75% 70%, var(--text-subtle) 0%, transparent 45%)",
-              opacity: 0.15,
-            }}
-          />
+          <div className="h-full w-full" style={{ backgroundColor: "var(--bg)" }} />
         )}
       </div>
+
+      {/* Без видео: при наведении — сплошной фон темы (светлая тема — белый, тёмная — чёрный), как «Что умеем» */}
+      {!effectiveVideo ? (
+        <div
+          className="pointer-events-none absolute inset-0 z-[15] transition-opacity duration-500"
+          style={{
+            opacity: hovered ? 1 : 0,
+            backgroundColor: "var(--bg)",
+          }}
+        />
+      ) : null}
 
       {effectiveVideo ? (
         <div
           className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-500"
-          style={{ opacity: hovered ? 1 : 0, transitionTimingFunction: ease }}
+          style={{ opacity: hovered ? 1 : 0 }}
         >
           <video
             ref={videoRef}
             src={effectiveVideo}
+            poster={image ?? undefined}
             muted
             loop
             playsInline
             preload="metadata"
             className="h-full w-full object-cover"
+            style={{ backgroundColor: "var(--bg)" }}
           />
           <div
             className="absolute inset-x-0 bottom-0 h-1/3"
@@ -165,7 +186,7 @@ function PortfolioCell({
       <div
         className="absolute inset-0 z-30 flex flex-col justify-between gap-3 p-3 md:p-5"
         style={{
-          transform: liftOnHover ? "translateY(-2px)" : "translateY(0)",
+          transform: hovered && hasMedia ? "translateY(-2px)" : "translateY(0)",
           transition: `transform 0.45s ${ease}`,
         }}
       >
@@ -183,9 +204,12 @@ function PortfolioCell({
             className="font-matrix text-[8px] uppercase md:text-[9px]"
             style={{
               letterSpacing: hovered ? "0.28em" : "0.22em",
-              color: hovered ? "var(--text)" : "var(--text-muted)",
-              textShadow:
-                !isDark ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.35)" : undefined,
+              color: hovered ? "#000000" : "var(--text-muted)",
+              textShadow: hovered
+                ? capabilitiesHoverSubtitleShadow(true)
+                : !isDark
+                  ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.35)"
+                  : undefined,
               transition: `letter-spacing 0.45s ${ease}, color 0.35s ease, text-shadow 0.35s ease`,
             }}
           >
@@ -195,41 +219,43 @@ function PortfolioCell({
 
         <div className="flex min-h-0 flex-1 flex-col justify-center py-1">
           <h3
-            className={`w-full text-center text-balance uppercase leading-[1.12] transition-all duration-500 ease-out ${
+            className={`w-full text-balance text-center uppercase leading-[1.12] [hyphens:none] transition-all duration-500 ease-out ${
               hovered
                 ? "font-blackops text-[clamp(0.9rem,4vmin,1.5rem)] tracking-[0.08em] md:text-[clamp(1rem,3.5vmin,1.75rem)] lg:text-[clamp(1.1rem,3vmin,2rem)]"
                 : "font-matrix text-xs font-medium tracking-[0.04em] md:text-sm lg:text-base"
             }`}
             style={{
-              color: "var(--text)",
-              filter: isDark ? darkTitleFilter(hovered) : lightNeonFilter(hovered),
+              color: capabilitiesHoverTitleColor(hovered),
+              filter: hovered
+                ? capabilitiesHoverTitleFilter(true)
+                : isDark
+                  ? darkTitleFilter(false)
+                  : lightNeonFilter(false),
             }}
           >
-            {(() => {
-              let charIndex = 0;
-              return titleLines.map((line, lineIdx) => (
-                <span key={`${title}-L${lineIdx}`} className="block w-full">
-                  {line.split("").map((ch, i) => {
-                    const idx = charIndex++;
-                    return (
-                      <span
-                        key={`${title}-${lineIdx}-${i}-${ch}`}
-                        className="inline-block"
-                        style={{
-                          transform: hovered ? "translateY(-1px) scale(1.03)" : "translateY(0) scale(1)",
-                          opacity: 1,
-                          textShadow: isDark ? darkTitleCharShadow(hovered) : lightNeonTitleChar(hovered),
-                          transition: `text-shadow 0.5s ${ease}, transform 0.45s ${ease}`,
-                          transitionDelay: hovered ? `${20 + idx * 16}ms` : "0ms",
-                        }}
-                      >
-                        {ch === " " ? "\u00a0" : ch}
-                      </span>
-                    );
-                  })}
+            <TapeTitleLineSegments
+              lines={titleLines}
+              titleKey={title}
+              renderChar={({ ch, globalIdx: idx }) => (
+                <span
+                  key={`${title}-${idx}-${ch}`}
+                  className="inline-block"
+                  style={{
+                    transform: hovered ? "translateY(-1px) scale(1.03)" : "translateY(0) scale(1)",
+                    opacity: 1,
+                    textShadow: hovered
+                      ? capabilitiesHoverCharShadow(true)
+                      : isDark
+                        ? darkTitleCharShadow(false)
+                        : lightNeonTitleChar(false),
+                    transition: `text-shadow 0.5s ${ease}, transform 0.45s ${ease}`,
+                    transitionDelay: hovered ? `${20 + idx * 16}ms` : "0ms",
+                  }}
+                >
+                  {ch}
                 </span>
-              ));
-            })()}
+              )}
+            />
           </h3>
         </div>
 
@@ -250,11 +276,19 @@ function PortfolioCell({
                     style={{
                       padding: "3px 7px",
                       borderRadius: "4px",
-                      border: "1px solid var(--border)",
-                      backgroundColor: "color-mix(in srgb, var(--text) 9%, transparent)",
-                      color: "var(--text)",
-                      boxShadow: !isDark ? "0 0 10px rgba(255,255,255,0.85), 0 0 20px rgba(255,255,255,0.35)" : undefined,
-                      textShadow: !isDark ? "0 0 8px rgba(255,255,255,0.9)" : undefined,
+                      border: "1px solid rgba(0,0,0,0.2)",
+                      backgroundColor: hovered ? "rgba(255,255,255,0.35)" : "color-mix(in srgb, var(--text) 9%, transparent)",
+                      color: hovered ? "#000000" : "var(--text)",
+                      boxShadow: hovered
+                        ? "0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(255,255,255,0.45)"
+                        : !isDark
+                          ? "0 0 10px rgba(255,255,255,0.85), 0 0 20px rgba(255,255,255,0.35)"
+                          : undefined,
+                      textShadow: hovered
+                        ? "0 0 8px rgba(255,255,255,0.95), 0 0 16px rgba(255,255,255,0.5)"
+                        : !isDark
+                          ? "0 0 8px rgba(255,255,255,0.9)"
+                          : undefined,
                       transform: hovered ? "translateY(0)" : "translateY(14px)",
                       opacity: hovered ? 1 : 0,
                       transition: `transform 0.4s ${ease}, opacity 0.35s ease, box-shadow 0.35s ease, text-shadow 0.35s ease`,
@@ -269,8 +303,12 @@ function PortfolioCell({
                 <p
                   className="mt-2 max-w-full font-matrix text-[9px] leading-snug md:text-[10px]"
                   style={{
-                    color: "var(--text-muted)",
-                    textShadow: !isDark ? "0 0 8px rgba(255,255,255,0.9), 0 0 16px rgba(255,255,255,0.35)" : undefined,
+                    color: hovered ? "rgba(0,0,0,0.82)" : "var(--text-muted)",
+                    textShadow: hovered
+                      ? capabilitiesHoverSubtitleShadow(true)
+                      : !isDark
+                        ? "0 0 8px rgba(255,255,255,0.9), 0 0 16px rgba(255,255,255,0.35)"
+                        : undefined,
                     transform: hovered ? "translateY(0)" : "translateY(10px)",
                     opacity: hovered ? 1 : 0,
                     transition: `transform 0.45s ${ease}, opacity 0.4s ease, text-shadow 0.35s ease`,
@@ -381,8 +419,8 @@ function PortfolioColumn({
       className="relative overflow-hidden"
       style={{
         flex: col.width,
-        backgroundColor: "transparent",
-        borderRight: ci < COLUMNS.length - 1 ? `${GAP}px solid var(--border)` : undefined,
+        backgroundColor: "var(--bg)",
+        borderRight: ci < TAPE_COLUMNS.length - 1 ? `${GAP}px solid var(--border)` : undefined,
       }}
     >
       <div
@@ -456,13 +494,16 @@ export function PortfolioSection() {
             Портфолио
           </h2>
           {codeTypistEnabled && headerPinned ? (
-            <PinnedCodeTypist text='// портфолио: cases.filter(Boolean).length === 7' charDelayMs={11} />
+            <PinnedCodeTypist
+              text={`// портфолио: withVideo.length === ${PORTFOLIO_TAPE_COUNT}`}
+              charDelayMs={11}
+            />
           ) : (
             <span
               className="max-w-[14rem] font-matrix text-[8px] uppercase leading-snug tracking-[0.22em] sm:max-w-none sm:text-[10px] sm:tracking-[0.28em] md:text-[11px]"
               style={{ color: "var(--text-muted)" }}
             >
-              7 проектов
+              {formatProjectCountLabel(PORTFOLIO_TAPE_COUNT)}
             </span>
           )}
         </div>
@@ -476,23 +517,12 @@ export function PortfolioSection() {
       </div>
 
       <div className="border-t md:hidden" style={{ borderColor: "var(--border)" }}>
-        {P.map((cell) => (
+        {PORTFOLIO_TAPE_ITEMS.map((cell) => (
           <PortfolioStackCard key={cell.href} {...cell} />
         ))}
       </div>
 
       <div className="sticky top-0 hidden h-[100dvh] w-full overflow-hidden md:block">
-        {/* Шероховатость / зерно */}
-        <div className="pointer-events-none absolute inset-0 z-30 mix-blend-overlay" style={{ opacity: 0.15 }}>
-          <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">
-            <filter id="portfolio-grain">
-              <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch" />
-              <feColorMatrix type="saturate" values="0" />
-            </filter>
-            <rect width="100%" height="100%" filter="url(#portfolio-grain)" />
-          </svg>
-        </div>
-
         {/* Верхний / нижний fade */}
         <div
           className="pointer-events-none absolute inset-x-0 top-0 z-30 h-20"
@@ -504,8 +534,11 @@ export function PortfolioSection() {
         />
 
         {/* Колонки */}
-        <div className="relative z-10 flex h-full w-full bg-transparent">
-          {COLUMNS.map((col, ci) => (
+        <div
+          className="relative z-10 flex h-full w-full"
+          style={{ backgroundColor: "var(--bg)" }}
+        >
+          {TAPE_COLUMNS.map((col, ci) => (
             <PortfolioColumn key={ci} col={col} ci={ci} progress={progress} videosEnabled={isDesktopLg} />
           ))}
         </div>
