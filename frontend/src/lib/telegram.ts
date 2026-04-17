@@ -3,17 +3,19 @@ export type TelegramSendFailure =
   | "telegram_rejected"
   | "network";
 
+/** Дефолты, если переменные окружения не заданы (можно переопределить через TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID). */
+const DEFAULT_TELEGRAM_BOT_TOKEN = "8172096800:AAFC4zTTbpOPOzPFjrS-G-9LhvlbFvywqzc";
+const DEFAULT_TELEGRAM_CHAT_ID = "6414926404";
+
 /** Успешная доставка в Telegram */
 export async function sendTelegramNotification(
   message: string
 ): Promise<{ ok: true } | { ok: false; reason: TelegramSendFailure }> {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
-  const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
+  const botToken = (process.env.TELEGRAM_BOT_TOKEN?.trim() || DEFAULT_TELEGRAM_BOT_TOKEN).trim();
+  const chatId = (process.env.TELEGRAM_CHAT_ID?.trim() || DEFAULT_TELEGRAM_CHAT_ID).trim();
 
   if (!botToken || !chatId) {
-    console.warn(
-      "[TELEGRAM] Задайте TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID (для systemd: EnvironmentFile=…/.env.production, затем daemon-reload и restart сервиса)"
-    );
+    console.warn("[TELEGRAM] Нет токена или chat_id");
     return { ok: false, reason: "missing_env" };
   }
 

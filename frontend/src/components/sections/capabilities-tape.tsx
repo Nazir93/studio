@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { useTheme } from "@/lib/theme-context";
 import { useStickyHeaderPinned } from "@/lib/use-sticky-header-pinned";
 import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
@@ -123,7 +122,7 @@ function flattenTapeItemsUnique(columns: Column[]): TapeItem[] {
 function TapeStackCard(item: TapeItem) {
   const titleLines = item.title.split("\n");
   return (
-    <Link
+    <a
       href={item.href}
       data-cursor-word="смотреть"
       className="block border-b px-4 py-5 transition-opacity active:opacity-90 last:border-b-0"
@@ -172,7 +171,7 @@ function TapeStackCard(item: TapeItem) {
       >
         {item.hoverLine}
       </p>
-    </Link>
+    </a>
   );
 }
 
@@ -334,7 +333,7 @@ function TapeCell({
   const ease = TAPE_CELL_EASE;
 
   return (
-    <Link
+    <a
       href={href}
       className="group relative flex shrink-0 flex-col overflow-hidden transition-colors"
       style={{ aspectRatio: "9 / 13", backgroundColor: "var(--bg)" }}
@@ -530,7 +529,7 @@ function TapeCell({
           </div>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }
 

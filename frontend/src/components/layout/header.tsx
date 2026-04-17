@@ -202,13 +202,19 @@ export function Header() {
       >
         <div className="container mx-auto flex items-center justify-between py-3 sm:py-4 md:py-5">
           {/* Logo */}
-          <Link href="/" className="relative w-20 h-8 sm:w-24 sm:h-9 pointer-events-auto flex items-center shrink-0" aria-label={SITE_NAME}>
+          <Link
+            href="/"
+            className="pointer-events-auto flex h-8 shrink-0 items-center sm:h-9"
+            aria-label={SITE_NAME}
+          >
             <Image
               src="/logo.png"
               alt={SITE_NAME}
-              fill
-              className="object-contain object-left"
-              sizes="(max-width: 640px) 80px, 96px"
+              width={200}
+              height={80}
+              priority
+              className="h-8 w-auto max-w-[5rem] object-contain object-left sm:h-9 sm:max-w-[6rem]"
+              sizes="96px"
             />
           </Link>
 
@@ -289,7 +295,7 @@ export function Header() {
                   </h3>
                   <div className="flex flex-col gap-0.5 sm:gap-1">
                     {section.items.map((item) => (
-                      <Link
+                      <a
                         key={item.href}
                         href={item.href}
                         onClick={() => setIsOpen(false)}
@@ -297,7 +303,7 @@ export function Header() {
                         style={{ color: "var(--text-muted)" }}
                       >
                         {item.label}
-                      </Link>
+                      </a>
                     ))}
                   </div>
                 </div>
@@ -308,7 +314,7 @@ export function Header() {
 
             {/* CTA + contacts */}
             <div className="pt-4 sm:pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-              <Link
+              <a
                 href="/brief?source=header-menu"
                 onClick={() => setIsOpen(false)}
                 className={`block w-full mt-2 sm:mt-4 py-3 sm:py-5 ${FONT_UI_AKONY_CTA} text-center rounded-full mb-4 sm:mb-5 min-h-[48px] border transition-colors duration-300 hover:opacity-95 sm:min-h-[52px]`}
@@ -319,7 +325,7 @@ export function Header() {
                 }}
               >
                 Обсудить проект
-              </Link>
+              </a>
 
               <p
                 className={`mb-2 text-center ${FONT_UI_MONO_MENU_BODY}`}
@@ -408,15 +414,21 @@ export function NavBar() {
       <div className="container mx-auto flex items-center justify-between py-2.5 sm:py-3 md:py-4">
         {/* Left: logo + contacts */}
         <div className="flex items-center gap-4 sm:gap-6">
-          <Link href="/" className="relative w-20 h-8 sm:w-24 sm:h-9 shrink-0 flex items-center" aria-label={SITE_NAME}>
+          <a
+            href="/"
+            className="flex h-8 shrink-0 items-center sm:h-9"
+            aria-label={SITE_NAME}
+          >
             <Image
               src="/logo.png"
               alt={SITE_NAME}
-              fill
-              className="object-contain object-left"
-              sizes="(max-width: 640px) 80px, 96px"
+              width={200}
+              height={80}
+              priority
+              className="h-8 w-auto max-w-[5rem] object-contain object-left sm:h-9 sm:max-w-[6rem]"
+              sizes="96px"
             />
-          </Link>
+          </a>
           <div className={`hidden sm:flex items-center gap-2 sm:gap-3 ${FONT_UI_MONO_CONTACT}`} style={{ color: "var(--text-muted)" }}>
             <a href={`tel:${PHONE_RAW}`} className="shrink-0 whitespace-nowrap hover:opacity-100 transition-opacity">
               {PHONE}
@@ -443,14 +455,14 @@ export function NavBar() {
                   ? pathname === "/"
                   : pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);
               return (
-                <Link
+                <a
                   key={item.href}
                   href={item.href}
                   className={`${FONT_UI_MONO_NAV} shrink-0 whitespace-nowrap py-2 transition-colors`}
                   style={{ color: isActive ? "var(--text)" : "var(--text-muted)" }}
                 >
                   {item.label}
-                </Link>
+                </a>
               );
             })}
           </div>

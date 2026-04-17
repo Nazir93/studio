@@ -36,12 +36,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       </main>
       <Footer />
       <MobileBottomNav />
-      {/* Отступ под фиксированный таббар + home indicator */}
-      <div
-        className="shrink-0 lg:hidden"
-        style={{ height: "calc(3.5rem + env(safe-area-inset-bottom, 0px))" }}
-        aria-hidden
-      />
     </>
   );
 }

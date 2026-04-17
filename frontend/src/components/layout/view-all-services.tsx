@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 export function ViewAllServices() {
@@ -15,7 +14,7 @@ export function ViewAllServices() {
       }}
     >
       <div className="container mx-auto flex items-center justify-center py-3 sm:py-4">
-        <Link
+        <a
           href="/services"
           className="group flex items-center gap-1.5 font-matrix font-normal text-[9px] uppercase tracking-[0.1em] transition-colors duration-300 hover:text-[var(--accent)] sm:gap-2 sm:text-[10px] sm:tracking-[0.11em]"
           style={{ color: "var(--text-muted)" }}
@@ -25,7 +24,7 @@ export function ViewAllServices() {
             size={14}
             className="transition-transform duration-300 group-hover:translate-x-1"
           />
-        </Link>
+        </a>
       </div>
     </div>
   );

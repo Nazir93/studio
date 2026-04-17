@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Send } from "lucide-react";
 import { SOCIAL_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -89,13 +88,13 @@ export function ContactChannelsBar({ className, showContactsPageLink = true }: P
         <MaxMessengerIcon size={17} className="sm:h-[19px] sm:w-[19px]" />
       </a>
       {showContactsPageLink && (
-        <Link
+        <a
           href="/contacts"
           className="font-matrix text-[9px] uppercase tracking-[0.18em] underline underline-offset-[3px] transition-opacity hover:opacity-90 sm:text-[10px]"
           style={{ color: "var(--text-muted)" }}
         >
           Все контакты
-        </Link>
+        </a>
       )}
     </div>
   );

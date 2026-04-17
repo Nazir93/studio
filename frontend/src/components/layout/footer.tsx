@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { SITE_NAME, SITE_BRAND_MARK, SITE_DOMAIN, PHONE, PHONE_RAW, EMAIL, SOCIAL_LINKS } from "@/lib/constants";
@@ -20,7 +19,7 @@ export function Footer() {
     >
       {/* CTA Button */}
       <div className="container mx-auto py-8 sm:py-12 md:py-16">
-        <Link
+        <a
           href="/brief?source=footer"
           onMouseEnter={() => setBtnHovered(true)}
           onMouseLeave={() => setBtnHovered(false)}
@@ -62,7 +61,7 @@ export function Footer() {
               style={{ color: btnHovered ? "var(--bg)" : "var(--text)" }}
             />
           </span>
-        </Link>
+        </a>
       </div>
 
       {/* Название бренда — читаемо CODE1618 */}
@@ -81,12 +80,12 @@ export function Footer() {
         </p>
       </div>
 
-      {/* Bottom bar */}
+      {/* Bottom bar — на мобильных отступ под фикс. таббар, иначе © уезжает под Navbar */}
       <div
-        className="border-t"
+        className="border-t max-lg:pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))]"
         style={{ borderColor: "var(--border)" }}
       >
-        <div className="container mx-auto py-4 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 safe-bottom">
+        <div className="container mx-auto py-4 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 lg:safe-bottom">
           <p
             className="text-[10px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.15em]"
             style={{ color: "var(--text-subtle)" }}
@@ -128,12 +127,12 @@ export function Footer() {
                 MAX
               </a>
             )}
-            <Link
+            <a
               href="/privacy"
               className="transition-colors duration-200 hover:text-[var(--text)]"
             >
               Политика конфиденциальности · {SITE_DOMAIN}
-            </Link>
+            </a>
             <a
               href={`mailto:${EMAIL}`}
               className="transition-colors duration-200 hover:text-[var(--text)]"

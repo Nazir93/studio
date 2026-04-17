@@ -97,7 +97,9 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
     if (data.honeypot) return;
     try {
       const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
-      const response = await fetch("/api/leads", {
+      const leadsUrl =
+        typeof window !== "undefined" ? `${window.location.origin}/api/leads` : "/api/leads";
+      const response = await fetch(leadsUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -182,7 +184,10 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={`relative flex min-h-0 flex-1 flex-col ${gapClass} overflow-hidden`}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className={`relative flex min-h-0 flex-1 flex-col ${gapClass} max-md:overflow-visible md:overflow-hidden`}
+    >
       <div className="min-h-0 shrink-0">
         <label
           className={`${labelMb} block font-matrix uppercase tracking-[0.16em] sm:tracking-[0.18em] ${pageTight ? "text-[9px] sm:text-[10px]" : "text-[10px]"}`}
@@ -266,7 +271,7 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
         {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email.message}</p>}
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 flex-col md:flex-1 md:overflow-hidden">
         <label
           className={`${labelMb} block shrink-0 font-matrix uppercase tracking-[0.16em] sm:tracking-[0.18em] ${pageTight ? "text-[9px] sm:text-[10px]" : "text-[10px]"}`}
           style={{ color: "var(--text-subtle)" }}
@@ -274,11 +279,13 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
           Комментарий <span style={{ color: "var(--accent)" }}>*</span>
         </label>
         <textarea
-          rows={pageTight ? 2 : 4}
+          rows={pageTight ? 4 : 4}
           className={cn(
             controlSurface,
-            "min-h-0 flex-1 leading-relaxed",
-            pageTight ? "max-h-[4.25rem] resize-none sm:max-h-[5rem] md:max-h-[5.5rem]" : "min-h-[112px] resize-y"
+            "leading-relaxed",
+            pageTight
+              ? "min-h-[7rem] max-h-[min(52dvh,22rem)] overflow-y-auto resize-y sm:min-h-[5.5rem] sm:max-h-[12rem] md:min-h-0 md:max-h-none md:flex-1 md:resize-none"
+              : "min-h-[112px] flex-1 resize-y"
           )}
           placeholder="Сроки, бюджет, ссылка на ТЗ…"
           {...register("message")}

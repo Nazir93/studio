@@ -1,14 +1,13 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 function FillLink({ href, label }: { href: string; label: string }) {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <Link
+    <a
       href={href}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -33,7 +32,7 @@ function FillLink({ href, label }: { href: string; label: string }) {
         className="relative z-10 transition-colors duration-700"
         style={{ color: hovered ? "var(--bg)" : "var(--text)" }}
       />
-    </Link>
+    </a>
   );
 }
 

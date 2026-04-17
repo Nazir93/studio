@@ -1,5 +1,5 @@
 /**
- * JetBrains Mono (`font-matrix` / Tailwind `font-body`) — навигация в шапке и основной текст страниц.
+ * JetBrains Mono (`font-matrix` / Tailwind `font-body`) — самохост в `globals.css` (@fontsource), навигация в шапке и основной текст страниц.
  * AKONY — класс `font-heading` только на **одном главном h1** страницы (герой, титул раздела).
  * Все h2 и остальной UI — `font-body` / `font-matrix` (см. константы ниже).
  */

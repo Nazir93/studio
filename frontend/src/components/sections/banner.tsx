@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -8,11 +8,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useIsDesktopLg } from "@/lib/use-is-desktop-lg";
 import { useTheme } from "@/lib/theme-context";
 import { cn } from "@/lib/utils";
-/** Заголовок баннера: один ритм, без «разъезда» кеглей */
+import { NeuralNetworkCanvas } from "@/components/effects/neural-network-canvas";
+
+/** Заголовок баннера: один ритм; на lg+ крупнее, чем на планшете */
 const BANNER_GHOST_MEASURE_CLASS =
   "font-akony text-[clamp(0.95rem,3.8vw,2.2rem)] font-normal leading-[0.9] tracking-[0.02em] uppercase " +
   "sm:text-[clamp(1.05rem,3.2vw,2.5rem)] md:text-[clamp(1.12rem,2.6vw,2.85rem)] " +
-  "lg:text-[clamp(1.3rem,2.95vw,3.5rem)] xl:text-[clamp(1.35rem,2.8vw,3.75rem)]";
+  "lg:text-[clamp(1.45rem,3.15vw,4rem)] xl:text-[clamp(1.55rem,2.95vw,4.35rem)] 2xl:text-[clamp(1.65rem,2.85vw,4.85rem)]";
 
 const SLIDES = [
   {
@@ -87,7 +89,7 @@ const OFFER_LOGO = "/logo.png";
 /** CTA «Обсудить проект»: моб. — обычная кнопка; lg+ — круг с лого */
 function BannerOfferCircle() {
   return (
-    <Link
+    <a
       href="/brief?source=banner-offer"
       className="group relative z-[1] ml-auto block w-full max-w-sm shrink-0 overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.01] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:max-w-xs lg:ml-0 lg:-translate-x-3 lg:aspect-square lg:h-[min(11.5rem,22vw)] lg:w-[min(11.5rem,22vw)] lg:min-h-[10.5rem] lg:min-w-[10.5rem] lg:max-w-none xl:-translate-x-5"
       style={{
@@ -120,7 +122,7 @@ function BannerOfferCircle() {
           </span>
         </span>
       </div>
-    </Link>
+    </a>
   );
 }
 
@@ -181,144 +183,6 @@ const subtitleVariants = {
   },
   exit: { opacity: 0, transition: { duration: 0.2 } },
 };
-
-const DOT_GAP = 28;
-const DOT_BASE_R = 1;
-const DOT_MAX_R = 3.5;
-const DOT_BASE_A = 0.07;
-const DOT_MAX_A = 0.45;
-const LENS_RADIUS = 110;
-
-function DotGrid() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -9999, y: -9999 });
-  const smoothMouseRef = useRef({ x: -9999, y: -9999 });
-  const rafRef = useRef(0);
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    mouseRef.current = { x: -9999, y: -9999 };
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const parent = canvas.parentElement;
-    if (!parent) return;
-
-    parent.addEventListener("mousemove", handleMouseMove);
-    parent.addEventListener("mouseleave", handleMouseLeave);
-
-    const dpr = window.devicePixelRatio || 1;
-    let W = 0;
-    let H = 0;
-
-    const resize = () => {
-      W = canvas.offsetWidth;
-      H = canvas.offsetHeight;
-      canvas.width = W * dpr;
-      canvas.height = H * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-    resize();
-
-    const isDark = () => {
-      const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
-      return bg === "#0A0A0A" || bg === "#0a0a0a" || bg.includes("10,10,10");
-    };
-
-    const draw = () => {
-      const sm = smoothMouseRef.current;
-      const tm = mouseRef.current;
-      sm.x += (tm.x - sm.x) * 0.15;
-      sm.y += (tm.y - sm.y) * 0.15;
-
-      ctx.clearRect(0, 0, W, H);
-
-      const dark = isDark();
-      const cols = Math.ceil(W / DOT_GAP) + 1;
-      const rows = Math.ceil(H / DOT_GAP) + 1;
-      const offsetX = (W - (cols - 1) * DOT_GAP) / 2;
-      const offsetY = (H - (rows - 1) * DOT_GAP) / 2;
-
-      const mx = sm.x;
-      const my = sm.y;
-      const lr2 = LENS_RADIUS * LENS_RADIUS;
-
-      for (let row = 0; row < rows; row++) {
-        const py = offsetY + row * DOT_GAP;
-        const dy = py - my;
-        const dy2 = dy * dy;
-
-        if (dy2 > lr2 + DOT_GAP * DOT_GAP * 4) {
-          for (let col = 0; col < cols; col++) {
-            const px = offsetX + col * DOT_GAP;
-            ctx.globalAlpha = DOT_BASE_A;
-            ctx.beginPath();
-            ctx.arc(px, py, DOT_BASE_R, 0, Math.PI * 2);
-            ctx.fillStyle = dark ? "#ffffff" : "#000000";
-            ctx.fill();
-          }
-          continue;
-        }
-
-        for (let col = 0; col < cols; col++) {
-          const px = offsetX + col * DOT_GAP;
-          const dx = px - mx;
-          const dist2 = dx * dx + dy2;
-
-          let r = DOT_BASE_R;
-          let a = DOT_BASE_A;
-
-          if (dist2 < lr2) {
-            const dist = Math.sqrt(dist2);
-            const t = 1 - dist / LENS_RADIUS;
-            const ease = t * t * (3 - 2 * t);
-            r = DOT_BASE_R + (DOT_MAX_R - DOT_BASE_R) * ease;
-            a = DOT_BASE_A + (DOT_MAX_A - DOT_BASE_A) * ease;
-          }
-
-          ctx.globalAlpha = a;
-          ctx.beginPath();
-          ctx.arc(px, py, r, 0, Math.PI * 2);
-          ctx.fillStyle = dark ? "#ffffff" : "#000000";
-          ctx.fill();
-        }
-      }
-
-      ctx.globalAlpha = 1;
-      rafRef.current = requestAnimationFrame(draw);
-    };
-
-    rafRef.current = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      parent.removeEventListener("mousemove", handleMouseMove);
-      parent.removeEventListener("mouseleave", handleMouseLeave);
-      ro.disconnect();
-    };
-  }, [handleMouseMove, handleMouseLeave]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="pointer-events-none absolute inset-0 z-[2] h-full w-full"
-    />
-  );
-}
 
 export function BannerSection() {
   const router = useRouter();
@@ -393,8 +257,8 @@ export function BannerSection() {
         }}
       />
 
-      {/* Интерактивная сетка точек */}
-      <DotGrid />
+      {/* Нейросеть на canvas — как на /services/ai-automation */}
+      <NeuralNetworkCanvas />
 
       {/* ===== CONTENT ===== */}
       <div className="relative z-[10] flex h-full min-h-0 flex-col justify-between">
@@ -631,7 +495,6 @@ export function BannerSection() {
             <Link
               key={slide.num}
               href={slide.href}
-              prefetch
               scroll
               onClick={() => setActiveIdx(i)}
               className="relative font-matrix text-[9px] sm:text-[10px] md:text-[11px] tracking-[0.08em] sm:tracking-[0.12em] uppercase px-2.5 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 transition-all duration-400"

@@ -59,14 +59,14 @@ export function BriefRequestSection() {
       <TerminalWindow
         titleBar={titleBar}
         scrollableContent={false}
-        className="flex min-h-[min(70vh,32rem)] min-w-0 flex-1 flex-col overflow-hidden text-[10px] sm:min-h-0 sm:text-[11px] md:flex-1"
-        innerClassName="!flex !min-h-0 !min-w-0 !flex-1 !flex-col !overflow-y-auto !overflow-x-hidden md:!overflow-hidden !p-2 sm:!p-3 md:!p-4"
+        className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden text-[10px] sm:text-[11px] md:flex-1"
+        innerClassName="!flex !min-h-0 !min-w-0 !flex-1 !flex-col !overflow-x-hidden !p-2 sm:!p-3 md:!p-4 max-md:!overflow-y-visible md:!overflow-hidden md:!overflow-y-auto"
       >
         <p className="mb-1.5 shrink-0 font-mono text-[9px] leading-tight sm:text-[10px]" style={{ color: "var(--text-subtle)" }}>
           # Тема и комментарий обязательны.
         </p>
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col md:overflow-hidden">
           <Suspense fallback={<FormFallback />}>
             <BriefFormWithSource />
           </Suspense>

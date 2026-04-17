@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Send, Sun, Moon } from "lucide-react";
 import { SOCIAL_LINKS, PHONE, PHONE_RAW, EMAIL } from "@/lib/constants";
@@ -82,15 +81,17 @@ export function DesktopSideNav({ visible }: { visible: boolean }) {
           }}
         >
           <div className="container mx-auto flex items-center justify-between py-3">
-            <Link href="/" className="relative w-20 h-8 sm:w-24 sm:h-9 shrink-0 flex items-center">
+            <a href="/" className="flex h-8 shrink-0 items-center sm:h-9">
               <Image
                 src="/logo.png"
                 alt="CODE1618"
-                fill
-                className="object-contain object-left"
-                sizes="(max-width: 640px) 80px, 96px"
+                width={200}
+                height={80}
+                priority
+                className="h-8 w-auto max-w-[5rem] object-contain object-left sm:h-9 sm:max-w-[6rem]"
+                sizes="96px"
               />
-            </Link>
+            </a>
 
             <div className={`flex items-center gap-3 ${FONT_UI_MONO_CONTACT}`} style={{ color: "var(--text-muted)" }}>
               <a href={`tel:${PHONE_RAW}`} className="hover:opacity-100 transition-opacity">{PHONE}</a>
@@ -125,7 +126,7 @@ export function DesktopSideNav({ visible }: { visible: boolean }) {
                         }}
                       >
                         {section.items.map((item) => (
-                          <Link
+                          <a
                             key={item.href}
                             href={item.href}
                             onClick={() => setOpenSection(null)}
@@ -141,7 +142,7 @@ export function DesktopSideNav({ visible }: { visible: boolean }) {
                             }}
                           >
                             {item.label}
-                          </Link>
+                          </a>
                         ))}
                       </div>
                     </div>
@@ -223,7 +224,7 @@ export function DesktopSideNav({ visible }: { visible: boolean }) {
             )}
           </div>
 
-          <Link
+          <a
             href="/brief?source=side-nav"
             onMouseEnter={() => setBtnHovered(true)}
             onMouseLeave={() => setBtnHovered(false)}
@@ -244,7 +245,7 @@ export function DesktopSideNav({ visible }: { visible: boolean }) {
                 style={{ transform: btnHovered ? "rotate(90deg) translateX(2px)" : "rotate(90deg)" }}
               />
             </span>
-          </Link>
+          </a>
 
           <div
             className="h-2 w-2 shrink-0 rounded-full transition-colors duration-500"

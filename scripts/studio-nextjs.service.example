@@ -1,5 +1,8 @@
 # Скопировать в /etc/systemd/system/studio-nextjs.service
 # Пользователь и пути подставить свои (ниже — пример для /opt/studio)
+#
+# После каждого npm run build от root: дать User запись в кэш next/image:
+#   sudo chown -R www-data:www-data /opt/studio/frontend/.next/standalone
 
 [Unit]
 Description=Studio Next.js (standalone)

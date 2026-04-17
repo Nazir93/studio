@@ -25,3 +25,25 @@ export function darkTitleFilter(hovered: boolean): string {
     ? "drop-shadow(0 3px 14px color-mix(in srgb, var(--text) 22%, transparent)) drop-shadow(0 0 28px color-mix(in srgb, var(--text) 18%, transparent))"
     : "none";
 }
+
+/** «Что умеем»: при hover — чёрный кегль + светлая обводка/неон, одинаково день и ночь */
+const HOVER_BLACK = "#000000";
+
+export function capabilitiesHoverTitleColor(hovered: boolean): string {
+  return hovered ? HOVER_BLACK : "var(--text)";
+}
+
+export function capabilitiesHoverCharShadow(hovered: boolean): string {
+  if (!hovered) return "none";
+  return "0 0 4px rgba(255,255,255,0.95), 0 0 10px rgba(255,255,255,0.9), 0 0 22px rgba(255,255,255,0.65), 0 0 36px rgba(255,255,255,0.4), 0 1px 0 rgba(255,255,255,0.35)";
+}
+
+export function capabilitiesHoverTitleFilter(hovered: boolean): string {
+  if (!hovered) return "none";
+  return "drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 22px rgba(255,255,255,0.55)) drop-shadow(0 2px 8px rgba(255,255,255,0.4))";
+}
+
+export function capabilitiesHoverSubtitleShadow(hovered: boolean): string {
+  if (!hovered) return "none";
+  return "0 0 6px rgba(255,255,255,0.9), 0 0 14px rgba(255,255,255,0.45)";
+}

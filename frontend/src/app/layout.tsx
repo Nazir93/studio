@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { Inter, JetBrains_Mono, Montserrat } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import { SiteShell } from "@/components/layout/site-shell";
 import { ThemeProvider } from "@/lib/theme-context";
 import { ModalProvider } from "@/lib/modal-context";
@@ -20,13 +20,6 @@ const interBody = Inter({
   subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-body",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "700"],
-  variable: "--font-matrix",
   display: "swap",
 });
 
@@ -122,7 +115,7 @@ export default function RootLayout({
     <html
       lang="ru"
       suppressHydrationWarning
-      className={`${akonyMain.variable} ${interBody.variable} ${jetbrainsMono.variable} ${montserratPortfolio.variable} ${blackOpsOne.variable} ${metalLord.variable} ${redMolot.variable} ${spriteGraffiti.variable}`}
+      className={`${akonyMain.variable} ${interBody.variable} ${montserratPortfolio.variable} ${blackOpsOne.variable} ${metalLord.variable} ${redMolot.variable} ${spriteGraffiti.variable}`}
     >
       <head>
         <meta name="format-detection" content="telephone=no" />
