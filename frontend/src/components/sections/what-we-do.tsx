@@ -34,8 +34,6 @@ export const SHOWCASE_ITEMS = [
       "Альтернативная страница UX/UI: геометрия куба, дада-коллаж, оп-арт и пуантилизм — интерфейс как выставка.",
     href: "/services/ux-ui-design/artistic",
     icon: "palette" as const,
-    previewGradient:
-      "linear-gradient(165deg, #141210 0%, #3d4a6b 38%, #4a3428 72%, #0c0b0a 100%)",
   },
 ] as const;
 
@@ -52,7 +50,6 @@ function IconGlyph({ item }: { item: ShowcaseItem }) {
 function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; previewVideosEnabled: boolean }) {
   const hasVideo = "previewVideo" in item && item.previewVideo;
   const showVideo = hasVideo && previewVideosEnabled;
-  const hasGradient = "previewGradient" in item && item.previewGradient;
 
   return (
     <Link
@@ -84,16 +81,6 @@ function ShowcaseCell({ item, previewVideosEnabled }: { item: ShowcaseItem; prev
           />
           <div
             className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[color-mix(in_srgb,var(--bg-secondary)_88%,transparent)] via-[color-mix(in_srgb,var(--bg)_40%,transparent)] to-[color-mix(in_srgb,var(--bg-secondary)_92%,transparent)] opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100"
-            aria-hidden
-          />
-        </>
-      ) : null}
-
-      {hasGradient ? (
-        <>
-          <div className="pointer-events-none absolute inset-0 z-0" style={{ background: item.previewGradient }} aria-hidden />
-          <div
-            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[color-mix(in_srgb,var(--bg)_35%,transparent)] via-transparent to-[color-mix(in_srgb,var(--bg)_70%,transparent)]"
             aria-hidden
           />
         </>

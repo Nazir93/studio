@@ -1,6 +1,6 @@
 /**
  * Навигация шапки (fullscreen-меню, desktop top bar, боковая панель).
- * Пункты: кейсы, услуги, ИИ/автоматизация, новости, обсудить проект.
+ * Пункты: кейсы, услуги, ИИ/автоматизация, новости, контакты.
  */
 
 import { PORTFOLIO_SECTORS } from "@/lib/portfolio-sectors";
@@ -18,7 +18,7 @@ export const HEADER_TOP_LINKS: NavItem[] = [
   { href: "/services", label: "Услуги" },
   { href: "/services/ai-automation", label: "ИИ и автоматизация" },
   { href: "/blog", label: "Новости" },
-  { href: "/brief?source=header", label: "Проект" },
+  { href: "/contacts", label: "Контакты" },
 ];
 
 export const NAV_SECTIONS: NavSection[] = [
@@ -56,7 +56,7 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [{ href: "/blog", label: "Блог студии" }],
   },
   {
-    label: "Проект",
+    label: "Связь",
     items: [
       { href: "/contacts", label: "Контакты" },
       { href: "/brief?source=nav", label: "Обсудить проект" },

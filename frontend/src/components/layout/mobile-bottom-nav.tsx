@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { FONT_UI_MONO_NAV } from "@/lib/ui-typography";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 /** pointer-events-none: иначе на iOS/WebKit длинные штрихи SVG (особенно у «Портфолио») ломают hit-test у <Link> */
 const NAV_ITEMS = [
@@ -52,11 +54,31 @@ const NAV_ITEMS = [
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  /** Скрываем бар, когда в зоне видимости футер — не перекрывает нижний контент */
+  const [footerVisible, setFooterVisible] = useState(false);
+
+  useEffect(() => {
+    const footer = document.getElementById("site-footer");
+    if (!footer) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        setFooterVisible(entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: "0px 0px 48px 0px" }
+    );
+    io.observe(footer);
+    return () => io.disconnect();
+  }, [pathname]);
 
   return (
     <nav
-      className="mobile-bottom-nav-shell fixed bottom-0 left-0 right-0 z-50 border-t safe-bottom lg:hidden"
+      className={cn(
+        "mobile-bottom-nav-shell fixed bottom-0 left-0 right-0 z-50 border-t safe-bottom lg:hidden",
+        "transition-[transform,opacity] duration-300 ease-out",
+        footerVisible && "pointer-events-none translate-y-full opacity-0"
+      )}
       style={{ borderColor: "var(--border)" }}
+      aria-hidden={footerVisible}
     >
       <div className="flex items-stretch justify-around">
         {NAV_ITEMS.map((item) => {

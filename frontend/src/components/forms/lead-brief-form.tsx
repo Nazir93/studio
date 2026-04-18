@@ -5,11 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, CheckCircle2, ChevronDown, Check } from "lucide-react";
+import { Loader2, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { z } from "zod";
 import { leadFormSchema } from "@/lib/schemas";
 import { PHONE, PHONE_RAW } from "@/lib/constants";
+import { PORTFOLIO_SECTORS } from "@/lib/portfolio-sectors";
 
 const contactFormSchema = leadFormSchema
   .extend({
@@ -22,10 +23,10 @@ const contactFormSchema = leadFormSchema
 
 export type LeadBriefFormValues = z.infer<typeof contactFormSchema>;
 
+/** Темы как категории кейсов (портфолио) + общие пункты */
 const SERVICE_OPTIONS: { value: string }[] = [
+  ...PORTFOLIO_SECTORS.map((s) => ({ value: s.label })),
   { value: "Сайт, лендинг, корпоративный портал" },
-  { value: "Электромонтаж, СКС, умный дом, акустика, видеонаблюдение" },
-  { value: "UX/UI, дизайн интерфейсов" },
   { value: "Автоматизация, ИИ, интеграции" },
   { value: "Выделенная команда / аутстафф" },
   { value: "Консультация — помогите определиться с задачей" },
@@ -33,7 +34,7 @@ const SERVICE_OPTIONS: { value: string }[] = [
 ];
 
 export function serviceDefaultForHint(hint: string | null): string {
-  if (hint === "development") return SERVICE_OPTIONS[0].value;
+  if (hint === "development") return "Сайт, лендинг, корпоративный портал";
   if (hint === "outstaff") return "Выделенная команда / аутстафф";
   return "";
 }
@@ -158,32 +159,19 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
   if (done && variant === "page") {
     return (
       <div
-        className="flex min-h-0 flex-1 flex-col justify-center rounded-lg border px-4 py-6 text-center sm:px-6 sm:py-8"
+        className="flex min-h-0 flex-1 flex-col justify-center rounded-lg border px-4 py-8 text-center sm:px-6 sm:py-10"
         style={{ borderColor: "var(--border)", backgroundColor: "color-mix(in srgb, var(--text) 3%, transparent)" }}
       >
-        <CheckCircle2 className="mx-auto h-10 w-10 sm:h-12 sm:w-12" style={{ color: "var(--accent)" }} aria-hidden />
-        <p className="mt-3 font-heading text-base tracking-tight sm:text-lg" style={{ color: "var(--text)" }}>
-          Заявка отправлена
+        <p className="mx-auto max-w-lg font-body text-sm leading-relaxed sm:text-base" style={{ color: "var(--text)" }}>
+          Спасибо за заявку. Наш инженер скоро с вами свяжется.
         </p>
-        <p className="mt-1.5 max-w-md mx-auto font-body text-xs leading-relaxed sm:text-sm" style={{ color: "var(--text-muted)" }}>
-          Свяжемся по указанным контактам. Срочно — звоните или Telegram.
-        </p>
-        <div className="mt-5 flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center border px-6 py-3 font-matrix text-[10px] uppercase tracking-[0.2em] transition-opacity hover:opacity-90 sm:text-xs"
-            style={{ borderColor: "var(--accent)", color: "var(--text)" }}
-          >
-            На главную
-          </Link>
-          <Link
-            href="/contacts"
-            className="font-matrix text-[10px] uppercase tracking-[0.18em] underline underline-offset-2 sm:text-xs"
-            style={{ color: "var(--text-muted)" }}
-          >
-            Контакты
-          </Link>
-        </div>
+        <Link
+          href="/"
+          className="mt-8 font-matrix text-[10px] uppercase tracking-[0.2em] underline underline-offset-4 transition-opacity hover:opacity-90 sm:text-xs"
+          style={{ color: "var(--text-muted)" }}
+        >
+          На главную
+        </Link>
       </div>
     );
   }

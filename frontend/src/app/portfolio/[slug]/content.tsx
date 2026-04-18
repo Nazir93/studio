@@ -119,9 +119,11 @@ function PortfolioRasterImg({
     const img = imgRef.current;
     const container = containerRef.current;
     if (!img?.naturalWidth || !container) return;
+    const parentW = container.clientWidth;
+    /** Пока контейнер без ширины (первый кадр layout), не ставим maxWidth — иначе 0px и «пустые» картинки */
+    if (parentW < 2) return;
     const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
     const maxCssPx = img.naturalWidth / dpr;
-    const parentW = container.clientWidth;
     img.style.maxWidth = `${Math.min(parentW, maxCssPx)}px`;
   }, []);
 

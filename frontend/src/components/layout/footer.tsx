@@ -14,6 +14,7 @@ export function Footer() {
 
   return (
     <footer
+      id="site-footer"
       className={cn("relative", pathname === "/" && "lg:pr-[60px]")}
       style={{ backgroundColor: "var(--bg)", borderTop: "1px solid var(--border)" }}
     >

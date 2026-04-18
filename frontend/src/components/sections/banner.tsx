@@ -89,8 +89,10 @@ const OFFER_LOGO = "/logo.png";
 /** CTA «Обсудить проект»: моб. — обычная кнопка; lg+ — круг с лого */
 function BannerOfferCircle() {
   return (
-    <a
+    <Link
       href="/brief?source=banner-offer"
+      prefetch
+      scroll
       className="group relative z-[1] ml-auto block w-full max-w-sm shrink-0 overflow-hidden rounded-full border text-center transition-[border-color,box-shadow,transform] hover:scale-[1.01] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:max-w-xs lg:ml-0 lg:-translate-x-3 lg:aspect-square lg:h-[min(11.5rem,22vw)] lg:w-[min(11.5rem,22vw)] lg:min-h-[10.5rem] lg:min-w-[10.5rem] lg:max-w-none xl:-translate-x-5"
       style={{
         borderColor: "var(--border)",
@@ -122,7 +124,7 @@ function BannerOfferCircle() {
           </span>
         </span>
       </div>
-    </a>
+    </Link>
   );
 }
 

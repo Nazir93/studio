@@ -6,12 +6,28 @@ import { ArrowRight } from "lucide-react";
 
 const GALLERY_PAGES = [
   {
-    slug: "film-reel",
+    href: "/gallery/film-reel",
     num: "01",
     title: "КИНОПЛЕНКА",
     subtitle: "Интерактивное видео + скролл-контрол",
     desc: "Скролл переключает текстовые кадры — как плёнку. Таймкоды, глитч между сценами, сюрприз посередине.",
     tags: ["Киноплёнка", "Текст", "Canvas", "Glitch"],
+  },
+  {
+    href: "/services/ux-ui-design/ancient",
+    num: "02",
+    title: "ДРЕВНОСТЬ",
+    subtitle: "Иероглифы · пирамиды · мистика",
+    desc: "Палео-контакт, Розеттский камень, кипу, каналы орошения — интерактивная витрина дизайна и типографики.",
+    tags: ["UX/UI", "Интерактив", "Типографика"],
+  },
+  {
+    href: "/services/ux-ui-design/artistic",
+    num: "03",
+    title: "ХУДОЖЕСТВЕННЫЕ СТИЛИ",
+    subtitle: "Кубизм · дада · оп-арт · пуантилизм",
+    desc: "Геометрия куба, дада-коллаж, оп-арт и пуантилизм — интерфейс как выставка, демо подхода студии.",
+    tags: ["Кубизм", "Оп-арт", "Motion", "UI"],
   },
 ];
 
@@ -48,8 +64,8 @@ export function GalleryContent() {
       <section className="px-4 pb-20 md:px-8 md:pb-28 lg:px-16">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {GALLERY_PAGES.map((page, i) => (
-            <AnimatedBlock key={page.slug} delay={i * 100}>
-              <Link href={`/gallery/${page.slug}`}
+            <AnimatedBlock key={page.href} delay={i * 100}>
+              <Link href={page.href}
                 className="group flex h-full flex-col justify-between p-6 md:p-8 transition-colors duration-300"
                 style={{ border: "1px solid var(--border)" }}
               >

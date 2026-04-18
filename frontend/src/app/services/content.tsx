@@ -46,7 +46,7 @@ function ServiceCard({
         setVisible(true);
         observer.disconnect();
       },
-      { threshold: 0.08, rootMargin: "140px 0px" }
+      { threshold: 0.08, rootMargin: "120px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -55,91 +55,55 @@ function ServiceCard({
   return (
     <div
       ref={ref}
-      className="transition-all duration-700 ease-out"
+      className="transition-all duration-500 ease-out"
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(28px)",
-        transitionDelay: `${index * 80}ms`,
+        transform: visible ? "translateY(0)" : "translateY(16px)",
+        transitionDelay: `${index * 50}ms`,
       }}
     >
       <Link
         href={service.slug}
         data-cursor-word="смотреть"
-        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--bg-secondary)_90%,var(--bg)_10%)] transition-all duration-500 hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--text)_20%,transparent)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_16px_48px_rgba(0,0,0,0.4)]"
+        className="group block rounded-xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--bg-secondary)_88%,var(--bg)_12%)] px-4 py-4 transition-all duration-300 hover:border-[color-mix(in_srgb,var(--text)_18%,var(--border))] hover:bg-[color-mix(in_srgb,var(--bg-secondary)_95%,var(--bg)_5%)] sm:px-5 sm:py-5 md:rounded-2xl md:px-6 md:py-5"
       >
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-[3] h-px opacity-80 transition-opacity group-hover:opacity-100"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--accent) 45%, transparent) 45%, color-mix(in srgb, var(--text) 25%, transparent) 55%, transparent 100%)",
-          }}
-          aria-hidden
-        />
-
-        {/* Превью: единый вид для всех услуг (без видео) */}
-        <div className="relative aspect-[16/10] overflow-hidden border-b border-[var(--border)]">
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `
-                radial-gradient(ellipse 85% 65% at 18% 28%, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 52%),
-                radial-gradient(ellipse 75% 55% at 88% 78%, color-mix(in srgb, var(--text) 8%, transparent) 0%, transparent 48%),
-                linear-gradient(168deg, color-mix(in srgb, var(--bg-secondary) 94%, var(--bg) 6%) 0%, var(--bg) 100%)
-              `,
-            }}
-            aria-hidden
-          />
-          <div
-            className="absolute inset-0 opacity-[0.4] dark:opacity-[0.22]"
-            style={{
-              backgroundImage:
-                "radial-gradient(color-mix(in srgb, var(--text) 18%, transparent) 1px, transparent 1px)",
-              backgroundSize: "16px 16px",
-            }}
-            aria-hidden
-          />
-          <span
-            className="absolute left-4 top-3 z-[2] font-matrix text-[10px] uppercase tracking-[0.28em] tabular-nums"
-            style={{ color: "var(--text-subtle)" }}
-          >
-            {num}
-          </span>
-          <div className="absolute inset-0 z-[1] flex items-center justify-center">
+        <div className="flex gap-3 sm:gap-4">
+          <div className="flex shrink-0 flex-col items-center gap-2 pt-0.5 sm:items-start">
             <span
-              className="flex h-[3.85rem] w-[3.85rem] items-center justify-center rounded-2xl border bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_36px_rgba(0,0,0,0.07)] backdrop-blur-[3px] transition-all duration-500 group-hover:scale-[1.07] group-hover:border-[color-mix(in_srgb,var(--accent)_35%,var(--border))] group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_14px_44px_rgba(0,0,0,0.12)] dark:bg-[color-mix(in_srgb,var(--bg-secondary)_55%,transparent)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_10px_36px_rgba(0,0,0,0.35)] dark:group-hover:shadow-[0_14px_44px_rgba(0,0,0,0.5)]"
-              style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+              className="font-matrix text-[9px] uppercase tracking-[0.26em] tabular-nums sm:text-[10px]"
+              style={{ color: "var(--text-subtle)" }}
             >
-              <Icon
-                size={28}
-                strokeWidth={1.35}
-                className="transition-colors duration-300 group-hover:text-[var(--text)]"
-                aria-hidden
-              />
+              {num}
+            </span>
+            <span
+              className="flex h-9 w-9 items-center justify-center rounded-lg border sm:h-10 sm:w-10"
+              style={{
+                borderColor: "var(--border)",
+                color: "var(--text-muted)",
+                backgroundColor: "color-mix(in srgb, var(--bg) 50%, transparent)",
+              }}
+            >
+              <Icon size={19} strokeWidth={1.35} className="transition-colors group-hover:text-[var(--text)]" aria-hidden />
             </span>
           </div>
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[55%] bg-gradient-to-t from-[color-mix(in_srgb,var(--bg)_78%,transparent)] via-[color-mix(in_srgb,var(--bg)_20%,transparent)] to-transparent opacity-95"
-            aria-hidden
-          />
-        </div>
 
-        <div className="relative z-[2] flex flex-1 flex-col p-5 md:p-6">
-          <h2
-            className="font-akony text-lg uppercase leading-tight tracking-[0.08em] transition-colors duration-300 group-hover:text-[color-mix(in_srgb,var(--text)_92%,var(--accent)_8%)] md:text-xl"
-            style={{ color: "var(--text)" }}
-          >
-            {service.title}
-          </h2>
-          <p
-            className="mt-3 flex-1 font-body text-sm leading-relaxed md:text-[15px]"
-            style={{ color: "var(--text-muted)" }}
-          >
-            {service.shortDescription}
-          </p>
-
-          <div className="mt-5 flex items-center gap-2 font-matrix text-[9px] uppercase tracking-[0.2em] text-[var(--text-muted)] transition-colors group-hover:text-[var(--accent)] md:text-[10px]">
-            Подробнее
-            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+          <div className="min-w-0 flex-1">
+            <h2
+              className="font-akony text-[0.95rem] uppercase leading-snug tracking-[0.07em] transition-colors duration-300 sm:text-base md:text-[1.05rem]"
+              style={{ color: "var(--text)" }}
+            >
+              {service.title}
+            </h2>
+            <p
+              className="mt-2 font-body text-[13px] leading-relaxed sm:text-sm md:text-[15px]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              {service.shortDescription}
+            </p>
+            <div className="mt-3 flex items-center gap-2 font-matrix text-[9px] uppercase tracking-[0.2em] text-[var(--text-subtle)] transition-colors group-hover:text-[var(--accent)] sm:mt-3.5 sm:text-[10px]">
+              Подробнее
+              <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+            </div>
           </div>
         </div>
       </Link>
@@ -173,7 +137,7 @@ export function ServicesPageContent() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:gap-6">
+        <div className="mx-auto grid max-w-4xl grid-cols-1 gap-3 sm:gap-3.5 md:max-w-5xl lg:max-w-6xl lg:grid-cols-2 lg:gap-x-6 lg:gap-y-3.5">
           {SERVICES.map((service, i) => (
             <ServiceCard key={service.id} service={service} index={i} />
           ))}
