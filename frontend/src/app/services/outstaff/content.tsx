@@ -19,7 +19,7 @@ function HeroSection() {
         </p>
 
         <h1
-          className="mt-4 max-w-4xl font-heading text-xl leading-[1.1] tracking-tight sm:text-2xl md:text-3xl lg:text-[2rem]"
+          className="mt-4 max-w-4xl min-w-0 font-heading services-page-h1 tracking-tight"
           style={{ color: "var(--text)" }}
         >
           разработчики — дизайнеры — аналитики — тестеры

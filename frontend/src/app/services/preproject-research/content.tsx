@@ -42,7 +42,7 @@ export function PreprojectResearchContent() {
           <p className="font-matrix text-[10px] uppercase tracking-[0.35em]" style={{ color: "var(--text-muted)" }}>
             Об услуге
           </p>
-          <h1 className="mt-3 font-heading text-xl leading-[1.1] tracking-tight sm:text-2xl md:text-3xl lg:text-[2rem]">
+          <h1 className="mt-3 font-heading services-page-h1 tracking-tight">
             Предпроектное исследование
           </h1>
           <p className="font-body mt-6 text-base leading-relaxed md:text-lg" style={{ color: "var(--text-muted)" }}>

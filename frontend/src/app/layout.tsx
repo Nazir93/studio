@@ -61,10 +61,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
-  ],
+  /** По умолчанию сайт в тёмной теме; цвет панели браузера под тёмный фон */
+  themeColor: "#0a0a0a",
 };
 
 export const metadata: Metadata = {
@@ -114,10 +112,16 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
+      data-theme="dark"
       suppressHydrationWarning
       className={`${akonyMain.variable} ${interBody.variable} ${montserratPortfolio.variable} ${blackOpsOne.variable} ${metalLord.variable} ${redMolot.variable} ${spriteGraffiti.variable}`}
     >
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k='code1618-theme';var s=localStorage.getItem(k);var t=s==='light'||s==='dark'?s:'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`,
+          }}
+        />
         <meta name="format-detection" content="telephone=no" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <JsonLd />

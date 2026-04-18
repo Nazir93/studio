@@ -13,9 +13,9 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "light",
+  theme: "dark",
   toggleTheme: () => {},
-  isDark: false,
+  isDark: true,
 });
 
 function readStoredTheme(): Theme | null {
@@ -39,11 +39,11 @@ function applyDom(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useLayoutEffect(() => {
     const stored = readStoredTheme();
-    const initial = stored ?? "light";
+    const initial = stored ?? "dark";
     setTheme(initial);
     applyDom(initial);
   }, []);

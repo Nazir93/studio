@@ -87,7 +87,7 @@ function HeroSection() {
           Тестирование
         </p>
         <h1
-          className="mt-4 max-w-5xl font-heading text-xl leading-[1.1] tracking-tight sm:text-2xl md:text-3xl lg:text-[2rem]"
+          className="mt-4 max-w-5xl min-w-0 font-heading services-page-h1 tracking-tight"
           style={{ color: "var(--text)" }}
         >
           сайты — приложения — ПО — API

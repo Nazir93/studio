@@ -16,7 +16,7 @@ export function PersonalCabinetContent() {
       {/* Hero */}
       <section className="border-b px-4 py-14 md:px-8 md:py-20 lg:px-12" style={{ borderColor: "var(--border)" }}>
         <div className="mx-auto max-w-[1100px]">
-          <h1 className="max-w-[24ch] font-heading text-xl leading-[1.1] tracking-tight sm:text-2xl md:text-3xl lg:text-[2rem]">
+          <h1 className="max-w-[24ch] min-w-0 font-heading services-page-h1 tracking-tight">
             Разработка личного кабинета для сотрудников и клиентов
           </h1>
 

@@ -44,6 +44,7 @@ export async function JsonLd() {
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Тестирование и QA" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "ИИ и автоматизация (Monday.com, AI-сотрудники)" } },
         { "@type": "Offer", itemOffered: { "@type": "Service", name: "Личные кабинеты и порталы" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "Разработка смарт-контрактов (Web3, EVM)" } },
       ],
     },
   };

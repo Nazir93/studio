@@ -272,7 +272,7 @@ function HeroSection() {
         <p className="font-matrix text-[10px] uppercase tracking-[0.4em] md:text-xs" style={{ color: "var(--text-muted)" }}>
           Реклама и продвижение
         </p>
-        <h1 className="mt-4 max-w-4xl font-heading text-xl leading-[1.1] tracking-tight sm:text-2xl md:text-3xl lg:text-[2rem]" style={{ color: "var(--text)" }}>
+        <h1 className="mt-4 max-w-4xl min-w-0 font-heading services-page-h1 tracking-tight" style={{ color: "var(--text)" }}>
           Привлекаем клиентов через digital-каналы
         </h1>
         <p className="font-body mt-6 max-w-2xl text-base leading-relaxed md:mt-8 md:text-lg" style={{ color: "var(--text-muted)" }}>

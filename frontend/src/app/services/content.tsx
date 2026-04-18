@@ -11,6 +11,7 @@ import {
   Code2,
   Users,
   Megaphone,
+  FileCode2,
   type LucideIcon,
 } from "lucide-react";
 import { SERVICES } from "@/lib/constants";
@@ -21,6 +22,7 @@ const SERVICE_ICONS: Record<(typeof SERVICES)[number]["icon"], LucideIcon> = {
   home: Home,
   network: Network,
   code: Code2,
+  fileCode: FileCode2,
   users: Users,
   megaphone: Megaphone,
 };
@@ -89,13 +91,13 @@ function ServiceCard({
 
           <div className="min-w-0 flex-1">
             <h2
-              className="font-akony text-[0.95rem] uppercase leading-snug tracking-[0.07em] transition-colors duration-300 sm:text-base md:text-[1.05rem]"
+              className="font-akony text-[0.9rem] uppercase leading-tight tracking-[0.07em] transition-colors duration-300 sm:text-[0.95rem] md:text-[1.05rem]"
               style={{ color: "var(--text)" }}
             >
-              {service.title}
+              {"listTitle" in service && service.listTitle ? service.listTitle : service.title}
             </h2>
             <p
-              className="mt-2 font-body text-[13px] leading-relaxed sm:text-sm md:text-[15px]"
+              className="mt-2 font-body text-[12px] leading-snug sm:text-[13px] md:text-[15px] md:leading-relaxed"
               style={{ color: "var(--text-muted)" }}
             >
               {service.shortDescription}
@@ -126,7 +128,7 @@ export function ServicesPageContent() {
             </span>
           </div>
           <h1
-            className="font-heading text-[clamp(1.2rem,3.8vw,2.75rem)] leading-[1.05] tracking-tight"
+            className="font-heading services-page-h1 tracking-tight"
             style={{ color: "var(--text)" }}
           >
             УСЛУГИ

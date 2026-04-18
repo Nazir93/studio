@@ -37,6 +37,7 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: "/services", label: "Все направления" },
       { href: "/services/development", label: "Сайты и разработка ПО" },
+      { href: "/services/smart-contracts", label: "Смарт-контракты" },
       { href: "/services/ux-ui-design", label: "UX/UI-дизайн" },
       { href: "/services/preproject-research", label: "Предпроект и Discovery" },
       { href: "/services/testing", label: "Тестирование" },

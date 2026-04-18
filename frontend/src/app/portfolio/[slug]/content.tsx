@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { PortfolioCase, PORTFOLIO_CASES } from "@/lib/portfolio-data";
 
 /** Кейсы: контент на всю ширину экрана с полями (без max-width у container) */
@@ -88,11 +89,7 @@ function PortfolioLightboxOverlay({
   );
 }
 
-/**
- * Растр без лишнего апскейла на Retina / при масштабе Windows:
- * ограничиваем CSS-ширину так, чтобы (ширина в CSS px × devicePixelRatio) не превышала naturalWidth.
- * Клик — полноэкранный просмотр исходного файла (качество как загружено в public).
- */
+/** Растр из /public: без JS-ограничения ширины (оно давало 0px и «пустые» кадры на части браузеров). Лайтбокс по клику. */
 function PortfolioRasterImg({
   src,
   alt,
@@ -108,63 +105,46 @@ function PortfolioRasterImg({
   fetchPriority?: "high" | "low" | "auto";
   loading?: "lazy" | "eager";
   decoding?: "async" | "auto" | "sync";
-  /** Показать полноэкранно по клику (тот же src) */
   lightbox?: boolean;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  const applyCrispWidth = useCallback(() => {
-    const img = imgRef.current;
-    const container = containerRef.current;
-    if (!img?.naturalWidth || !container) return;
-    const parentW = container.clientWidth;
-    /** Пока контейнер без ширины (первый кадр layout), не ставим maxWidth — иначе 0px и «пустые» картинки */
-    if (parentW < 2) return;
-    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
-    const maxCssPx = img.naturalWidth / dpr;
-    img.style.maxWidth = `${Math.min(parentW, maxCssPx)}px`;
-  }, []);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const ro = new ResizeObserver(() => applyCrispWidth());
-    ro.observe(container);
-    window.addEventListener("resize", applyCrispWidth);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", applyCrispWidth);
-    };
-  }, [applyCrispWidth]);
+  const openLightbox = () => setLightboxOpen(true);
 
   const imgEl = (
     /* eslint-disable-next-line @next/next/no-img-element */
     <img
-      ref={imgRef}
       src={src}
       alt={alt}
-      className={className}
+      className={cn("block h-auto w-full max-w-full min-w-0", className)}
       fetchPriority={fetchPriority}
       loading={loading}
       decoding={decoding}
-      onLoad={applyCrispWidth}
     />
   );
 
+  const lightboxTriggerClass =
+    "relative block w-full min-h-0 cursor-zoom-in border-0 bg-transparent p-0 text-left outline-none transition-opacity hover:opacity-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]";
+
   return (
     <>
-      <div ref={containerRef} className="relative w-full">
+      <div className="relative min-w-0 w-full">
         {lightbox ? (
-          <button
-            type="button"
-            className="relative w-full cursor-zoom-in border-0 bg-transparent p-0 text-left outline-none transition-opacity hover:opacity-[0.98] focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]"
-            onClick={() => setLightboxOpen(true)}
+          <div
+            role="button"
+            tabIndex={0}
+            className={lightboxTriggerClass}
+            onClick={openLightbox}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openLightbox();
+              }
+            }}
             aria-label="Открыть изображение в полном размере"
           >
             {imgEl}
-          </button>
+          </div>
         ) : (
           imgEl
         )}
@@ -258,9 +238,10 @@ function HeroCaseImage({ src, title, compact }: { src: string; title: string; co
         <PortfolioRasterImg
           src={src}
           alt={`${title} — интерфейс`}
-          className="mx-auto block h-auto max-h-[min(85vh,1100px)] w-auto object-contain object-center"
+          className="mx-auto max-h-[min(85vh,1100px)] object-contain object-center"
           decoding="async"
           fetchPriority="high"
+          loading="eager"
         />
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 h-14 md:h-20"
@@ -389,7 +370,7 @@ function ShowcasePhoto({
             <PortfolioRasterImg
               src={src}
               alt={label.trim() ? label : "Скриншот интерфейса"}
-              className="mx-auto block h-auto max-h-[min(88vh,1200px)] w-auto object-contain object-center"
+              className="mx-auto max-h-[min(88vh,1200px)] object-contain object-center"
               loading="lazy"
               decoding="async"
             />
@@ -437,7 +418,7 @@ function ShowcasePair({
             <PortfolioRasterImg
               src={leftSrc}
               alt={label ? `${label} — фрагмент слева` : "Скриншот слева"}
-              className="mx-auto block h-auto max-h-[min(80vh,1000px)] w-full object-contain object-center md:object-right"
+              className="mx-auto max-h-[min(80vh,1000px)] object-contain object-center md:object-right"
               loading="lazy"
               decoding="async"
             />
@@ -446,7 +427,7 @@ function ShowcasePair({
             <PortfolioRasterImg
               src={rightSrc}
               alt={label ? `${label} — фрагмент справа` : "Скриншот справа"}
-              className="mx-auto block h-auto max-h-[min(80vh,1000px)] w-full object-contain object-center md:object-left"
+              className="mx-auto max-h-[min(80vh,1000px)] object-contain object-center md:object-left"
               loading="lazy"
               decoding="async"
             />
@@ -598,7 +579,7 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
           {/* Title row */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
             <h1
-              className="font-heading text-[clamp(1.2rem,5.2vw,1.7rem)] sm:text-[clamp(1.28rem,3.8vw,1.75rem)] md:text-[clamp(1.35rem,2.85vw,1.65rem)] lg:text-[clamp(1.4rem,2.15vw,1.7rem)] xl:text-[clamp(1.42rem,1.75vw,1.75rem)] leading-[1.05] tracking-tight transition-all duration-1000 ease-out"
+              className="font-heading text-[clamp(0.95rem,4vw,1.45rem)] sm:text-[clamp(1.15rem,3.4vw,1.62rem)] md:text-[clamp(1.3rem,2.75vw,1.62rem)] lg:text-[clamp(1.35rem,2.1vw,1.68rem)] xl:text-[clamp(1.38rem,1.7vw,1.75rem)] leading-[1.06] tracking-tight transition-all duration-1000 ease-out"
               style={{
                 color: "var(--text)",
                 opacity: heroVisible ? 1 : 0,

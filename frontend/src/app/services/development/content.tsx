@@ -406,7 +406,7 @@ function HeroSection() {
       <div className="relative z-10 grid min-h-[90vh] grid-cols-1 lg:grid-cols-[1fr_1fr] px-4 py-20 md:px-8 lg:px-16">
         <div className="flex flex-col justify-center">
           <p className="font-matrix text-[10px] uppercase tracking-[0.4em] md:text-xs" style={{ color: "var(--text-muted)" }}>Разработка</p>
-          <h1 className="mt-4 max-w-xl font-heading text-xl leading-[1.1] tracking-tight sm:text-2xl md:text-3xl lg:text-[2rem]" style={{ color: "var(--text)" }}>
+          <h1 className="mt-4 max-w-xl min-w-0 font-heading services-page-h1 tracking-tight" style={{ color: "var(--text)" }}>
             Frontend — Backend — iOS — Android — API
           </h1>
           <p className="font-body mt-6 max-w-lg text-base leading-relaxed md:mt-8 md:text-lg" style={{ color: "var(--text-muted)" }}>

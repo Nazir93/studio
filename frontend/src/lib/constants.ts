@@ -97,6 +97,16 @@ export const SERVICES = [
     videoUrl: null as string | null,
   },
   {
+    id: "smart-contracts",
+    slug: "/services/smart-contracts",
+    title: "Смарт-контракты",
+    shortDescription:
+      "Solidity, тесты и аудит логики, деплой в EVM-сети, связка с фронтом и безопасные обновления.",
+    icon: "fileCode" as const,
+    coverImage: null as string | null,
+    videoUrl: null as string | null,
+  },
+  {
     id: "outstaff",
     slug: "/services/outstaff",
     title: "Аутстаф",
@@ -110,8 +120,10 @@ export const SERVICES = [
     id: "advertising",
     slug: "/services/advertising",
     title: "Реклама и продвижение",
+    /** Короткий заголовок в сетке /services — полное название на главной и в шапке раздела */
+    listTitle: "Реклама",
     shortDescription:
-      "Таргет, контекст, SEO, SMM — привлекаем клиентов через digital-каналы со сквозной аналитикой.",
+      "Таргет, контекст, SEO, SMM — заявки и сквозная аналитика по каналам.",
     icon: "megaphone" as const,
     coverImage: null as string | null,
     videoUrl: null as string | null,

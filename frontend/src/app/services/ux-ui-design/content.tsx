@@ -279,7 +279,7 @@ export function UxUiDesignContent() {
           <p className="font-matrix text-[10px] uppercase tracking-[0.35em] md:text-[11px]" style={{ color: "var(--text-muted)" }}>
             UX/UI-дизайн
           </p>
-          <h1 className="mt-4 max-w-[24ch] font-heading text-xl leading-[1.12] tracking-tight sm:text-2xl md:text-3xl lg:text-[2rem]" style={{ color: "var(--text)" }}>
+          <h1 className="mt-4 max-w-[24ch] min-w-0 font-heading services-page-h1 tracking-tight" style={{ color: "var(--text)" }}>
             Создаём удобные и эстетичные интерфейсы
           </h1>
           <p className="font-body mt-6 max-w-xl text-base leading-relaxed md:text-lg" style={{ color: "var(--text-muted)" }}>
@@ -388,10 +388,10 @@ export function UxUiDesignContent() {
             Что мы умеем и любим
           </p>
           <div className="mt-8 flex flex-col gap-2 md:mt-10 md:gap-3">
-            <h2 className="font-akony text-[clamp(1.05rem,4vw,3rem)] font-normal leading-[0.95] uppercase tracking-[0.02em] sm:text-[clamp(1.2rem,3.5vw,3rem)]" style={{ color: "var(--text)" }}>
+            <h2 className="font-akony text-[clamp(0.9rem,3.2vw,2.25rem)] font-normal leading-[0.95] uppercase tracking-[0.02em] sm:text-[clamp(1.05rem,4vw,3rem)] md:text-[clamp(1.2rem,3.5vw,3rem)]" style={{ color: "var(--text)" }}>
               дизайн
             </h2>
-            <h2 className="font-akony text-[clamp(1.05rem,4vw,3rem)] font-normal leading-[0.95] uppercase tracking-[0.02em] sm:text-[clamp(1.2rem,3.5vw,3rem)]"
+            <h2 className="font-akony text-[clamp(0.9rem,3.2vw,2.25rem)] font-normal leading-[0.95] uppercase tracking-[0.02em] sm:text-[clamp(1.05rem,4vw,3rem)] md:text-[clamp(1.2rem,3.5vw,3rem)]"
               style={{ color: "transparent", WebkitTextStroke: "1.5px color-mix(in srgb, var(--text) 30%, transparent)" }}>
               продукт
             </h2>
