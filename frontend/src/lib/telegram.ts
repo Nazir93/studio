@@ -34,7 +34,7 @@ export function userFacingTelegramHint(
  * После смены — деплой и `npm run build` на сервере.
  */
 const TELEGRAM_BOT_TOKEN = "8765604434:AAFHbAIr7EKg3VCMs5gGbIPYcKX9MOjcDh0";
-const TELEGRAM_CHAT_ID = "8765604434";
+const TELEGRAM_CHAT_ID = "-1002163952214";
 
 /** Доставка в Telegram; при ошибке смотрите telegramDescription и логи сервера */
 export async function sendTelegramNotification(message: string): Promise<TelegramSendResult> {
