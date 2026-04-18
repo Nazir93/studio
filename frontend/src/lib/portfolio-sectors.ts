@@ -10,6 +10,7 @@ export const PORTFOLIO_SECTORS = [
   { id: "manufacturing", label: "Производство" },
   { id: "industry", label: "Промышленность" },
   { id: "real-estate", label: "Недвижимость" },
+  { id: "commerce", label: "Коммерция" },
 ] as const;
 
 export type PortfolioSectorId = (typeof PORTFOLIO_SECTORS)[number]["id"];

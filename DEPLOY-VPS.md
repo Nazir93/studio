@@ -30,6 +30,41 @@ sudo systemctl status studio-nextjs --no-pager
 
 ---
 
+## Сайт на сервере без CSS / «голый» HTML (на localhost всё ок)
+
+**Причина:** в режиме **`output: "standalone"`** Next.js кладёт в **`.next/standalone`** только сервер. Стили и чанки лежат в **`.next/static`**; картинки и `favicon` — в **`public/`**. Их **докладывает** скрипт **`scripts/copy-standalone-assets.mjs`**, он вызывается **только** из **`npm run build`** (не из голого `next build`).
+
+**На сервере проверьте** (пути подставьте свои, ниже — как в примере):
+
+```bash
+cd /opt/studio/frontend
+# Должны существовать и быть непустыми:
+ls -la .next/standalone/.next/static/chunks 2>/dev/null | head -5
+ls -la .next/standalone/public 2>/dev/null | head -5
+```
+
+Если каталогов **нет** или **пусто** — пересоберите **из `frontend`**:
+
+```bash
+cd /opt/studio/frontend
+rm -rf .next
+npm ci
+npm run build
+```
+
+В логе сборки в конце должны быть строки **`[copy-standalone-assets] OK: public →`** и **`OK: .next/static →`**. Затем:
+
+```bash
+sudo chown -R www-data:www-data /opt/studio/frontend/.next/standalone
+sudo systemctl restart studio-nextjs
+```
+
+**Ещё проверьте:** в **`/etc/systemd/system/studio-nextjs.service`** у сервиса **`WorkingDirectory`** и **`ExecStart`** указывают на **`…/frontend/.next/standalone`** и **`server.js`** именно там, а не на старую копию проекта.
+
+После исправления в браузере сделайте **жёсткое обновление** (Ctrl+F5), чтобы не подтянуть старый HTML с прежними путями к `_next/static`.
+
+---
+
 ## Первая установка (один раз)
 
 **Пакеты и firewall**
@@ -95,11 +130,12 @@ sudo certbot --nginx -d code1618.ru -d www.code1618.ru
 | Рестарт | `sudo systemctl restart studio-nextjs` |
 | Проверка Nginx | `sudo nginx -t` |
 
-Заявки в Telegram: переменные в **`frontend/.env.production`** (если строки **пустые** — берутся значения из кода в `telegram.ts`). После правки — **`sudo systemctl restart studio-nextjs`**.
+Заявки в Telegram: **`TELEGRAM_BOT_TOKEN`** и **`chat_id`** задаются **только в коде** — **`frontend/src/lib/telegram.ts`**. Переменные окружения для бота **не читаются** (строки в `.env` на это не влияют). После смены токена — **`git pull`**, **`npm run build`**, **`chown`** на standalone, **`sudo systemctl restart studio-nextjs`**.
 
-- В **личку** боту обязательно **`/start`** иначе API вернёт «chat not found» / «bot was blocked».
-- Для **группы**: `TELEGRAM_CHAT_ID=-100…`, бот добавлен в группу и не удалён.
-- Не работает — смотрите лог: **`sudo journalctl -u studio-nextjs -n 100 --no-pager | grep -E 'TELEGRAM|LEAD'`** (там текст ошибки от Telegram).
+- Проверка: откройте **`/brief`**, отправьте форму — при успехе **`/spasibo`** и сообщение в Telegram.
+- Ошибка **503**: F12 → **Сеть** → запрос **`leads`** → **`hint`** / **`code`**; на сервере — **`journalctl`** (см. таблицу).
+- В **личку** боту **`/start`**; для **группы** укажите id вида **`-100…`** в **`telegram.ts`**, бот в группе.
+- Логи: **`sudo journalctl -u studio-nextjs -n 100 --no-pager | grep -E 'TELEGRAM|LEAD'`**
 
 Мало RAM на `npm run build` — добавьте swap 1–2 ГБ.
 

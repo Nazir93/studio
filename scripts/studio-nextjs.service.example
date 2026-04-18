@@ -17,7 +17,7 @@ Environment=NODE_ENV=production
 Environment=PORT=3000
 # Только localhost — снаружи доступ через системный Nginx
 Environment=HOSTNAME=127.0.0.1
-# TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID — в этом файле (заявки с сайта в Telegram)
+# NEXT_PUBLIC_* и прочее — заявки в Telegram идут из констант в src/lib/telegram.ts (не из env)
 EnvironmentFile=-/opt/studio/frontend/.env.production
 ExecStart=/usr/bin/node /opt/studio/frontend/.next/standalone/server.js
 Restart=on-failure

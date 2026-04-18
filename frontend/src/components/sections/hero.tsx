@@ -291,7 +291,7 @@ export function HeroSection() {
 
           <div className="relative z-10">
             <Link href="/services">
-              <h1 className="font-heading text-[clamp(17px,4.8vw,30px)] leading-[1.06] tracking-tight mb-4">
+              <h1 className="font-heading text-[clamp(16px,4.2vw,30px)] leading-[1.08] tracking-tight mb-4 max-w-full">
                 <span style={{ color: HERO.text }}>ВЕБ-СЕРВИСЫ</span>
                 <br />
                 <span style={{ color: HERO.textStrong }}>МОБИЛЬНЫЕ ПРИЛОЖЕНИЯ</span>

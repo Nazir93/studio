@@ -191,7 +191,11 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className={`relative flex min-h-0 w-full min-w-0 flex-1 flex-col ${gapClass}`}
+      className={cn(
+        "relative flex w-full min-w-0 flex-col",
+        gapClass,
+        pageTight ? "" : "min-h-0 flex-1"
+      )}
     >
       <div className="min-h-0 shrink-0">
         <label
@@ -284,12 +288,12 @@ export function LeadBriefForm({ sourceHint = null, onSuccess, variant = "modal" 
           Комментарий <span style={{ color: "var(--accent)" }}>*</span>
         </label>
         <textarea
-          rows={pageTight ? 4 : 4}
+          rows={pageTight ? 5 : 4}
           className={cn(
             controlSurface,
             "leading-relaxed",
             pageTight
-              ? "min-h-[7rem] max-h-[min(52dvh,22rem)] resize-y overflow-y-auto sm:min-h-[6rem] sm:max-h-[14rem] md:min-h-[10rem] md:max-h-[min(50dvh,20rem)] md:resize-y"
+              ? "min-h-[8.5rem] resize-y sm:min-h-[7.5rem] md:min-h-[11rem]"
               : "min-h-[112px] flex-1 resize-y"
           )}
           placeholder="Сроки, бюджет, ссылка на ТЗ…"

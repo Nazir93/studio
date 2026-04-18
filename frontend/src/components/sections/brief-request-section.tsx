@@ -27,10 +27,9 @@ export function BriefRequestSection() {
 
   return (
     <div
-      className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden px-3 py-2 sm:gap-1.5 sm:px-5 md:h-full md:overflow-hidden md:py-0 md:max-w-[52rem] md:px-6"
+      className="mx-auto flex w-full max-w-3xl flex-col gap-3 overflow-x-hidden px-3 py-4 sm:gap-4 sm:px-5 md:max-w-[52rem] md:px-6 md:py-6"
       style={{
-        paddingTop: "max(0.5rem, env(safe-area-inset-top))",
-        paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))",
+        paddingTop: "max(1rem, env(safe-area-inset-top))",
       }}
     >
       <header className="flex shrink-0 items-center justify-between gap-2">
@@ -59,14 +58,14 @@ export function BriefRequestSection() {
       <TerminalWindow
         titleBar={titleBar}
         scrollableContent={false}
-        className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden text-[10px] sm:text-[11px] md:flex-1"
-        innerClassName="!flex !min-h-0 !min-w-0 !flex-1 !flex-col !overflow-x-hidden !overflow-y-auto !p-2 sm:!p-3 md:!p-4"
+        className="w-full min-w-0 text-[10px] sm:text-[11px]"
+        innerClassName="!flex !flex-col !gap-1 !overflow-x-hidden !overflow-y-visible !p-2 sm:!p-3 md:!p-4"
       >
         <p className="mb-1.5 shrink-0 font-mono text-[9px] leading-tight sm:text-[10px]" style={{ color: "var(--text-subtle)" }}>
           # Тема и комментарий обязательны.
         </p>
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="min-w-0">
           <Suspense fallback={<FormFallback />}>
             <BriefFormWithSource />
           </Suspense>

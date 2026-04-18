@@ -10,7 +10,7 @@ import { ContactModal } from "../ui/contact-modal";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  /** Страница заявки (оффер): без шапки и футера; на мобильных — прокрутка всей страницы */
+  /** Страница заявки: без шапки и футера; одна прокрутка у окна браузера */
   const isBriefFullBleed = pathname === "/brief";
 
   if (isBriefFullBleed) {
@@ -18,7 +18,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <>
         <CustomCursor />
         <ContactModal />
-        <main className="relative flex min-h-[100dvh] w-full max-w-full flex-col overflow-x-hidden overflow-y-auto md:h-[100dvh] md:max-h-[100dvh] md:overflow-hidden">
+        <main className="relative flex min-h-[100dvh] w-full max-w-full flex-col overflow-x-hidden overflow-y-auto">
           {children}
         </main>
       </>

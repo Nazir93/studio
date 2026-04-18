@@ -773,7 +773,7 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
       {/* Text block 1 */}
       <TextBlock leftText={project.leftText1} rightText={project.rightText1} />
 
-      {project.showcasePair ? (
+      {project.showcasePair && !project.showcasePairAfterShowcase2 ? (
         <ShowcasePair
           leftSrc={project.showcasePair.left}
           rightSrc={project.showcasePair.right}
@@ -788,6 +788,14 @@ export function CaseContent({ project }: { project: PortfolioCase }) {
         ) : (
           <ParallaxShowcase label={project.showcaseLabel2!} dark={false} />
         )
+      ) : null}
+
+      {project.showcasePair && project.showcasePairAfterShowcase2 ? (
+        <ShowcasePair
+          leftSrc={project.showcasePair.left}
+          rightSrc={project.showcasePair.right}
+          label={project.showcasePair.label}
+        />
       ) : null}
 
       {/* Showcase 3 (optional) */}

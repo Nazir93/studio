@@ -9,6 +9,20 @@ import {
 
 export const dynamic = "force-dynamic";
 
+/** Подсказка для теста из консоли (токен задаётся только в telegram.ts, не в .env) */
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    usage:
+      "POST JSON: name, phone, email, service, message, source?, pageUrl?, honeypot? — см. leadFormSchema",
+    telegram: {
+      source: "embedded",
+      hint: "Токен и chat_id — только в frontend/src/lib/telegram.ts; переменные окружения TELEGRAM_* не читаются.",
+    },
+    browserConsoleTest: String.raw`fetch("/api/leads",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:"Тест",phone:"+79991234567",email:"test@example.com",service:"Другое",message:"Проверка отправки из консоли браузера",source:"browser-console",pageUrl:location.href})}).then(r=>r.json()).then(console.log)`,
+  });
+}
+
 const RATE_LIMIT_MAP = new Map<string, { count: number; resetAt: number }>();
 /** Лимит на IP: при частых тестах заявки «молчат» с 429 — не путать с Telegram */
 const RATE_LIMIT_MAX = 12;
@@ -76,9 +90,7 @@ export async function POST(request: NextRequest) {
       const { reason, telegramDescription } = telegramResult;
       const hint = userFacingTelegramHint(reason, telegramDescription);
       if (reason === "missing_env") {
-        console.error(
-          "[LEAD] Нет TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID в окружении процесса (standalone: проверьте путь в systemd EnvironmentFile и restart)"
-        );
+        console.error("[LEAD] Нет токена или chat_id в frontend/src/lib/telegram.ts");
       } else {
         console.error(
           "[LEAD] Telegram не доставил заявку:",
